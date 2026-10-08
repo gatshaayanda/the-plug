@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import {useEffect,useMemo,useState} from "react";
-import {getDownloadURL,ref,uploadBytes} from "firebase/storage";
 import AdminGate from "@/app/admin/admin-gate";
 import {storage} from "@/lib/firebase/client";
 import NotificationSettings from "@/components/NotificationSettings";
