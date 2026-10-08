@@ -117,7 +117,7 @@ async function remindUser(uid:string,leadMinutes:number,order:ReminderOrder,admi
   const customerName=(order.customerName||"customer").trim();
   const title=admin
     ?"Pickup in "+leadMinutes+" minutes · "+customerName
-    :"Your BOEMO pickup is in "+leadMinutes+" minutes";
+    :"Your The Plug pickup is in "+leadMinutes+" minutes";
   const body=admin
     ?customerName+" · "+items+" · "+timeText
     :"Hi "+customerName.split(/\s+/)[0]+", your pickup is at "+timeText+". "+items;
