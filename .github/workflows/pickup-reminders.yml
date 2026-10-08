@@ -1,4 +1,4 @@
-name: BOEMO pickup reminders
+name: The Plug pickup reminders
 
 on:
   schedule:
@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: boemo-pickup-reminders
+  group: the-plug-pickup-reminders
   cancel-in-progress: false
 
 jobs:
@@ -20,10 +20,10 @@ jobs:
       - name: Call production reminder endpoint
         env:
           BOEMO_REMINDER_CRON_SECRET: ${{ secrets.BOEMO_REMINDER_CRON_SECRET }}
-          BOEMO_PUBLIC_URL: https://boemo-joos-food-deals.vercel.app
+          THE_PLUG_PUBLIC_URL: https://the-plug-pearl.vercel.app
         run: |
           test -n "$BOEMO_REMINDER_CRON_SECRET"
           curl --fail-with-body --silent --show-error \
             -X POST \
             -H "Authorization: Bearer $BOEMO_REMINDER_CRON_SECRET" \
-            "$BOEMO_PUBLIC_URL/api/notifications/reminders"
+            $THE_PLUG_PUBLIC_URL/api/notifications/reminders"
