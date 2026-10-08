@@ -188,3 +188,4 @@ export default function PwaRegister() {
     {updateReady && <div className="pwaUpdate" role="status" aria-live="polite"><div><strong>The Plug update is ready</strong><span>Refresh when you are ready.</span></div><button type="button" className="button buttonPrimary" onClick={applyUpdate}>Refresh</button></div>}
   </>;
 }
+
