@@ -167,18 +167,6 @@ export default function PwaRegister() {
       <div><strong>Install {APP_NAME}</strong><span>Get the app on this device for faster access.</span></div>
       <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={() => void install()}>Install app</button><button type="button" onClick={dismissInstall}>Not now</button></div>
     </div>
-  ) : installState === "embedded" ? (
-    <div style={embeddedInstallStyle} role="dialog" aria-modal="true" aria-label="Open The Plug in your browser">
-      <div className="pwaInstallInfo" style={{...installShellStyle, position: "relative", left: "auto", right: "auto", bottom: "auto", width: "100%", maxWidth: 520, margin: 0}}>
-        <div>
-          <strong><span aria-hidden="true">🌐 </span>OPEN THE PLUG IN YOUR BROWSER</strong>
-          <span>You&apos;re viewing The Plug inside another app. The first step is to tap the <b>⋮ three-dot menu</b>, then choose <b>Open in browser</b> or <b>Open in Chrome</b>.</span>
-        </div>
-        <div className="pwaInstallActions" style={{display:"flex",justifyContent:"flex-end"}}>
-          <button type="button" onClick={dismissInstall}>GOT IT</button>
-        </div>
-      </div>
-    </div>
   ) : installState === "ios" ? (
     <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Add ${APP_NAME} to your Home Screen`}>
       <div><strong>Add {APP_NAME} to your Home Screen</strong><span>In Safari, tap Share, choose <b>Add to Home Screen</b>, then tap Add.</span></div>
