@@ -1,5 +1,7 @@
 "use client";
 
+// Keep embedded-browser install enforcement explicit at the top-level PWA boundary.
+
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { getIdToken, onAuthStateChanged } from "firebase/auth";
