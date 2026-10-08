@@ -159,15 +159,23 @@ export default function PwaRegister() {
   }
 
   const installShellStyle: CSSProperties = { position: "fixed", left: 16, right: 16, bottom: 16, zIndex: 1000, maxWidth: 720, margin: "0 auto", padding: 16, borderRadius: 18, background: "#FFFFFF", color: "#111318", boxShadow: "0 12px 40px rgba(0,0,0,.18)", border: "1px solid rgba(17,19,24,.12)" };
+  const embeddedInstallStyle: CSSProperties = { position: "fixed", inset: 0, zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(0,0,0,.72)", backdropFilter: "blur(4px)" };
   const installCard = installState === "native" && installPrompt ? (
     <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Install ${APP_NAME}`}>
       <div><strong>Install {APP_NAME}</strong><span>Get the app on this device for faster access.</span></div>
       <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={() => void install()}>Install app</button><button type="button" onClick={dismissInstall}>Not now</button></div>
     </div>
   ) : installState === "embedded" ? (
-    <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label="Open The Plug in your browser">
-      <div><strong><span aria-hidden="true">🌐 </span>OPEN THE PLUG IN YOUR BROWSER</strong><span>You&apos;re viewing The Plug inside another app. Open it in your browser for the full experience.</span></div>
-      <div className="pwaInstallActions" style={{display:"flex",justifyContent:"flex-end"}}><button type="button" style={{background:"#0866FF",color:"#fff",width:"100%"}} onClick={openBrowser}>{embeddedAndroid ? "Open in Chrome" : "Open in browser"}</button></div>
+    <div style={embeddedInstallStyle} role="dialog" aria-modal="true" aria-label="Open The Plug in your browser">
+      <div className="pwaInstallInfo" style={{...installShellStyle, position: "relative", left: "auto", right: "auto", bottom: "auto", width: "100%", maxWidth: 520, margin: 0}}>
+        <div>
+          <strong><span aria-hidden="true">🌐 </span>OPEN THE PLUG IN YOUR BROWSER</strong>
+          <span>You&apos;re viewing The Plug inside another app. To use The Plug, first tap the <b>⋮ three-dot menu</b> and choose <b>Open in browser</b> or <b>Open in Chrome</b>.</span>
+        </div>
+        <div className="pwaInstallActions" style={{display:"flex",justifyContent:"flex-end"}}>
+          <button type="button" onClick={dismissInstall}>Cancel</button>
+        </div>
+      </div>
     </div>
   ) : installState === "ios" ? (
     <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Add ${APP_NAME} to your Home Screen`}>
