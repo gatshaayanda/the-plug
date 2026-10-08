@@ -105,7 +105,7 @@ export function downloadReceiptPdf(order:ReceiptOrder){
       content.push("0.043 0.043 0.047 rg");
     }
 
-    const x=first&&raw==="BOEMO"?50:50;
+    const x=first&&raw==="THE PLUG"?50:50;
     content.push("BT /F1 "+size+" Tf "+x+" "+y+" Td ("+escapePdf(raw)+") Tj ET");
     first=false;
     y-=size+9;
