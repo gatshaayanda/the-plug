@@ -158,25 +158,25 @@ export default function PwaRegister() {
     updateReady.postMessage({ type: "SKIP_WAITING" });
   }
 
-  const installCard = installState === "native" && installPrompt ? (
-    <div className="pwaInstallInfo" role="dialog" aria-label={`Install ${APP_NAME}`}>
+  const installShellStyle: React.CSSProperties = { position: "fixed", left: 16, right: 16, bottom: 16, zIndex: 1000, maxWidth: 720, margin: "0 auto", padding: 16, borderRadius: 18, background: "#FFFFFF", color: "#111318", boxShadow: "0 12px 40px rgba(0,0,0,.18)", border: "1px solid rgba(17,19,24,.12)" };\n  const installCard = installState === "native" && installPrompt ? (
+    <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Install ${APP_NAME}`}>
       <div><strong>Install {APP_NAME}</strong><span>Get the app on this device for faster access.</span></div>
       <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={() => void install()}>Install app</button><button type="button" onClick={dismissInstall}>Not now</button></div>
     </div>
   ) : installState === "embedded" ? (
-    <div className="pwaInstallInfo" role="dialog" aria-label="Open The Plug in your browser">
+    <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label="Open The Plug in your browser">
       <div><strong>Open {APP_NAME} in your browser</strong><span>You&apos;re viewing The Plug inside another app. Open it in Chrome to get the full app experience and install it.</span></div>
       <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={openBrowser}>{embeddedAndroid ? "Open in Chrome" : "Open in browser"}</button><button type="button" onClick={dismissInstall}>Continue here</button></div>
     </div>
   ) : installState === "ios" ? (
-    <div className="pwaInstallInfo" role="dialog" aria-label={`Add ${APP_NAME} to your Home Screen`}>
+    <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Add ${APP_NAME} to your Home Screen`}>
       <div><strong>Add {APP_NAME} to your Home Screen</strong><span>In Safari, tap Share, choose <b>Add to Home Screen</b>, then tap Add.</span></div>
       <div className="pwaInstallActions" style={{display:"flex",justifyContent:"flex-end"}}><button type="button" onClick={dismissInstall}>Got it</button></div>
     </div>
   ) : installState === "browser-menu" ? (
-    <div className="pwaInstallInfo" role="dialog" aria-label={`Install ${APP_NAME}`}>
-      <div><strong>Install {APP_NAME}</strong><span>Your browser can install this app from its menu. Look for <b>Install app</b> or <b>Add to Home screen</b>.</span></div>
-      <div className="pwaInstallActions"><button type="button" className="pwaInstallDismiss" onClick={dismissInstall}>Got it</button></div>
+    <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Install ${APP_NAME}`}>
+      <div><strong>Install {APP_NAME}</strong><span>Your browser has not given the site a one-tap install prompt. Open your browser menu and choose <b>Install app</b> or <b>Add to Home screen</b>.</span></div>
+      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={() => { window.scrollTo({top:0,behavior:"smooth"}); }}>Install The Plug</button><button type="button" onClick={dismissInstall}>Not now</button></div>
     </div>
   ) : null;
 
