@@ -175,7 +175,7 @@ export default function PwaRegister() {
           <span>You&apos;re viewing The Plug inside another app. To use The Plug, first tap the <b>⋮ three-dot menu</b> and choose <b>Open in browser</b> or <b>Open in Chrome</b>.</span>
         </div>
         <div className="pwaInstallActions" style={{display:"flex",justifyContent:"flex-end"}}>
-          <button type="button" onClick={dismissInstall}>Cancel</button>
+          <button type="button" onClick={dismissInstall}>I&apos;LL OPEN THE BROWSER</button>
         </div>
       </div>
     </div>
