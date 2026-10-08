@@ -10,7 +10,7 @@ export type PaymentStatus="unpaid"|"paid"|"partial";
 export type OrderItem={name:string;price:number;quantity:number};
 export type CustomerProfile={uid:string;name:string;email:string;phone:string;preferredDeliveryLocation:string;notes:string;createdAt:string;updatedAt:string};
 export type FoodOrder={id:string;customerId?:string;createdAt:string;customerName:string;phone:string;mode:"pickup"|"delivery";scheduledFor:string;deliveryLocation:string;instructions:string;items:OrderItem[];total:number;status:OrderStatus;paymentStatus?:PaymentStatus;paymentMethod?:PaymentMethod;amountPaid?:number};
-export type MenuItem={id:string;name:string;price:number;friendPrice?:number;category:string;description:string;available:boolean;preparationMinutes:number;sortOrder:number;imageUrl?:string;section?:"daily"|"deal";days?:string[]};
+export type MenuItem={id:string;name:string;price:number;friendPrice?:number;category:string;description:string;available:boolean;preparationMinutes:number;sortOrder:number;imageUrl?:string;section?:"daily"|"deal";days?:string[];brand?:string;productType?:string;sizes?:string[];colors?:string[];sourceUrl?:string};
 export type BusinessSettings={id:string;location:string;hours:string;locationNote:string;updatedAt:string};export type NotificationPreferences={enabled:boolean;leadMinutes:number;updatedAt:string};
 export type NotificationToken={token:string;admin:boolean;updatedAt:string};
 export type DailyReconciliation={date:string;actualCash:number;actualETransfer:number;actualOther:number;notes:string;updatedAt:string};
