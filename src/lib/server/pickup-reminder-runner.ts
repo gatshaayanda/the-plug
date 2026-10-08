@@ -122,7 +122,7 @@ async function remindUser(uid:string,leadMinutes:number,order:ReminderOrder,admi
     ?customerName+" · "+items+" · "+timeText
     :"Hi "+customerName.split(/\s+/)[0]+", your pickup is at "+timeText+". "+items;
   const link=admin?"/admin":"/account";
-  const publicUrl=process.env.BOEMO_PUBLIC_URL||"https://boemo-joos-food-deals.vercel.app";
+  const publicUrl=process.env.NEXT_PUBLIC_BASE_URL||"https://the-plug-pearl.vercel.app";
 
   const deliveryData={
     orderId:order.id,
@@ -141,9 +141,9 @@ async function remindUser(uid:string,leadMinutes:number,order:ReminderOrder,admi
       webpush:{
         fcmOptions:{link:publicUrl+link},
         notification:{
-          tag:"boemo-pickup-"+order.id,
-          icon:"/icon.svg",
-          badge:"/icon.svg"
+          tag:"the-plug-pickup-"+order.id,
+          icon:"/plug-icon.svg",
+          badge:"/plug-icon.svg"
         }
       }
     });
@@ -163,7 +163,7 @@ async function remindUser(uid:string,leadMinutes:number,order:ReminderOrder,admi
 
 async function runPickupReminders():Promise<{orders:number;reminders:number;sent:number}>{
   const now=Date.now();
-  // Do not range-query scheduledFor as a string. BOEMO has deliberately supported
+  // Do not range-query scheduledFor as a string. The Plug supports
   // both legacy datetime-local values and explicit +02:00/Z values, and those textual
   // representations are not safely comparable as Firestore strings. Read the small
   // pickup queue and compare the parsed instants in Gaborone/UTC time instead.
@@ -230,7 +230,7 @@ async function runPickupReminders():Promise<{orders:number;reminders:number;sent
   }
 
   const summary={orders:ordersSnapshot.size,reminders,sent};
-  console.log("BOEMO pickup reminders:",JSON.stringify(summary));
+  console.log("The Plug pickup reminders:",JSON.stringify(summary));
   return summary;
 }
 
@@ -242,17 +242,17 @@ async function sendTestNotification(uid:string,deviceToken:string):Promise<Notif
   const displayName=(userRecord.displayName||"").trim();
   const firstName=displayName.split(/\s+/)[0]||"there";
   const isKitchenAdmin=adminSnapshot.exists&&["owner","staff"].includes(String(adminSnapshot.data()?.role||"").toLowerCase());
-  const title=isKitchenAdmin?"BOEMO kitchen alerts are on":"BOEMO notifications are on";
+  const title=isKitchenAdmin?"The Plug operations alerts are on":"The Plug notifications are on";
   const body=isKitchenAdmin
     ? "This device is ready for new-order and pickup alerts."
-    : "Hi "+firstName+", this device is ready for your BOEMO pickup reminders.";
+    : "Hi "+firstName+", this device is ready for your The Plug pickup reminders.";
   const link=isKitchenAdmin?"/admin":"/account";
   const result=await sendToDeviceToken(uid,deviceToken,{
     notification:{title,body},
     data:{title,body,link,test:"true"},
     webpush:{
-      fcmOptions:{link:(process.env.BOEMO_PUBLIC_URL||"https://boemo-joos-food-deals.vercel.app")+link},
-      notification:{tag:"boemo-test-notification",icon:"/icon.svg",badge:"/icon.svg"}
+      fcmOptions:{link:(process.env.NEXT_PUBLIC_BASE_URL||"https://the-plug-pearl.vercel.app")+link},
+      notification:{tag:"the-plug-test-notification",icon:"/plug-icon.svg",badge:"/plug-icon.svg"}
     }
   });
   if(!result.sent)throw new Error(result.reason||"no-token");
@@ -273,16 +273,16 @@ async function sendNewOrderNotifications(orderId:string,customerUid:string):Prom
   const customerName=(order.customerName||"customer").trim();
   const title="New order · "+customerName;
   const body=items+(typeof order.total==="number"?" · P"+order.total.toFixed(2):"")+" · "+(order.mode==="delivery"?"Delivery":"Pickup")+" "+timeText;
-  const publicUrl=process.env.BOEMO_PUBLIC_URL||"https://boemo-joos-food-deals.vercel.app";
+  const publicUrl=process.env.NEXT_PUBLIC_BASE_URL||"https://the-plug-pearl.vercel.app";
   for(const adminDoc of adminsSnapshot.docs){
     const uid=adminDoc.id; const pref=(await db.collection("notificationPreferences").doc(uid).get()).data();
     if(!pref?.enabled)continue; admins++;
     const jobId="new-order_"+orderId+"_"+uid; const deliveryData={orderId,recipientUid:uid,type:"new-order",admin:true};
     if(!await claimDelivery(jobId,deliveryData))continue;
     try{
-      const result=await sendToUser(uid,{notification:{title,body},data:{title,body,link:"/admin",orderId},webpush:{fcmOptions:{link:publicUrl+"/admin"},notification:{tag:"boemo-new-order-"+orderId,icon:"/icon.svg",badge:"/icon.svg"}}});
+      const result=await sendToUser(uid,{notification:{title,body},data:{title,body,link:"/admin",orderId},webpush:{fcmOptions:{link:publicUrl+"/admin"},notification:{tag:"the-plug-new-order-"+orderId,icon:"/plug-icon.svg",badge:"/plug-icon.svg"}}});
       if(result.sent){await markSent(jobId,deliveryData);sent++;}else await releaseDelivery(jobId);
-    }catch(error){await releaseDelivery(jobId).catch(()=>{});console.error("BOEMO new-order notification failed for "+uid+":",error);}
+    }catch(error){await releaseDelivery(jobId).catch(()=>{});console.error("The Plug new-order notification failed for "+uid+":",error);}
   }
   return {sent,admins};
 }
@@ -312,20 +312,20 @@ async function sendConversationMessageNotification(conversationId:string,message
     if(customerId)recipientUids.push(customerId);
   }
   const customerName=String(conversation.customerName||"customer").trim();
-  const title=senderRole==="customer"?customerName+" sent a message":"BOEMO replied to you";
+  const title=senderRole==="customer"?customerName+" sent a message":"The Plug replied to you";
   const preview=String(message.text||"Attachment sent");
   const body=preview.length>120?preview.slice(0,117)+"…":preview;
   const link=senderRole==="customer"?"/admin":"/account";
-  const publicUrl=process.env.BOEMO_PUBLIC_URL||"https://boemo-joos-food-deals.vercel.app";
+  const publicUrl=process.env.NEXT_PUBLIC_BASE_URL||"https://the-plug-pearl.vercel.app";
   let sent=0;
   for(const uid of recipientUids){
     const jobId="conversation-message_"+conversationId+"_"+messageId+"_"+uid;
     const deliveryData={conversationId,messageId,recipientUid:uid,type:"conversation-message"};
     if(!await claimDelivery(jobId,deliveryData))continue;
     try{
-      const result=await sendToUser(uid,{notification:{title,body},data:{title,body,link,conversationId,messageId},webpush:{fcmOptions:{link:publicUrl+link},notification:{tag:"boemo-conversation-"+conversationId,icon:"/icon.svg",badge:"/icon.svg"}}});
+      const result=await sendToUser(uid,{notification:{title,body},data:{title,body,link,conversationId,messageId},webpush:{fcmOptions:{link:publicUrl+link},notification:{tag:"the-plug-conversation-"+conversationId,icon:"/plug-icon.svg",badge:"/plug-icon.svg"}}});
       if(result.sent){await markSent(jobId,deliveryData);sent++;}else await releaseDelivery(jobId);
-    }catch(error){await releaseDelivery(jobId).catch(()=>{});console.error("BOEMO conversation notification failed for "+uid+":",error);}
+    }catch(error){await releaseDelivery(jobId).catch(()=>{});console.error("The Plug conversation notification failed for "+uid+":",error);}
   }
   return {sent,recipient:senderRole==="customer"?"kitchen":"customer"};
 }
