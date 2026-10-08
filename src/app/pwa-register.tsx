@@ -166,8 +166,8 @@ export default function PwaRegister() {
     </div>
   ) : installState === "embedded" ? (
     <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label="Open The Plug in your browser">
-      <div><strong>Open {APP_NAME} in your browser</strong><span>You&apos;re viewing The Plug inside another app. Open it in Chrome to get the full app experience and install it.</span></div>
-      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={openBrowser}>{embeddedAndroid ? "Open in Chrome" : "Open in browser"}</button><button type="button" onClick={dismissInstall}>Continue here</button></div>
+      <div><strong><span aria-hidden="true">🌐 </span>OPEN THE PLUG IN YOUR BROWSER</strong><span>You&apos;re viewing The Plug inside another app. Open it in your browser for the full experience.</span></div>
+      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={openBrowser}>{embeddedAndroid ? "Open in Chrome" : "Open in browser"}</button><button type="button" onClick={dismissInstall}>Not now</button></div>
     </div>
   ) : installState === "ios" ? (
     <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Add ${APP_NAME} to your Home Screen`}>
@@ -176,8 +176,8 @@ export default function PwaRegister() {
     </div>
   ) : installState === "browser-menu" ? (
     <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Install ${APP_NAME}`}>
-      <div><strong>Install {APP_NAME}</strong><span>Your browser has not given the site a one-tap install prompt. Open your browser menu and choose <b>Install app</b> or <b>Add to Home screen</b>.</span></div>
-      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={() => window.alert("Open your browser menu (⋮) and choose Install app or Add to Home screen.")}>How to install</button><button type="button" onClick={dismissInstall}>Not now</button></div>
+      <div><strong>Install {APP_NAME}</strong><span>Open your browser menu and look for <b>Install app</b>.</span></div>
+      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={dismissInstall}>Got it</button></div>
     </div>
   ) : null;
 
