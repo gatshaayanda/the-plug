@@ -172,7 +172,7 @@ export default function PwaRegister() {
       <div className="pwaInstallInfo" style={{...installShellStyle, position: "relative", left: "auto", right: "auto", bottom: "auto", width: "100%", maxWidth: 520, margin: 0}}>
         <div>
           <strong><span aria-hidden="true">🌐 </span>OPEN THE PLUG IN YOUR BROWSER</strong>
-          <span>You&apos;re viewing The Plug inside another app. To use The Plug, first tap the <b>⋮ three-dot menu</b> and choose <b>Open in browser</b> or <b>Open in Chrome</b>.</span>
+          <span>You&apos;re viewing The Plug inside another app. The first step is to tap the <b>⋮ three-dot menu</b>, then choose <b>Open in browser</b> or <b>Open in Chrome</b>.</span>
         </div>
         <div className="pwaInstallActions" style={{display:"flex",justifyContent:"flex-end"}}>
           <button type="button" onClick={dismissInstall}>GOT IT</button>
@@ -198,4 +198,3 @@ export default function PwaRegister() {
     {updateReady && <div className="pwaUpdate" role="status" aria-live="polite"><div><strong>The Plug update is ready</strong><span>Refresh when you are ready.</span></div><button type="button" className="button buttonPrimary" onClick={applyUpdate}>Refresh</button></div>}
   </>;
 }
-
