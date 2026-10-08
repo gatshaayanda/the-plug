@@ -31,6 +31,6 @@ export async function POST(request:Request){
     return NextResponse.json(result);
   }catch(error){
     console.error("The Plug new-order notification failed:",error);
-    return NextResponse.json({sent:0,error:error instanceof Error?error.message:"The Plug could not notify the kitchen."},{status:400});
+    return NextResponse.json({sent:0,error:error instanceof Error?error.message:"The Plug could not notify operations."},{status:400});
   }
 }
