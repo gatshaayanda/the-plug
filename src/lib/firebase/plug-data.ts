@@ -39,6 +39,7 @@ export type PlugRequest = {
   deliveryMethod?:"delivery"|"collection";
   deliveryDetails?:string;
   adminNote?:string;
+  customerApprovedAt?:string;
 };
 
 const requests = collection(db,"sourcingRequests");
