@@ -4,52 +4,183 @@ import { useEffect, useRef, useState } from "react";
 import { getIdToken, onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase/client";
 
-type InstallPromptEvent = Event & { prompt:()=>Promise<void>; userChoice:Promise<{outcome:"accepted"|"dismissed";platform:string}> };
+type InstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+};
+type InstallState = "hidden" | "native" | "embedded" | "ios" | "browser-menu";
+
+const APP_NAME = "The Plug";
+
+function environment() {
+  const ua = navigator.userAgent || "";
+  const standalone = window.matchMedia("(display-mode: standalone)").matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
+  const ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const android = /Android/i.test(ua);
+  const embedded = /WhatsApp|Instagram|FBAN|FBAV|Messenger|Line\/|Twitter|TikTok|Snapchat/i.test(ua) ||
+    (/Android/i.test(ua) && /; wv\)/i.test(ua));
+  return { standalone, ios, android, embedded };
+}
 
 export default function PwaRegister() {
-  const [offline,setOffline]=useState(false),[reconnecting,setReconnecting]=useState(false),[installPrompt,setInstallPrompt]=useState<InstallPromptEvent|null>(null),[updateReady,setUpdateReady]=useState<ServiceWorker|null>(null),[installInfo,setInstallInfo]=useState(false);
-  const reloadForUpdate=useRef(false);
+  const [offline, setOffline] = useState(false);
+  const [reconnecting, setReconnecting] = useState(false);
+  const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
+  const [installState, setInstallState] = useState<InstallState>("hidden");
+  const [updateReady, setUpdateReady] = useState<ServiceWorker | null>(null);
+  const reloadForUpdate = useRef(false);
 
-  useEffect(()=>{
+  useEffect(() => {
     setOffline(!navigator.onLine);
-    const retryPendingOrderNotifications=async()=>{
-      const user=auth.currentUser;if(!user)return;
-      const idToken=await getIdToken(user).catch(()=>null);if(!idToken)return;
-      const pendingKeys=Object.keys(localStorage).filter(key=>key.startsWith("plug-pending-order-notification-"));
-      for(const key of pendingKeys){
-        const orderId=key.replace("plug-pending-order-notification-","");
-        try{
-          const response=await fetch("/api/notifications/order-created",{method:"POST",headers:{Authorization:"Bearer "+idToken,"Content-Type":"application/json"},body:JSON.stringify({orderId})});
-          if(response.ok)localStorage.removeItem(key);
-        }catch{}
+    const env = environment();
+
+    const retryPendingOrderNotifications = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      const idToken = await getIdToken(user).catch(() => null);
+      if (!idToken) return;
+      const pendingKeys = Object.keys(localStorage).filter(key => key.startsWith("plug-pending-order-notification-"));
+      for (const key of pendingKeys) {
+        const orderId = key.replace("plug-pending-order-notification-", "");
+        try {
+          const response = await fetch("/api/notifications/order-created", {
+            method: "POST",
+            headers: { Authorization: "Bearer " + idToken, "Content-Type": "application/json" },
+            body: JSON.stringify({ orderId })
+          });
+          if (response.ok) localStorage.removeItem(key);
+        } catch {}
       }
     };
-    const online=()=>{setOffline(false);setReconnecting(true);window.setTimeout(()=>{setReconnecting(false);void retryPendingOrderNotifications()},1200)};
-    const off=()=>{setReconnecting(false);setOffline(true)};
-    const install=(event:Event)=>{event.preventDefault();setInstallPrompt(event as InstallPromptEvent)};
-    window.addEventListener("online",online);window.addEventListener("offline",off);window.addEventListener("beforeinstallprompt",install);
 
-    let registration:ServiceWorkerRegistration|null=null;
-    const inspect=()=>{if(registration?.waiting&&navigator.serviceWorker.controller)setUpdateReady(registration.waiting)};
-    const register=async()=>{
-      if(!("serviceWorker" in navigator))return;
-      try{
-        registration=await navigator.serviceWorker.register("/sw.js");
-        inspect();
-        registration.addEventListener("updatefound",()=>{const worker=registration?.installing;if(!worker)return;worker.addEventListener("statechange",inspect)});
-        await registration.update();inspect();
-      }catch{}
+    const online = () => {
+      setOffline(false);
+      setReconnecting(true);
+      window.setTimeout(() => {
+        setReconnecting(false);
+        void retryPendingOrderNotifications();
+      }, 1200);
     };
+    const off = () => {
+      setReconnecting(false);
+      setOffline(true);
+    };
+
+    const install = (event: Event) => {
+      event.preventDefault();
+      setInstallPrompt(event as InstallPromptEvent);
+      if (!env.standalone && !env.embedded && !env.ios) setInstallState("native");
+    };
+
+    window.addEventListener("online", online);
+    window.addEventListener("offline", off);
+    window.addEventListener("beforeinstallprompt", install);
+
+    if (env.standalone) {
+      setInstallState("hidden");
+    } else if (env.embedded) {
+      setInstallState("embedded");
+    } else if (env.ios) {
+      setInstallState("ios");
+    }
+
+    const installTimer = window.setTimeout(() => {
+      if (env.standalone) return;
+      if (sessionStorage.getItem("theplug-install-dismissed") === "1") return;
+      setInstallState(current => current === "native" || current === "embedded" || current === "ios" ? current : "browser-menu");
+    }, 1800);
+
+    let registration: ServiceWorkerRegistration | null = null;
+    const inspect = () => {
+      if (registration?.waiting && navigator.serviceWorker.controller) setUpdateReady(registration.waiting);
+    };
+    const register = async () => {
+      if (!("serviceWorker" in navigator)) return;
+      try {
+        registration = await navigator.serviceWorker.register("/sw.js");
+        inspect();
+        registration.addEventListener("updatefound", () => {
+          const worker = registration?.installing;
+          if (!worker) return;
+          worker.addEventListener("statechange", inspect);
+        });
+        await registration.update();
+        inspect();
+      } catch {}
+    };
+
     void register();
     void retryPendingOrderNotifications();
-    const stopPendingAuth=onAuthStateChanged(auth,()=>{void retryPendingOrderNotifications()});
-    const controllerChange=()=>{if(reloadForUpdate.current)window.location.reload()};
-    navigator.serviceWorker?.addEventListener("controllerchange",controllerChange);
-    return()=>{window.removeEventListener("online",online);window.removeEventListener("offline",off);window.removeEventListener("beforeinstallprompt",install);navigator.serviceWorker?.removeEventListener("controllerchange",controllerChange);stopPendingAuth()};
-  },[]);
+    const stopPendingAuth = onAuthStateChanged(auth, () => { void retryPendingOrderNotifications(); });
+    const controllerChange = () => { if (reloadForUpdate.current) window.location.reload(); };
+    navigator.serviceWorker?.addEventListener("controllerchange", controllerChange);
 
-  async function install(){if(!installPrompt){setInstallInfo(true);return}await installPrompt.prompt();await installPrompt.userChoice;setInstallPrompt(null)}
-  function applyUpdate(){if(!updateReady)return;reloadForUpdate.current=true;updateReady.postMessage({type:"SKIP_WAITING"})}
+    return () => {
+      window.clearTimeout(installTimer);
+      window.removeEventListener("online", online);
+      window.removeEventListener("offline", off);
+      window.removeEventListener("beforeinstallprompt", install);
+      navigator.serviceWorker?.removeEventListener("controllerchange", controllerChange);
+      stopPendingAuth();
+    };
+  }, []);
 
-  return <>{offline&&<div className="offlineBanner" role="status" aria-live="polite"><span aria-hidden="true">⚡</span> Offline · The Plug is still being built, but this device can keep the app shell available. Requests may wait for reconnection.</div>}{!offline&&reconnecting&&<div className="offlineBanner reconnectingBanner" role="status" aria-live="polite"><span aria-hidden="true">↻</span> Reconnected · The Plug is syncing and checking for the latest information.</div>}{(installPrompt||installInfo)&&<button className="pwaInstall" type="button" onClick={()=>void install()}><span aria-hidden="true">✦</span> Install The Plug</button>}{updateReady&&<div className="pwaUpdate" role="status" aria-live="polite"><div><strong>The Plug update is ready</strong><span>Refresh when you are ready.</span></div><button type="button" className="button buttonPrimary" onClick={applyUpdate}>Refresh</button></div>}</>;
+  async function install() {
+    if (!installPrompt) return;
+    await installPrompt.prompt();
+    await installPrompt.userChoice;
+    setInstallPrompt(null);
+    setInstallState("hidden");
+  }
+
+  function dismissInstall() {
+    sessionStorage.setItem("theplug-install-dismissed", "1");
+    setInstallState("hidden");
+  }
+
+  function openBrowser() {
+    const url = window.location.href;
+    const env = environment();
+    if (env.android) {
+      window.location.href = "intent://" + url.replace(/^https?:\/\//, "") + "#Intent;scheme=https;package=com.android.chrome;end";
+      window.setTimeout(() => window.open(url, "_blank", "noopener,noreferrer"), 700);
+      return;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+
+  function applyUpdate() {
+    if (!updateReady) return;
+    reloadForUpdate.current = true;
+    updateReady.postMessage({ type: "SKIP_WAITING" });
+  }
+
+  const installCard = installState === "native" && installPrompt ? (
+    <div className="pwaInstallInfo" role="dialog" aria-label={`Install ${APP_NAME}`}>
+      <div><strong>Install {APP_NAME}</strong><span>Get the app on this device for faster access.</span></div>
+      <div className="pwaInstallActions"><button type="button" className="pwaInstallPrimary" onClick={() => void install()}>Install app</button><button type="button" className="pwaInstallDismiss" onClick={dismissInstall}>Not now</button></div>
+    </div>
+  ) : installState === "embedded" ? (
+    <div className="pwaInstallInfo" role="dialog" aria-label="Open The Plug in your browser">
+      <div><strong>Open {APP_NAME} in your browser</strong><span>You're viewing The Plug inside another app. Open it in Chrome to get the full app experience and install it.</span></div>
+      <div className="pwaInstallActions"><button type="button" className="pwaInstallPrimary" onClick={openBrowser}>{environment().android ? "Open in Chrome" : "Open in browser"}</button><button type="button" className="pwaInstallDismiss" onClick={dismissInstall}>Continue here</button></div>
+    </div>
+  ) : installState === "ios" ? (
+    <div className="pwaInstallInfo" role="dialog" aria-label={`Add ${APP_NAME} to your Home Screen`}>
+      <div><strong>Add {APP_NAME} to your Home Screen</strong><span>In Safari, tap Share, choose <b>Add to Home Screen</b>, then tap Add.</span></div>
+      <div className="pwaInstallActions"><button type="button" className="pwaInstallDismiss" onClick={dismissInstall}>Got it</button></div>
+    </div>
+  ) : installState === "browser-menu" ? (
+    <div className="pwaInstallInfo" role="dialog" aria-label={`Install ${APP_NAME}`}>
+      <div><strong>Install {APP_NAME}</strong><span>Your browser can install this app from its menu. Look for <b>Install app</b> or <b>Add to Home screen</b>.</span></div>
+      <div className="pwaInstallActions"><button type="button" className="pwaInstallDismiss" onClick={dismissInstall}>Got it</button></div>
+    </div>
+  ) : null;
+
+  return <>
+    {offline && <div className="offlineBanner" role="status" aria-live="polite"><span aria-hidden="true">⚡</span> Offline · The Plug is still being built, but this device can keep the app shell available. Requests may wait for reconnection.</div>}
+    {!offline && reconnecting && <div className="offlineBanner reconnectingBanner" role="status" aria-live="polite"><span aria-hidden="true">↻</span> Reconnected · The Plug is syncing and checking for the latest information.</div>}
+    {installCard}
+    {updateReady && <div className="pwaUpdate" role="status" aria-live="polite"><div><strong>The Plug update is ready</strong><span>Refresh when you are ready.</span></div><button type="button" className="button buttonPrimary" onClick={applyUpdate}>Refresh</button></div>}
+  </>;
 }
