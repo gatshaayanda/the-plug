@@ -59,3 +59,21 @@ The BOEMO foundation commit remains the recovery source for infrastructure behav
 The Plug must never use BOEMO's Firebase project, credentials, service-worker config, rules deployment target or production data. The foundation was copied for code architecture only. A dedicated The Plug Firebase project must be provisioned before production auth, Firestore, Storage or FCM testing. Until then, environment placeholders remain blank and push notifications are not claimed as live.
 
 Current Firebase Web guidance requires HTTPS, correct service-worker setup and web push credentials for FCM. The server notification path can remain Next.js/Vercel + Firebase Admin without Firebase Cloud Functions.
+
+## Operational customer flow checkpoint
+The customer-facing model is now a sourcing workflow, not a food-order workflow:
+- Browse catalogue or start a sourcing request.
+- Guest submits product/name/link or screenshot, size, colour, contact and notes.
+- A structured `sourcingRequests` record is created and linked to the existing private conversation system.
+- Frank's admin queue manages: New Request → Quote Ready → Awaiting Deposit → Deposit Received → Sourcing → In Transit → Ready → Delivered/Collected → Cancelled.
+- Frank records quote, 50% deposit required/received, sourcing expectation, fulfilment method/details and customer-facing note.
+- Customer can track the private request from My The Plug and a dedicated request route.
+- Status/quote updates can trigger customer notifications when the dedicated Firebase project and FCM credentials are configured.
+- If notification infrastructure is unavailable, the request remains the source of truth and WhatsApp is the explicit fallback.
+
+## Build-state fallback language
+- Explain that The Plug is still being built/connected where relevant.
+- Never claim a notification was sent if it was not confirmed.
+- Never claim a request reached Frank if the Firestore write was not confirmed.
+- Offer WhatsApp `+267 76 411 150` as the reliable direct fallback.
+- Offline messaging must distinguish cached/app-shell availability from a request actually reaching Frank.
