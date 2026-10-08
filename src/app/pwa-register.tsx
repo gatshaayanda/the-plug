@@ -13,6 +13,7 @@ type InstallState = "hidden" | "native" | "embedded" | "ios" | "browser-menu";
 const APP_NAME = "The Plug";
 
 function environment() {
+  if (typeof window === "undefined") return { standalone: true, ios: false, android: false, embedded: false };
   const ua = navigator.userAgent || "";
   const standalone = window.matchMedia("(display-mode: standalone)").matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
   const ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
@@ -28,11 +29,13 @@ export default function PwaRegister() {
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
   const [installState, setInstallState] = useState<InstallState>("hidden");
   const [updateReady, setUpdateReady] = useState<ServiceWorker | null>(null);
+  const [embeddedAndroid, setEmbeddedAndroid] = useState(false);
   const reloadForUpdate = useRef(false);
 
   useEffect(() => {
     setOffline(!navigator.onLine);
     const env = environment();
+    setEmbeddedAndroid(env.embedded && env.android);
 
     const retryPendingOrderNotifications = async () => {
       const user = auth.currentUser;
@@ -158,17 +161,17 @@ export default function PwaRegister() {
   const installCard = installState === "native" && installPrompt ? (
     <div className="pwaInstallInfo" role="dialog" aria-label={`Install ${APP_NAME}`}>
       <div><strong>Install {APP_NAME}</strong><span>Get the app on this device for faster access.</span></div>
-      <div className="pwaInstallActions"><button type="button" className="pwaInstallPrimary" onClick={() => void install()}>Install app</button><button type="button" className="pwaInstallDismiss" onClick={dismissInstall}>Not now</button></div>
+      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={() => void install()}>Install app</button><button type="button" onClick={dismissInstall}>Not now</button></div>
     </div>
   ) : installState === "embedded" ? (
     <div className="pwaInstallInfo" role="dialog" aria-label="Open The Plug in your browser">
       <div><strong>Open {APP_NAME} in your browser</strong><span>You're viewing The Plug inside another app. Open it in Chrome to get the full app experience and install it.</span></div>
-      <div className="pwaInstallActions"><button type="button" className="pwaInstallPrimary" onClick={openBrowser}>{environment().android ? "Open in Chrome" : "Open in browser"}</button><button type="button" className="pwaInstallDismiss" onClick={dismissInstall}>Continue here</button></div>
+      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={openBrowser}>{embeddedAndroid ? "Open in Chrome" : "Open in browser"}</button><button type="button" onClick={dismissInstall}>Continue here</button></div>
     </div>
   ) : installState === "ios" ? (
     <div className="pwaInstallInfo" role="dialog" aria-label={`Add ${APP_NAME} to your Home Screen`}>
       <div><strong>Add {APP_NAME} to your Home Screen</strong><span>In Safari, tap Share, choose <b>Add to Home Screen</b>, then tap Add.</span></div>
-      <div className="pwaInstallActions"><button type="button" className="pwaInstallDismiss" onClick={dismissInstall}>Got it</button></div>
+      <div className="pwaInstallActions" style={{display:"flex",justifyContent:"flex-end"}}><button type="button" onClick={dismissInstall}>Got it</button></div>
     </div>
   ) : installState === "browser-menu" ? (
     <div className="pwaInstallInfo" role="dialog" aria-label={`Install ${APP_NAME}`}>
