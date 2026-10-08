@@ -15,9 +15,9 @@ export default function PwaRegister() {
     const retryPendingOrderNotifications=async()=>{
       const user=auth.currentUser;if(!user)return;
       const idToken=await getIdToken(user).catch(()=>null);if(!idToken)return;
-      const pendingKeys=Object.keys(localStorage).filter(key=>key.startsWith("boemo-pending-order-notification-"));
+      const pendingKeys=Object.keys(localStorage).filter(key=>key.startsWith("plug-pending-order-notification-"));
       for(const key of pendingKeys){
-        const orderId=key.replace("boemo-pending-order-notification-","");
+        const orderId=key.replace("plug-pending-order-notification-","");
         try{
           const response=await fetch("/api/notifications/order-created",{method:"POST",headers:{Authorization:"Bearer "+idToken,"Content-Type":"application/json"},body:JSON.stringify({orderId})});
           if(response.ok)localStorage.removeItem(key);
@@ -51,5 +51,5 @@ export default function PwaRegister() {
   async function install(){if(!installPrompt)return;await installPrompt.prompt();await installPrompt.userChoice;setInstallPrompt(null)}
   function applyUpdate(){if(!updateReady)return;reloadForUpdate.current=true;updateReady.postMessage({type:"SKIP_WAITING"})}
 
-  return <>{offline&&<div className="offlineBanner" role="status" aria-live="polite"><span aria-hidden="true">⚡</span> Offline · BOEMO is available on this device. New orders may wait for reconnection.</div>}{!offline&&reconnecting&&<div className="offlineBanner reconnectingBanner" role="status" aria-live="polite"><span aria-hidden="true">↻</span> Reconnected · BOEMO is syncing and checking for the latest information.</div>}{installPrompt&&<button className="pwaInstall" type="button" onClick={()=>void install()}><span aria-hidden="true">✦</span> Install BOEMO</button>}{updateReady&&<div className="pwaUpdate" role="status" aria-live="polite"><div><strong>BOEMO update ready</strong><span>Refresh when you are ready.</span></div><button type="button" className="button buttonPrimary" onClick={applyUpdate}>Refresh</button></div>}</>;
+  return <>{offline&&<div className="offlineBanner" role="status" aria-live="polite"><span aria-hidden="true">⚡</span> Offline · The Plug is available on this device. New orders may wait for reconnection.</div>}{!offline&&reconnecting&&<div className="offlineBanner reconnectingBanner" role="status" aria-live="polite"><span aria-hidden="true">↻</span> Reconnected · The Plug is syncing and checking for the latest information.</div>}{installPrompt&&<button className="pwaInstall" type="button" onClick={()=>void install()}><span aria-hidden="true">✦</span> Install The Plug</button>}{updateReady&&<div className="pwaUpdate" role="status" aria-live="polite"><div><strong>The Plug update ready</strong><span>Refresh when you are ready.</span></div><button type="button" className="button buttonPrimary" onClick={applyUpdate}>Refresh</button></div>}</>;
 }
