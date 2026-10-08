@@ -77,3 +77,5 @@ The customer-facing model is now a sourcing workflow, not a food-order workflow:
 - Never claim a request reached Frank if the Firestore write was not confirmed.
 - Offer WhatsApp `+267 76 411 150` as the reliable direct fallback.
 - Offline messaging must distinguish cached/app-shell availability from a request actually reaching Frank.
+## PWA install UX standard
+The Plug is commonly opened from WhatsApp/social links, including embedded in-app browsers. If the app detects an embedded browser, the primary install/discovery action must be **Open The Plug in your browser** and must hand the customer to a normal browser (Chrome on Android where supported). Do not use a JavaScript alert for install guidance. Do not present **Add to Home screen** as the generic primary fallback; use the browser's proper **Install app** flow when the browser exposes it. Platform-specific iPhone/iPad guidance may still explain Safari's Home Screen flow. Browser chrome such as the embedded app's address-bar title/URL is controlled by the host app/browser and cannot be changed by The Plug. Keep install messaging concise, branded and in-page, with no duplicate stacked dialogs.
