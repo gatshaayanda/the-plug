@@ -11,7 +11,7 @@ export async function POST(request:Request){
     const summary=await runPickupReminders();
     return NextResponse.json({ok:true,...summary});
   }catch(error){
-    console.error("BOEMO pickup reminder route failed:",error);
+    console.error("The Plug pickup reminder route failed:",error);
     return NextResponse.json({ok:false,error:error instanceof Error?error.message:"Reminder run failed."},{status:500});
   }
 }
