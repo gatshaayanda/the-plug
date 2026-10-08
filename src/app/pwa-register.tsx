@@ -165,7 +165,7 @@ export default function PwaRegister() {
     </div>
   ) : installState === "embedded" ? (
     <div className="pwaInstallInfo" role="dialog" aria-label="Open The Plug in your browser">
-      <div><strong>Open {APP_NAME} in your browser</strong><span>You're viewing The Plug inside another app. Open it in Chrome to get the full app experience and install it.</span></div>
+      <div><strong>Open {APP_NAME} in your browser</strong><span>You&apos;re viewing The Plug inside another app. Open it in Chrome to get the full app experience and install it.</span></div>
       <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={openBrowser}>{embeddedAndroid ? "Open in Chrome" : "Open in browser"}</button><button type="button" onClick={dismissInstall}>Continue here</button></div>
     </div>
   ) : installState === "ios" ? (
