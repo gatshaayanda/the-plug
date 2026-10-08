@@ -7,7 +7,7 @@ import { auth } from "@/lib/firebase/client";
 type InstallPromptEvent = Event & { prompt:()=>Promise<void>; userChoice:Promise<{outcome:"accepted"|"dismissed";platform:string}> };
 
 export default function PwaRegister() {
-  const [offline,setOffline]=useState(false),[reconnecting,setReconnecting]=useState(false),[installPrompt,setInstallPrompt]=useState<InstallPromptEvent|null>(null),[updateReady,setUpdateReady]=useState<ServiceWorker|null>(null);
+  const [offline,setOffline]=useState(false),[reconnecting,setReconnecting]=useState(false),[installPrompt,setInstallPrompt]=useState<InstallPromptEvent|null>(null),[updateReady,setUpdateReady]=useState<ServiceWorker|null>(null),[installInfo,setInstallInfo]=useState(false);
   const reloadForUpdate=useRef(false);
 
   useEffect(()=>{
@@ -48,8 +48,8 @@ export default function PwaRegister() {
     return()=>{window.removeEventListener("online",online);window.removeEventListener("offline",off);window.removeEventListener("beforeinstallprompt",install);navigator.serviceWorker?.removeEventListener("controllerchange",controllerChange);stopPendingAuth()};
   },[]);
 
-  async function install(){if(!installPrompt)return;await installPrompt.prompt();await installPrompt.userChoice;setInstallPrompt(null)}
+  async function install(){if(!installPrompt){setInstallInfo(true);return}await installPrompt.prompt();await installPrompt.userChoice;setInstallPrompt(null)}
   function applyUpdate(){if(!updateReady)return;reloadForUpdate.current=true;updateReady.postMessage({type:"SKIP_WAITING"})}
 
-  return <>{offline&&<div className="offlineBanner" role="status" aria-live="polite"><span aria-hidden="true">⚡</span> Offline · The Plug is still being built, but this device can keep the app shell available. Requests may wait for reconnection.</div>}{!offline&&reconnecting&&<div className="offlineBanner reconnectingBanner" role="status" aria-live="polite"><span aria-hidden="true">↻</span> Reconnected · The Plug is syncing and checking for the latest information.</div>}{installPrompt&&<button className="pwaInstall" type="button" onClick={()=>void install()}><span aria-hidden="true">✦</span> Install The Plug</button>}{updateReady&&<div className="pwaUpdate" role="status" aria-live="polite"><div><strong>The Plug update is ready</strong><span>Refresh when you are ready.</span></div><button type="button" className="button buttonPrimary" onClick={applyUpdate}>Refresh</button></div>}</>;
+  return <>{offline&&<div className="offlineBanner" role="status" aria-live="polite"><span aria-hidden="true">⚡</span> Offline · The Plug is still being built, but this device can keep the app shell available. Requests may wait for reconnection.</div>}{!offline&&reconnecting&&<div className="offlineBanner reconnectingBanner" role="status" aria-live="polite"><span aria-hidden="true">↻</span> Reconnected · The Plug is syncing and checking for the latest information.</div>}{(installPrompt||installInfo)&&<button className="pwaInstall" type="button" onClick={()=>void install()}><span aria-hidden="true">✦</span> Install The Plug</button>}{updateReady&&<div className="pwaUpdate" role="status" aria-live="polite"><div><strong>The Plug update is ready</strong><span>Refresh when you are ready.</span></div><button type="button" className="button buttonPrimary" onClick={applyUpdate}>Refresh</button></div>}</>;
 }
