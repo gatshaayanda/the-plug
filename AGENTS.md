@@ -53,3 +53,9 @@ Before a meaningful checkpoint run: npx tsc --noEmit, npm run lint, npm run buil
 
 ## Recovery
 The BOEMO foundation commit remains the recovery source for infrastructure behavior. If The Plug work breaks offline/auth/notification/PWA infrastructure, stop and compare against the original BOEMO foundation rather than layering fixes blindly.
+
+
+## Firebase isolation checkpoint
+The Plug must never use BOEMO's Firebase project, credentials, service-worker config, rules deployment target or production data. The foundation was copied for code architecture only. A dedicated The Plug Firebase project must be provisioned before production auth, Firestore, Storage or FCM testing. Until then, environment placeholders remain blank and push notifications are not claimed as live.
+
+Current Firebase Web guidance requires HTTPS, correct service-worker setup and web push credentials for FCM. The server notification path can remain Next.js/Vercel + Firebase Admin without Firebase Cloud Functions.
