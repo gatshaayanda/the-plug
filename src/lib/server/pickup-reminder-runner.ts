@@ -241,12 +241,12 @@ async function sendTestNotification(uid:string,deviceToken:string):Promise<Notif
   ]);
   const displayName=(userRecord.displayName||"").trim();
   const firstName=displayName.split(/\s+/)[0]||"there";
-  const isKitchenAdmin=adminSnapshot.exists&&["owner","staff"].includes(String(adminSnapshot.data()?.role||"").toLowerCase());
-  const title=isKitchenAdmin?"The Plug operations alerts are on":"The Plug notifications are on";
-  const body=isKitchenAdmin
+  const isOperationsAdmin=adminSnapshot.exists&&["owner","staff"].includes(String(adminSnapshot.data()?.role||"").toLowerCase());
+  const title=isOperationsAdmin?"The Plug operations alerts are on":"The Plug notifications are on";
+  const body=isOperationsAdmin
     ? "This device is ready for new-order and pickup alerts."
     : "Hi "+firstName+", this device is ready for your The Plug pickup reminders.";
-  const link=isKitchenAdmin?"/admin":"/account";
+  const link=isOperationsAdmin?"/admin":"/account";
   const result=await sendToDeviceToken(uid,deviceToken,{
     notification:{title,body},
     data:{title,body,link,test:"true"},
@@ -327,7 +327,7 @@ async function sendConversationMessageNotification(conversationId:string,message
       if(result.sent){await markSent(jobId,deliveryData);sent++;}else await releaseDelivery(jobId);
     }catch(error){await releaseDelivery(jobId).catch(()=>{});console.error("The Plug conversation notification failed for "+uid+":",error);}
   }
-  return {sent,recipient:senderRole==="customer"?"kitchen":"customer"};
+  return {sent,recipient:senderRole==="customer"?"operations":"customer"};
 }
 
 export {runPickupReminders,sendTestNotification,sendNewOrderNotifications,sendConversationMessageNotification};
