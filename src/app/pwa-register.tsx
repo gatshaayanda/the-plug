@@ -167,7 +167,7 @@ export default function PwaRegister() {
   ) : installState === "embedded" ? (
     <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label="Open The Plug in your browser">
       <div><strong><span aria-hidden="true">🌐 </span>OPEN THE PLUG IN YOUR BROWSER</strong><span>You&apos;re viewing The Plug inside another app. Open it in your browser for the full experience.</span></div>
-      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={openBrowser}>{embeddedAndroid ? "Open in Chrome" : "Open in browser"}</button><button type="button" onClick={dismissInstall}>Not now</button></div>
+      <div className="pwaInstallActions" style={{display:"flex",justifyContent:"flex-end"}}><button type="button" style={{background:"#0866FF",color:"#fff",width:"100%"}} onClick={openBrowser}>{embeddedAndroid ? "Open in Chrome" : "Open in browser"}</button></div>
     </div>
   ) : installState === "ios" ? (
     <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Add ${APP_NAME} to your Home Screen`}>
