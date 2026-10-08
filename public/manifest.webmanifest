@@ -9,6 +9,6 @@
   "background_color": "#FFFFFF",
   "theme_color": "#0866FF",
   "icons": [
-    {"src":"/plug-icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+    {"src":"/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
   ]
 }
