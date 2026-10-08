@@ -176,7 +176,7 @@ export default function PwaRegister() {
   ) : installState === "browser-menu" ? (
     <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Install ${APP_NAME}`}>
       <div><strong>Install {APP_NAME}</strong><span>Your browser has not given the site a one-tap install prompt. Open your browser menu and choose <b>Install app</b> or <b>Add to Home screen</b>.</span></div>
-      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={() => { window.scrollTo({top:0,behavior:"smooth"}); }}>Install The Plug</button><button type="button" onClick={dismissInstall}>Not now</button></div>
+      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={() => window.alert("Open your browser menu (⋮) and choose Install app or Add to Home screen.")}>How to install</button><button type="button" onClick={dismissInstall}>Not now</button></div>
     </div>
   ) : null;
 
