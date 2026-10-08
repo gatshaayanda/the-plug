@@ -26,4 +26,4 @@ jobs:
           curl --fail-with-body --silent --show-error \
             -X POST \
             -H "Authorization: Bearer $BOEMO_REMINDER_CRON_SECRET" \
-            $THE_PLUG_PUBLIC_URL/api/notifications/reminders"
+            "$THE_PLUG_PUBLIC_URL/api/notifications/reminders"
