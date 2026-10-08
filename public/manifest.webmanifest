@@ -1,0 +1,14 @@
+{
+  "id": "/",
+  "name": "The Plug | Sneakers & Apparel",
+  "short_name": "The Plug",
+  "description": "Sneaker and apparel sourcing in Botswana. If we can source it, you can get it.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0866FF",
+  "icons": [
+    {"src":"/plug-icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
