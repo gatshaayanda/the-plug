@@ -79,8 +79,9 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
 
     const install = (event: Event) => {
       event.preventDefault();
+      // Capture the browser's one-shot prompt, but never interrupt a route automatically.
+      // The customer opens the branded install journey from an explicit install action.
       setInstallPrompt(event as InstallPromptEvent);
-      if (!env.standalone && !env.embedded) setInstallState("native");
     };
 
     window.addEventListener("online", online);
@@ -90,16 +91,14 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     if (env.standalone && !embedded) {
       setInstallState("hidden");
     } else if (embedded) {
+      // Embedded browsers are a compatibility gate, not an install promotion.
       setInstallState("embedded");
-    } else if (sessionStorage.getItem("theplug-install-dismissed-v2") !== "1") {
-      // The Plug is install-led: show its branded install invitation on first visit.
-      // The customer can still choose to continue in the browser.
-      setInstallState("native");
     }
 
     const requestInstall = () => {
       const current = environment();
       if (current.standalone) return;
+      setInstallHelpOpen(false);
       setInstallState(current.embedded ? "embedded" : "native");
     };
     const appInstalled = () => {
@@ -187,18 +186,20 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
 
   async function install() {
     if (!installPrompt) {
-      setInstallState("hidden");
+      // Keep guidance in the same branded dialog; never stack a second modal.
       setInstallHelpOpen(true);
       return;
     }
     await installPrompt.prompt();
     await installPrompt.userChoice;
     setInstallPrompt(null);
+    setInstallHelpOpen(false);
     setInstallState("hidden");
   }
 
   function dismissInstall() {
     sessionStorage.setItem("theplug-install-dismissed-v2", "1");
+    setInstallHelpOpen(false);
     setInstallState("hidden");
   }
 
@@ -227,9 +228,23 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
         <div className="plugInstallKicker">YOUR SOURCING APP</div>
         <h2 id="plug-install-title">The Plug.<br/><em>One tap away.</em></h2>
         <p id="plug-install-message">Install The Plug on your device for a direct home-screen shortcut to your sourcing requests, account and private conversations with Frank.</p>
-        <div className="plugInstallModalBenefits"><span><b>01</b><strong>Quick access</strong><small>Open The Plug from your home screen.</small></span><span><b>02</b><strong>Your requests</strong><small>Return to your sourcing journey and account.</small></span><span><b>03</b><strong>Private by account</strong><small>Keep your conversations in your member space.</small></span></div>
-        <button type="button" className="plugInstallPrimary" onClick={() => void install()}>{installPrompt ? "Install The Plug →" : installPlatform === "ios" ? "Show iPhone install steps →" : "Show install steps →"}</button>
-        <button type="button" className="plugInstallSecondary" onClick={dismissInstall}>Continue in browser</button>
+        {installHelpOpen ? (
+          <div className="plugInstallSteps" role="status" aria-live="polite">
+            <strong>{installPlatform === "ios" ? "Add The Plug from Safari" : "Finish installing The Plug"}</strong>
+            <p>{installPlatform === "ios"
+              ? <>Open this page in <b>Safari</b>, tap <b>Share</b>, choose <b>Add to Home Screen</b>, then tap <b>Add</b>.</>
+              : installPlatform === "android"
+                ? <>In <b>Chrome</b>, open the <b>⋮ menu</b> and choose <b>Install app</b> or <b>Add to Home screen</b>.</>
+                : <>Open your browser menu and choose <b>Install app</b> or <b>Install The Plug</b>, if offered.</>}</p>
+            <button type="button" className="plugInstallPrimary" onClick={dismissInstall}>Got it</button>
+          </div>
+        ) : (
+          <>
+            <div className="plugInstallModalBenefits"><span><b>01</b><strong>Quick access</strong><small>Open The Plug from your home screen.</small></span><span><b>02</b><strong>Your requests</strong><small>Return to your sourcing journey and account.</small></span><span><b>03</b><strong>Private by account</strong><small>Keep your conversations in your member space.</small></span></div>
+            <button type="button" className="plugInstallPrimary" onClick={() => void install()}>{installPrompt ? "Install The Plug →" : installPlatform === "ios" ? "Show iPhone install steps →" : "Show install steps →"}</button>
+            <button type="button" className="plugInstallSecondary" onClick={dismissInstall}>Continue in browser</button>
+          </>
+        )}
         <p className="plugInstallFootnote">No app-store search needed. Your browser will guide the installation.</p>
       </section>
     </div>
@@ -262,13 +277,6 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     {!offline && reconnecting && <div className="offlineBanner reconnectingBanner" role="status" aria-live="polite"><span aria-hidden="true">↻</span> Reconnected · The Plug is syncing and checking for the latest information.</div>}
     {installCard}
 
-    {installHelpOpen && <div style={{...embeddedInstallStyle, zIndex: 10001}} role="presentation" onClick={() => setInstallHelpOpen(false)}>
-      <section role="dialog" aria-modal="true" aria-labelledby="plug-install-help-title" aria-describedby="plug-install-help-message" onClick={event => event.stopPropagation()} style={{width: "100%", maxWidth: 360, borderRadius: 12, padding: "22px 20px 16px", background: "#fff", color: "#202124", boxShadow: "0 8px 32px rgba(0,0,0,.28)"}}>
-        <h2 id="plug-install-help-title" style={{fontSize: 18, fontWeight: 700, margin: "0 0 12px"}}>🌐 How to install The Plug</h2>
-        <p id="plug-install-help-message" style={{fontSize: 14, lineHeight: 1.5, margin: "0 0 22px"}}>{installPlatform === "ios" ? <>📲 In Safari, tap <b>Share</b>, choose <b>Add to Home Screen</b>, then tap <b>Add</b>.</> : installPlatform === "android" ? <>📲 In Chrome, open the <b>⋮ menu</b> and choose <b>Install app</b>.</> : <>📲 Open your browser menu and choose <b>Install app</b> or <b>Install The Plug</b>.</>}</p>
-        <div style={{display: "flex", justifyContent: "flex-end"}}><button type="button" style={{background: "#0866FF", color: "#fff", minWidth: 72}} onClick={() => setInstallHelpOpen(false)}>Done</button></div>
-      </section>
-    </div>}
     {updateReady && <div className="pwaUpdate" role="status" aria-live="polite"><div><strong>The Plug update is ready</strong><span>Refresh when you are ready.</span></div><button type="button" className="button buttonPrimary" onClick={applyUpdate}>Refresh</button></div>}
   </>;
 }
