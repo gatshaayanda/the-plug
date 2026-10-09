@@ -14,9 +14,9 @@ export default async function RootLayout({children}:{children:React.ReactNode}){
  const requestedWith=requestHeaders.get("x-requested-with")||"";
  const referrer=requestHeaders.get("referer")||"";
  const embedded=EMBEDDED_BROWSER_PATTERN.test(userAgent)
-   || (/Android/i.test(userAgent)&&/\\bwv\\b/i.test(userAgent))
-   || /^(com\\.whatsapp|com\\.instagram\\.android|com\\.facebook\\.katana|com\\.facebook\\.lite|com\\.facebook\\.orca)$/i.test(requestedWith)
-   || /(^|\\.)((l|www)\\.)?(whatsapp|instagram|facebook|tiktok|line)\\.com\\//i.test(referrer);
+   || (/Android/i.test(userAgent)&&/\bwv\b/i.test(userAgent))
+   || /^(com\.whatsapp|com\.instagram\.android|com\.facebook\.katana|com\.facebook\.lite|com\.facebook\.orca)$/i.test(requestedWith)
+   || /(^|\.)((l|www)\.)?(whatsapp|instagram|facebook|tiktok|line)\.com\//i.test(referrer);
  const android=/Android/i.test(userAgent);
  return <html lang="en"><body style={embedded?{overflow:"hidden"}:undefined}><PwaRegister initialEmbedded={embedded} initialAndroid={android}/>{children}<Analytics/><SpeedInsights/></body></html>
 }
