@@ -99,12 +99,14 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
       setInstallState("ios");
     }
 
+    // Normal browser visits must remain usable. Never replace the page with an
+    // install card on a timer; offer lightweight help only after the user has
+    // had a chance to explore, and respect their dismissal for this session.
     const installTimer = window.setTimeout(() => {
-      if (env.standalone) return;
-      setInstallHelpAvailable(true);
+      if (env.standalone || embedded || env.ios) return;
       if (sessionStorage.getItem("theplug-install-dismissed") === "1") return;
-      setInstallState(current => current === "native" || current === "embedded" || current === "ios" ? current : "browser-menu");
-    }, 1800);
+      setInstallHelpAvailable(true);
+    }, 8000);
 
     let registration: ServiceWorkerRegistration | null = null;
     const inspect = () => {
@@ -231,7 +233,7 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     {offline && <div className="offlineBanner" role="status" aria-live="polite"><span aria-hidden="true">⚡</span> Offline · The Plug is still being built, but this device can keep the app shell available. Requests may wait for reconnection.</div>}
     {!offline && reconnecting && <div className="offlineBanner reconnectingBanner" role="status" aria-live="polite"><span aria-hidden="true">↻</span> Reconnected · The Plug is syncing and checking for the latest information.</div>}
     {installCard}
-    {installHelpAvailable && installState === "hidden" && <button type="button" onClick={() => setInstallHelpOpen(true)} style={{position:"fixed",right:16,bottom:16,zIndex:1000,border:0,borderRadius:999,padding:"11px 15px",background:"#0866FF",color:"#fff",fontWeight:900,boxShadow:"0 8px 24px rgba(0,0,0,.25)"}}>🌐 How to install</button>}
+    {installHelpAvailable && installState === "hidden" && !offline && <button type="button" onClick={() => setInstallHelpOpen(true)} style={{position:"fixed",right:16,bottom:16,zIndex:1000,border:"1px solid rgba(8,102,255,.2)",borderRadius:999,padding:"10px 14px",background:"#fff",color:"#084db8",fontWeight:800,boxShadow:"0 4px 16px rgba(0,0,0,.12)"}}>🌐 Install help</button>}
     {installHelpOpen && <div style={{...embeddedInstallStyle, zIndex: 10001}} role="presentation" onClick={() => setInstallHelpOpen(false)}>
       <section role="dialog" aria-modal="true" aria-labelledby="plug-install-help-title" aria-describedby="plug-install-help-message" onClick={event => event.stopPropagation()} style={{width: "100%", maxWidth: 360, borderRadius: 12, padding: "22px 20px 16px", background: "#fff", color: "#202124", boxShadow: "0 8px 32px rgba(0,0,0,.28)"}}>
         <h2 id="plug-install-help-title" style={{fontSize: 18, fontWeight: 700, margin: "0 0 12px"}}>🌐 How to install The Plug</h2>
