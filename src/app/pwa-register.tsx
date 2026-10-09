@@ -132,7 +132,7 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
       navigator.serviceWorker?.removeEventListener("controllerchange", controllerChange);
       stopPendingAuth();
     };
-  }, []);
+  }, [initialEmbedded, initialAndroid]);
 
   useEffect(() => {
     if (installState !== "embedded") return;
