@@ -149,10 +149,10 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
         setInstallState("embedded");
         return;
       }
-      // Mirror the working install patterns: show an install journey only when the
-      // browser offers its native prompt or iOS Safari has a known manual path.
+      // An automatic invitation respects the seven-day dismissal, but an explicit
+      // click on the site's Install CTA must always be allowed to reopen it, matching
+      // PurePress's compact install control after the automatic card is dismissed.
       // Missing beforeinstallprompt is not permission to invent a Chrome-menu modal.
-      if (dismissedRecently()) return;
       if (!installPromptRef.current && !isIosSafari()) return;
       setInstallHelpOpen(false);
       setInstallPlatform(current.ios ? "ios" : current.android ? "android" : "other");
