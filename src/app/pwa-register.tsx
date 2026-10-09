@@ -113,11 +113,19 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     };
 
     const onBeforeInstallPrompt = (event: Event) => {
-      if (environment().standalone) return;
+      const current = environment();
+      if (current.standalone) return;
       event.preventDefault();
       const prompt = event as InstallPromptEvent;
       installPromptRef.current = prompt;
       setInstallPrompt(prompt);
+      // Match PurePress/Admin Hub: show a branded, non-blocking card when the
+      // browser makes native installation available, but only on the public home.
+      if (!current.embedded && window.location.pathname === "/" && !dismissedRecently()) {
+        setInstallHelpOpen(false);
+        setInstallPlatform(current.ios ? "ios" : current.android ? "android" : "other");
+        setInstallState("native");
+      }
     };
 
     window.addEventListener("online", online);
@@ -129,6 +137,9 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     } else if (embedded) {
       // Embedded browsers are a compatibility gate, not an install promotion.
       setInstallState("embedded");
+    } else if (window.location.pathname === "/" && isIosSafari() && !dismissedRecently()) {
+      // iOS Safari has no beforeinstallprompt event; offer its known manual path.
+      setInstallState("native");
     }
 
     const requestInstall = () => {
@@ -263,9 +274,19 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   }
 
   function applyUpdate() {
-    if (!updateReady) return;
+    // Always provide a visible outcome. Normally controllerchange reloads as soon
+    // as the waiting worker activates; the timeout covers a stale/nonresponsive worker.
     reloadForUpdate.current = true;
-    updateReady.postMessage({ type: "SKIP_WAITING" });
+    if (updateReady) {
+      try {
+        updateReady.postMessage({ type: "SKIP_WAITING" });
+      } catch {
+        // The full navigation below remains the recovery path.
+      }
+    }
+    window.setTimeout(() => {
+      if (reloadForUpdate.current) window.location.reload();
+    }, 1800);
   }
 
   const installShellStyle: CSSProperties = { position: "fixed", left: 16, right: 16, bottom: 16, zIndex: 1000, maxWidth: 720, margin: "0 auto", padding: 16, borderRadius: 18, background: "#FFFFFF", color: "#111318", boxShadow: "0 12px 40px rgba(0,0,0,.18)", border: "1px solid rgba(17,19,24,.12)" };
