@@ -200,7 +200,6 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   function dismissInstall() {
     sessionStorage.setItem("theplug-install-dismissed-v2", "1");
     setInstallState("hidden");
-    setInstallHelpAvailable(false);
   }
 
   function openBrowser() {
