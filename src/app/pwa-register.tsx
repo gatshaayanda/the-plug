@@ -147,8 +147,9 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   useEffect(() => {
     if (installState !== "embedded" && installState !== "native") return;
 
+    const isEmbeddedGate = installState === "embedded";
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    if (isEmbeddedGate) document.body.style.overflow = "hidden";
     const modalButtons = () => Array.from(document.querySelectorAll<HTMLButtonElement>(
       installState === "embedded" ? ".pwaInstallInfo button" : ".plugInstallModal button"
     )).filter(button => !button.disabled);
@@ -157,29 +158,22 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
 
     const keepDialogFocused = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        event.preventDefault();
-        event.stopPropagation();
-        if (installState === "native") dismissInstall();
-      }
-      if (event.key === "Tab") {
-        event.preventDefault();
-        if (installState === "embedded") {
-          embeddedActionRef.current?.focus();
-          return;
+        if (isEmbeddedGate) {
+          event.preventDefault();
+          event.stopPropagation();
+        } else {
+          dismissInstall();
         }
-        const buttons = modalButtons();
-        if (!buttons.length) return;
-        const current = buttons.indexOf(document.activeElement as HTMLButtonElement);
-        const nextIndex = event.shiftKey
-          ? (current <= 0 ? buttons.length - 1 : current - 1)
-          : (current < 0 || current === buttons.length - 1 ? 0 : current + 1);
-        buttons[nextIndex]?.focus();
+      }
+      if (event.key === "Tab" && isEmbeddedGate) {
+        event.preventDefault();
+        embeddedActionRef.current?.focus();
       }
     };
 
     window.addEventListener("keydown", keepDialogFocused, true);
     return () => {
-      document.body.style.overflow = previousOverflow;
+      if (isEmbeddedGate) document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", keepDialogFocused, true);
     };
   }, [installState, installHelpOpen]);
@@ -222,8 +216,8 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   const installShellStyle: CSSProperties = { position: "fixed", left: 16, right: 16, bottom: 16, zIndex: 1000, maxWidth: 720, margin: "0 auto", padding: 16, borderRadius: 18, background: "#FFFFFF", color: "#111318", boxShadow: "0 12px 40px rgba(0,0,0,.18)", border: "1px solid rgba(17,19,24,.12)" };
   const embeddedInstallStyle: CSSProperties = { position: "fixed", inset: 0, zIndex: 2147483647, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(0,0,0,.82)", backdropFilter: "blur(4px)", overscrollBehavior: "contain" };
   const installCard = installState === "native" ? (
-    <div style={embeddedInstallStyle} role="presentation">
-      <section className="plugInstallModal" role="dialog" aria-modal="true" aria-labelledby="plug-install-title" aria-describedby="plug-install-message">
+    <div style={installShellStyle} role="presentation">
+      <section className="plugInstallModal" role="dialog" aria-modal="false" aria-labelledby="plug-install-title" aria-describedby="plug-install-message">
         <div className="plugInstallTop"><span className="plugInstallMark">P</span><span className="plugInstallTag">THE PLUG · BOTSWANA</span><button type="button" className="plugInstallClose" aria-label="Continue in browser" onClick={dismissInstall}>×</button></div>
         <div className="plugInstallKicker">YOUR SOURCING APP</div>
         <h2 id="plug-install-title">The Plug.<br/><em>One tap away.</em></h2>
