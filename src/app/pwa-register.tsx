@@ -26,13 +26,13 @@ function environment() {
   return { standalone, ios, android, embedded };
 }
 
-export default function PwaRegister() {
+export default function PwaRegister({ initialEmbedded = false, initialAndroid = false }: { initialEmbedded?: boolean; initialAndroid?: boolean }) {
   const [offline, setOffline] = useState(false);
   const [reconnecting, setReconnecting] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
-  const [installState, setInstallState] = useState<InstallState>("hidden");
+  const [installState, setInstallState] = useState<InstallState>(initialEmbedded ? "embedded" : "hidden");
   const [updateReady, setUpdateReady] = useState<ServiceWorker | null>(null);
-  const [embeddedAndroid, setEmbeddedAndroid] = useState(false);
+  const [embeddedAndroid, setEmbeddedAndroid] = useState(initialEmbedded && initialAndroid);
   const [installHelpOpen, setInstallHelpOpen] = useState(false);
   const embeddedActionRef = useRef<HTMLButtonElement | null>(null);
   const reloadForUpdate = useRef(false);
@@ -40,7 +40,8 @@ export default function PwaRegister() {
   useEffect(() => {
     setOffline(!navigator.onLine);
     const env = environment();
-    setEmbeddedAndroid(env.embedded && env.android);
+    const embedded = initialEmbedded || env.embedded;
+    setEmbeddedAndroid((initialEmbedded && initialAndroid) || (env.embedded && env.android));
 
     const retryPendingOrderNotifications = async () => {
       const user = auth.currentUser;
@@ -84,9 +85,9 @@ export default function PwaRegister() {
     window.addEventListener("offline", off);
     window.addEventListener("beforeinstallprompt", install);
 
-    if (env.standalone) {
+    if (env.standalone && !embedded) {
       setInstallState("hidden");
-    } else if (env.embedded) {
+    } else if (embedded) {
       setInstallState("embedded");
     } else if (env.ios) {
       setInstallState("ios");
@@ -188,7 +189,7 @@ export default function PwaRegister() {
   }
 
   const installShellStyle: CSSProperties = { position: "fixed", left: 16, right: 16, bottom: 16, zIndex: 1000, maxWidth: 720, margin: "0 auto", padding: 16, borderRadius: 18, background: "#FFFFFF", color: "#111318", boxShadow: "0 12px 40px rgba(0,0,0,.18)", border: "1px solid rgba(17,19,24,.12)" };
-  const embeddedInstallStyle: CSSProperties = { position: "fixed", inset: 0, zIndex: 10000, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(0,0,0,.72)", backdropFilter: "blur(4px)" };
+  const embeddedInstallStyle: CSSProperties = { position: "fixed", inset: 0, zIndex: 2147483647, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(0,0,0,.82)", backdropFilter: "blur(4px)", overscrollBehavior: "contain" };
   const installCard = installState === "native" && installPrompt ? (
     <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Install ${APP_NAME}`}>
       <div><strong>Install {APP_NAME}</strong><span>Get the app on this device for faster access.</span></div>
