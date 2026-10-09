@@ -150,9 +150,6 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     const isEmbeddedGate = installState === "embedded";
     const previousOverflow = document.body.style.overflow;
     if (isEmbeddedGate) document.body.style.overflow = "hidden";
-    const modalButtons = () => Array.from(document.querySelectorAll<HTMLButtonElement>(
-      installState === "embedded" ? ".pwaInstallInfo button" : ".plugInstallModal button"
-    )).filter(button => !button.disabled);
     if (installState === "embedded") embeddedActionRef.current?.focus();
     else document.querySelector<HTMLButtonElement>(".plugInstallPrimary")?.focus();
 
