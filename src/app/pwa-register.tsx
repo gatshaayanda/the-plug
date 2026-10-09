@@ -91,7 +91,7 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
       setInstallState("hidden");
     } else if (embedded) {
       setInstallState("embedded");
-    } else if (sessionStorage.getItem("theplug-install-dismissed") !== "1") {
+    } else if (sessionStorage.getItem("theplug-install-dismissed-v2") !== "1") {
       // The Plug is install-led: show its branded install invitation on first visit.
       // The customer can still choose to continue in the browser.
       setInstallState("native");
@@ -146,20 +146,35 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   }, [initialEmbedded, initialAndroid]);
 
   useEffect(() => {
-    if (installState !== "embedded") return;
+    if (installState !== "embedded" && installState !== "native") return;
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    embeddedActionRef.current?.focus();
+    const modalButtons = () => Array.from(document.querySelectorAll<HTMLButtonElement>(
+      installState === "embedded" ? ".pwaInstallInfo button" : ".plugInstallModal button"
+    )).filter(button => !button.disabled);
+    if (installState === "embedded") embeddedActionRef.current?.focus();
+    else document.querySelector<HTMLButtonElement>(".plugInstallPrimary")?.focus();
 
     const keepDialogFocused = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
         event.stopPropagation();
+        if (installState === "native") dismissInstall();
       }
       if (event.key === "Tab") {
         event.preventDefault();
-        embeddedActionRef.current?.focus();
+        if (installState === "embedded") {
+          embeddedActionRef.current?.focus();
+          return;
+        }
+        const buttons = modalButtons();
+        if (!buttons.length) return;
+        const current = buttons.indexOf(document.activeElement as HTMLButtonElement);
+        const nextIndex = event.shiftKey
+          ? (current <= 0 ? buttons.length - 1 : current - 1)
+          : (current < 0 || current === buttons.length - 1 ? 0 : current + 1);
+        buttons[nextIndex]?.focus();
       }
     };
 
@@ -183,7 +198,7 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   }
 
   function dismissInstall() {
-    sessionStorage.setItem("theplug-install-dismissed", "1");
+    sessionStorage.setItem("theplug-install-dismissed-v2", "1");
     setInstallState("hidden");
     setInstallHelpAvailable(false);
   }
