@@ -130,6 +130,15 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
 
     window.addEventListener("online", online);
     window.addEventListener("offline", off);
+    const promptWindow = window as Window & { __thePlugInstallPrompt?: Event; __thePlugPwaListenerReady?: boolean };
+    // The browser can emit beforeinstallprompt before React hydrates. Adopt the
+    // event captured by the tiny beforeInteractive script before listening normally.
+    promptWindow.__thePlugPwaListenerReady = true;
+    const earlyPrompt = promptWindow.__thePlugInstallPrompt;
+    if (earlyPrompt) {
+      delete promptWindow.__thePlugInstallPrompt;
+      onBeforeInstallPrompt(earlyPrompt);
+    }
     window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
 
     if (env.standalone && !embedded) {
