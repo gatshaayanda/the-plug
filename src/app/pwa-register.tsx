@@ -33,6 +33,7 @@ export default function PwaRegister() {
   const [installState, setInstallState] = useState<InstallState>("hidden");
   const [updateReady, setUpdateReady] = useState<ServiceWorker | null>(null);
   const [embeddedAndroid, setEmbeddedAndroid] = useState(false);
+  const [installHelpOpen, setInstallHelpOpen] = useState(false);
   const reloadForUpdate = useRef(false);
 
   useEffect(() => {
@@ -187,7 +188,7 @@ export default function PwaRegister() {
   ) : installState === "browser-menu" ? (
     <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Install ${APP_NAME}`}>
       <div><strong>Install {APP_NAME}</strong><span>Open your browser menu and look for <b>Install app</b>.</span></div>
-      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={() => window.alert("To continue with The Plug, tap the ⋮ three-dot menu and choose Open in browser or Open in Chrome. Then use your browser menu to install The Plug.")}>How to install</button><button type="button" onClick={dismissInstall}>Not now</button></div>
+      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={() => setInstallHelpOpen(true)}>How to install</button><button type="button" onClick={dismissInstall}>Not now</button></div>
     </div>
   ) : null;
 
@@ -195,6 +196,13 @@ export default function PwaRegister() {
     {offline && <div className="offlineBanner" role="status" aria-live="polite"><span aria-hidden="true">⚡</span> Offline · The Plug is still being built, but this device can keep the app shell available. Requests may wait for reconnection.</div>}
     {!offline && reconnecting && <div className="offlineBanner reconnectingBanner" role="status" aria-live="polite"><span aria-hidden="true">↻</span> Reconnected · The Plug is syncing and checking for the latest information.</div>}
     {installCard}
+    {installHelpOpen && <div style={{...embeddedInstallStyle, zIndex: 10001}} role="presentation" onClick={() => setInstallHelpOpen(false)}>
+      <section role="alertdialog" aria-modal="true" aria-labelledby="plug-install-help-title" aria-describedby="plug-install-help-message" onClick={event => event.stopPropagation()} style={{width: "100%", maxWidth: 360, borderRadius: 8, padding: "22px 20px 16px", background: "#fff", color: "#202124", boxShadow: "0 8px 32px rgba(0,0,0,.28)"}}>
+        <h2 id="plug-install-help-title" style={{fontSize: 18, fontWeight: 600, margin: "0 0 12px"}}>How to install The Plug</h2>
+        <p id="plug-install-help-message" style={{fontSize: 14, lineHeight: 1.5, margin: "0 0 22px"}}>To continue with The Plug, tap the ⋮ three-dot menu and choose <b>Open in browser</b> or <b>Open in Chrome</b>. Then use your browser menu to install The Plug.</p>
+        <div style={{display: "flex", justifyContent: "flex-end"}}><button type="button" style={{background: "#0866FF", color: "#fff", minWidth: 72}} onClick={() => setInstallHelpOpen(false)}>OK</button></div>
+      </section>
+    </div>}
     {updateReady && <div className="pwaUpdate" role="status" aria-live="polite"><div><strong>The Plug update is ready</strong><span>Refresh when you are ready.</span></div><button type="button" className="button buttonPrimary" onClick={applyUpdate}>Refresh</button></div>}
   </>;
 }
