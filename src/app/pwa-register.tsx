@@ -34,6 +34,8 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   const [updateReady, setUpdateReady] = useState<ServiceWorker | null>(null);
   const [embeddedAndroid, setEmbeddedAndroid] = useState(initialEmbedded && initialAndroid);
   const [installHelpOpen, setInstallHelpOpen] = useState(false);
+  const [installHelpAvailable, setInstallHelpAvailable] = useState(false);
+  const [installPlatform, setInstallPlatform] = useState<"android" | "ios" | "other">("other");
   const embeddedActionRef = useRef<HTMLButtonElement | null>(null);
   const reloadForUpdate = useRef(false);
 
@@ -42,6 +44,7 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     const env = environment();
     const embedded = initialEmbedded || env.embedded;
     setEmbeddedAndroid((initialEmbedded && initialAndroid) || (env.embedded && env.android));
+    setInstallPlatform(env.ios ? "ios" : env.android ? "android" : "other");
 
     const retryPendingOrderNotifications = async () => {
       const user = auth.currentUser;
@@ -78,7 +81,10 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     const install = (event: Event) => {
       event.preventDefault();
       setInstallPrompt(event as InstallPromptEvent);
-      if (!env.standalone && !env.embedded && !env.ios) setInstallState("native");
+      if (!env.standalone && !env.embedded && !env.ios) {
+        setInstallState("native");
+        setInstallHelpAvailable(true);
+      }
     };
 
     window.addEventListener("online", online);
@@ -95,6 +101,7 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
 
     const installTimer = window.setTimeout(() => {
       if (env.standalone) return;
+      setInstallHelpAvailable(true);
       if (sessionStorage.getItem("theplug-install-dismissed") === "1") return;
       setInstallState(current => current === "native" || current === "embedded" || current === "ios" ? current : "browser-menu");
     }, 1800);
@@ -162,9 +169,10 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   async function install() {
     if (!installPrompt) return;
     await installPrompt.prompt();
-    await installPrompt.userChoice;
+    const choice = await installPrompt.userChoice;
     setInstallPrompt(null);
     setInstallState("hidden");
+    if (choice.outcome === "accepted") setInstallHelpAvailable(false);
   }
 
   function dismissInstall() {
@@ -223,11 +231,12 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     {offline && <div className="offlineBanner" role="status" aria-live="polite"><span aria-hidden="true">⚡</span> Offline · The Plug is still being built, but this device can keep the app shell available. Requests may wait for reconnection.</div>}
     {!offline && reconnecting && <div className="offlineBanner reconnectingBanner" role="status" aria-live="polite"><span aria-hidden="true">↻</span> Reconnected · The Plug is syncing and checking for the latest information.</div>}
     {installCard}
+    {installHelpAvailable && installState === "hidden" && <button type="button" onClick={() => setInstallHelpOpen(true)} style={{position:"fixed",right:16,bottom:16,zIndex:1000,border:0,borderRadius:999,padding:"11px 15px",background:"#0866FF",color:"#fff",fontWeight:900,boxShadow:"0 8px 24px rgba(0,0,0,.25)"}}>🌐 How to install</button>}
     {installHelpOpen && <div style={{...embeddedInstallStyle, zIndex: 10001}} role="presentation" onClick={() => setInstallHelpOpen(false)}>
-      <section role="alertdialog" aria-modal="true" aria-labelledby="plug-install-help-title" aria-describedby="plug-install-help-message" onClick={event => event.stopPropagation()} style={{width: "100%", maxWidth: 360, borderRadius: 8, padding: "22px 20px 16px", background: "#fff", color: "#202124", boxShadow: "0 8px 32px rgba(0,0,0,.28)"}}>
-        <h2 id="plug-install-help-title" style={{fontSize: 18, fontWeight: 600, margin: "0 0 12px"}}>🌐 Open The Plug in your browser</h2>
-        <p id="plug-install-help-message" style={{fontSize: 14, lineHeight: 1.5, margin: "0 0 22px"}}>📲 To install The Plug, open it in Chrome first. Tap the ⋮ menu and choose <b>Open in browser</b> or <b>Open in Chrome</b>. Then open the browser menu again and choose <b>Install app</b>.</p>
-        <div style={{display: "flex", justifyContent: "flex-end"}}><button type="button" style={{background: "#0866FF", color: "#fff", minWidth: 72}} onClick={() => setInstallHelpOpen(false)}>OK</button></div>
+      <section role="dialog" aria-modal="true" aria-labelledby="plug-install-help-title" aria-describedby="plug-install-help-message" onClick={event => event.stopPropagation()} style={{width: "100%", maxWidth: 360, borderRadius: 12, padding: "22px 20px 16px", background: "#fff", color: "#202124", boxShadow: "0 8px 32px rgba(0,0,0,.28)"}}>
+        <h2 id="plug-install-help-title" style={{fontSize: 18, fontWeight: 700, margin: "0 0 12px"}}>🌐 How to install The Plug</h2>
+        <p id="plug-install-help-message" style={{fontSize: 14, lineHeight: 1.5, margin: "0 0 22px"}}>{installPlatform === "ios" ? <>📲 In Safari, tap <b>Share</b>, choose <b>Add to Home Screen</b>, then tap <b>Add</b>.</> : installPlatform === "android" ? <>📲 In Chrome, open the <b>⋮ menu</b> and choose <b>Install app</b>.</> : <>📲 Open your browser menu and choose <b>Install app</b> or <b>Install The Plug</b>.</>}</p>
+        <div style={{display: "flex", justifyContent: "flex-end"}}><button type="button" style={{background: "#0866FF", color: "#fff", minWidth: 72}} onClick={() => setInstallHelpOpen(false)}>Done</button></div>
       </section>
     </div>}
     {updateReady && <div className="pwaUpdate" role="status" aria-live="polite"><div><strong>The Plug update is ready</strong><span>Refresh when you are ready.</span></div><button type="button" className="button buttonPrimary" onClick={applyUpdate}>Refresh</button></div>}
