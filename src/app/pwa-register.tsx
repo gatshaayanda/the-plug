@@ -11,25 +11,60 @@ type InstallPromptEvent = Event & {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 };
-type InstallState = "hidden" | "native" | "embedded" | "ios" | "browser-menu";
+type InstallState = "hidden" | "native" | "embedded";
 
 const APP_NAME = "The Plug";
+const INSTALL_DISMISSED_KEY = "theplug:install:dismissed-at";
+const INSTALL_DISMISS_MS = 7 * 24 * 60 * 60 * 1000;
 
 function environment() {
   if (typeof window === "undefined") return { standalone: true, ios: false, android: false, embedded: false };
   const ua = navigator.userAgent || "";
   const standalone = window.matchMedia("(display-mode: standalone)").matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
-  const ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const ios = /iPad|iPhone|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const android = /Android/i.test(ua);
   const embedded = /WhatsApp|Instagram|FBAN|FBAV|Messenger|Line\/|Twitter|TikTok|Snapchat/i.test(ua) ||
     (/Android/i.test(ua) && /; wv\)/i.test(ua));
   return { standalone, ios, android, embedded };
 }
 
+function isIosSafari() {
+  if (typeof window === "undefined") return false;
+  const nav = window.navigator;
+  const ios = /iPad|iPhone|iPod/i.test(nav.userAgent) ||
+    (nav.platform === "MacIntel" && nav.maxTouchPoints > 1);
+  return ios && /Safari/i.test(nav.userAgent) && !/CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo/i.test(nav.userAgent);
+}
+
+function dismissedRecently() {
+  try {
+    const value = window.localStorage.getItem(INSTALL_DISMISSED_KEY);
+    if (!value) return false;
+    const at = Date.parse(value);
+    if (!Number.isFinite(at)) return false;
+    return Date.now() - at < INSTALL_DISMISS_MS;
+  } catch {
+    return false;
+  }
+}
+
+function rememberDismissal() {
+  try {
+    window.localStorage.setItem(INSTALL_DISMISSED_KEY, new Date().toISOString());
+  } catch {
+    // Installation remains optional when storage is unavailable.
+  }
+}
+
+function clearDismissal() {
+  try { window.localStorage.removeItem(INSTALL_DISMISSED_KEY); } catch {}
+}
+
 export default function PwaRegister({ initialEmbedded = false, initialAndroid = false }: { initialEmbedded?: boolean; initialAndroid?: boolean }) {
   const [offline, setOffline] = useState(false);
   const [reconnecting, setReconnecting] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
+  const installPromptRef = useRef<InstallPromptEvent | null>(null);
   const [installState, setInstallState] = useState<InstallState>(initialEmbedded ? "embedded" : "hidden");
   const [updateReady, setUpdateReady] = useState<ServiceWorker | null>(null);
   const [embeddedAndroid, setEmbeddedAndroid] = useState(initialEmbedded && initialAndroid);
@@ -77,16 +112,17 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
       setOffline(true);
     };
 
-    const install = (event: Event) => {
+    const onBeforeInstallPrompt = (event: Event) => {
+      if (environment().standalone) return;
       event.preventDefault();
-      // Capture the browser's one-shot prompt, but never interrupt a route automatically.
-      // The customer opens the branded install journey from an explicit install action.
-      setInstallPrompt(event as InstallPromptEvent);
+      const prompt = event as InstallPromptEvent;
+      installPromptRef.current = prompt;
+      setInstallPrompt(prompt);
     };
 
     window.addEventListener("online", online);
     window.addEventListener("offline", off);
-    window.addEventListener("beforeinstallprompt", install);
+    window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
 
     if (env.standalone && !embedded) {
       setInstallState("hidden");
@@ -98,12 +134,25 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     const requestInstall = () => {
       const current = environment();
       if (current.standalone) return;
+      if (current.embedded) {
+        setInstallState("embedded");
+        return;
+      }
+      // Mirror the working install patterns: show an install journey only when the
+      // browser offers its native prompt or iOS Safari has a known manual path.
+      // Missing beforeinstallprompt is not permission to invent a Chrome-menu modal.
+      if (dismissedRecently()) return;
+      if (!installPromptRef.current && !isIosSafari()) return;
       setInstallHelpOpen(false);
-      setInstallState(current.embedded ? "embedded" : "native");
+      setInstallPlatform(current.ios ? "ios" : current.android ? "android" : "other");
+      setInstallState("native");
     };
     const appInstalled = () => {
+      installPromptRef.current = null;
       setInstallPrompt(null);
+      setInstallHelpOpen(false);
       setInstallState("hidden");
+      clearDismissal();
     };
     window.addEventListener("theplug-open-install", requestInstall);
     window.addEventListener("appinstalled", appInstalled);
@@ -138,7 +187,7 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
       window.removeEventListener("appinstalled", appInstalled);
       window.removeEventListener("online", online);
       window.removeEventListener("offline", off);
-      window.removeEventListener("beforeinstallprompt", install);
+      window.removeEventListener("beforeinstallprompt", onBeforeInstallPrompt);
       navigator.serviceWorker?.removeEventListener("controllerchange", controllerChange);
       stopPendingAuth();
     };
@@ -176,20 +225,29 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   }, [installState, installHelpOpen]);
 
   async function install() {
-    if (!installPrompt) {
-      // Keep guidance in the same branded dialog; never stack a second modal.
-      setInstallHelpOpen(true);
+    const prompt = installPromptRef.current;
+    if (!prompt) {
+      // iOS Safari has a documented manual path; other browsers remain untouched.
+      if (isIosSafari()) setInstallHelpOpen(true);
       return;
     }
-    await installPrompt.prompt();
-    await installPrompt.userChoice;
-    setInstallPrompt(null);
-    setInstallHelpOpen(false);
-    setInstallState("hidden");
+    try {
+      await prompt.prompt();
+      const choice = await prompt.userChoice;
+      if (choice.outcome === "dismissed") rememberDismissal();
+    } catch {
+      // The event is one-shot and browser-controlled. Do not replace it with
+      // generic Chrome-menu instructions when the native prompt fails.
+    } finally {
+      installPromptRef.current = null;
+      setInstallPrompt(null);
+      setInstallHelpOpen(false);
+      setInstallState("hidden");
+    }
   }
 
   function dismissInstall() {
-    sessionStorage.setItem("theplug-install-dismissed-v2", "1");
+    rememberDismissal();
     setInstallHelpOpen(false);
     setInstallState("hidden");
   }
@@ -221,18 +279,14 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
         <p id="plug-install-message">Install The Plug on your device for a direct home-screen shortcut to your sourcing requests, account and private conversations with Frank.</p>
         {installHelpOpen ? (
           <div className="plugInstallSteps" role="status" aria-live="polite">
-            <strong>{installPlatform === "ios" ? "Add The Plug from Safari" : "Finish installing The Plug"}</strong>
-            <p>{installPlatform === "ios"
-              ? <>Open this page in <b>Safari</b>, tap <b>Share</b>, choose <b>Add to Home Screen</b>, then tap <b>Add</b>.</>
-              : installPlatform === "android"
-                ? <>In <b>Chrome</b>, open the <b>⋮ menu</b> and choose <b>Install app</b> or <b>Add to Home screen</b>.</>
-                : <>Open your browser menu and choose <b>Install app</b> or <b>Install The Plug</b>, if offered.</>}</p>
+            <strong>Add The Plug from Safari</strong>
+            <p>Open this page in <b>Safari</b>, tap <b>Share</b>, choose <b>Add to Home Screen</b>, then tap <b>Add</b>.</p>
             <button type="button" className="plugInstallPrimary" onClick={dismissInstall}>Got it</button>
           </div>
         ) : (
           <>
             <div className="plugInstallModalBenefits"><span><b>01</b><strong>Quick access</strong><small>Open The Plug from your home screen.</small></span><span><b>02</b><strong>Your requests</strong><small>Return to your sourcing journey and account.</small></span><span><b>03</b><strong>Private by account</strong><small>Keep your conversations in your member space.</small></span></div>
-            <button type="button" className="plugInstallPrimary" onClick={() => void install()}>{installPrompt ? "Install The Plug →" : installPlatform === "ios" ? "Show iPhone install steps →" : "Show install steps →"}</button>
+            <button type="button" className="plugInstallPrimary" onClick={() => void install()}>{installPrompt ? "Install The Plug →" : "Show iPhone install steps →"}</button>
             <button type="button" className="plugInstallSecondary" onClick={dismissInstall}>Continue in browser</button>
           </>
         )}
@@ -251,23 +305,12 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
         </div>
       </div>
     </div>
-  ) : installState === "ios" ? (
-    <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Add ${APP_NAME} to your Home Screen`}>
-      <div><strong>Add {APP_NAME} to your Home Screen</strong><span>In Safari, tap Share, choose <b>Add to Home Screen</b>, then tap Add.</span></div>
-      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" onClick={() => setInstallHelpOpen(true)}>How to install</button><button type="button" onClick={dismissInstall}>Not now</button></div>
-    </div>
-  ) : installState === "browser-menu" ? (
-    <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Install ${APP_NAME}`}>
-      <div><strong>Install {APP_NAME}</strong><span>Open your browser menu and look for <b>Install app</b>.</span></div>
-      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={() => setInstallHelpOpen(true)}>How to install</button><button type="button" onClick={dismissInstall}>Not now</button></div>
-    </div>
   ) : null;
 
   return <>
     {offline && <div className="offlineBanner" role="status" aria-live="polite"><span aria-hidden="true">⚡</span> Offline · The Plug is still being built, but this device can keep the app shell available. Requests may wait for reconnection.</div>}
     {!offline && reconnecting && <div className="offlineBanner reconnectingBanner" role="status" aria-live="polite"><span aria-hidden="true">↻</span> Reconnected · The Plug is syncing and checking for the latest information.</div>}
     {installCard}
-
     {updateReady && <div className="pwaUpdate" role="status" aria-live="polite"><div><strong>The Plug update is ready</strong><span>Refresh when you are ready.</span></div><button type="button" className="button buttonPrimary" onClick={applyUpdate}>Refresh</button></div>}
   </>;
 }
