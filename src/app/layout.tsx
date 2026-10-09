@@ -12,11 +12,11 @@ export default async function RootLayout({children}:{children:React.ReactNode}){
  const requestHeaders=await headers();
  const userAgent=requestHeaders.get("user-agent")||"";
  const requestedWith=requestHeaders.get("x-requested-with")||"";
- const referrer=requestHeaders.get("referer")||"";
+ // A social referrer does not prove this browser is embedded: Chrome opened from WhatsApp
+ // must not be trapped in the in-app-browser install gate.
  const embedded=EMBEDDED_BROWSER_PATTERN.test(userAgent)
    || (/Android/i.test(userAgent)&&/\bwv\b/i.test(userAgent))
-   || /^(com\.whatsapp|com\.instagram\.android|com\.facebook\.katana|com\.facebook\.lite|com\.facebook\.orca)$/i.test(requestedWith)
-   || /(^|\.)((l|www)\.)?(whatsapp|instagram|facebook|tiktok|line)\.com\//i.test(referrer);
+   || /^(com\.whatsapp|com\.instagram\.android|com\.facebook\.katana|com\.facebook\.lite|com\.facebook\.orca)$/i.test(requestedWith);
  const android=/Android/i.test(userAgent);
  return <html lang="en"><body style={embedded?{overflow:"hidden"}:undefined}><PwaRegister initialEmbedded={embedded} initialAndroid={android}/>{children}<Analytics/><SpeedInsights/></body></html>
 }
