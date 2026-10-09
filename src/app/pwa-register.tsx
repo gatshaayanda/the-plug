@@ -81,10 +81,7 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     const install = (event: Event) => {
       event.preventDefault();
       setInstallPrompt(event as InstallPromptEvent);
-      if (!env.standalone && !env.embedded && !env.ios) {
-        setInstallState("native");
-        setInstallHelpAvailable(true);
-      }
+      if (!env.standalone && !env.embedded) setInstallState("native");
     };
 
     window.addEventListener("online", online);
@@ -95,19 +92,24 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
       setInstallState("hidden");
     } else if (embedded) {
       setInstallState("embedded");
-    } else if (env.ios) {
-      // Keep the page usable; iOS install instructions are opened on demand.
-      setInstallState("hidden");
+    } else if (sessionStorage.getItem("theplug-install-dismissed") !== "1") {
+      // The Plug is install-led: show its branded install invitation on first visit.
+      // The customer can still choose to continue in the browser.
+      setInstallState("native");
     }
 
-    // Normal browser visits must remain usable. Never replace the page with an
-    // install card on a timer; offer lightweight help only after the user has
-    // had a chance to explore, and respect their dismissal for this session.
-    const installTimer = window.setTimeout(() => {
-      if (env.standalone || embedded) return;
-      if (sessionStorage.getItem("theplug-install-dismissed") === "1") return;
-      setInstallHelpAvailable(true);
-    }, 8000);
+    const requestInstall = () => {
+      const current = environment();
+      if (current.standalone) return;
+      setInstallState(current.embedded ? "embedded" : "native");
+    };
+    const appInstalled = () => {
+      setInstallPrompt(null);
+      setInstallState("hidden");
+      setInstallHelpAvailable(false);
+    };
+    window.addEventListener("theplug-open-install", requestInstall);
+    window.addEventListener("appinstalled", appInstalled);
 
     let registration: ServiceWorkerRegistration | null = null;
     const inspect = () => {
@@ -135,7 +137,8 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     navigator.serviceWorker?.addEventListener("controllerchange", controllerChange);
 
     return () => {
-      window.clearTimeout(installTimer);
+      window.removeEventListener("theplug-open-install", requestInstall);
+      window.removeEventListener("appinstalled", appInstalled);
       window.removeEventListener("online", online);
       window.removeEventListener("offline", off);
       window.removeEventListener("beforeinstallprompt", install);
@@ -170,7 +173,11 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   }, [installState]);
 
   async function install() {
-    if (!installPrompt) return;
+    if (!installPrompt) {
+      setInstallState("hidden");
+      setInstallHelpOpen(true);
+      return;
+    }
     await installPrompt.prompt();
     const choice = await installPrompt.userChoice;
     setInstallPrompt(null);
@@ -202,10 +209,18 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
 
   const installShellStyle: CSSProperties = { position: "fixed", left: 16, right: 16, bottom: 16, zIndex: 1000, maxWidth: 720, margin: "0 auto", padding: 16, borderRadius: 18, background: "#FFFFFF", color: "#111318", boxShadow: "0 12px 40px rgba(0,0,0,.18)", border: "1px solid rgba(17,19,24,.12)" };
   const embeddedInstallStyle: CSSProperties = { position: "fixed", inset: 0, zIndex: 2147483647, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(0,0,0,.82)", backdropFilter: "blur(4px)", overscrollBehavior: "contain" };
-  const installCard = installState === "native" && installPrompt ? (
-    <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Install ${APP_NAME}`}>
-      <div><strong>Install {APP_NAME}</strong><span>Get the app on this device for faster access.</span></div>
-      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" onClick={() => setInstallHelpOpen(true)}>How to install</button><button type="button" onClick={dismissInstall}>Not now</button><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={() => void install()}>Install app</button></div>
+  const installCard = installState === "native" ? (
+    <div style={embeddedInstallStyle} role="presentation">
+      <section className="plugInstallModal" role="dialog" aria-modal="true" aria-labelledby="plug-install-title" aria-describedby="plug-install-message">
+        <div className="plugInstallTop"><span className="plugInstallMark">P</span><span className="plugInstallTag">THE PLUG · BOTSWANA</span><button type="button" className="plugInstallClose" aria-label="Continue in browser" onClick={dismissInstall}>×</button></div>
+        <div className="plugInstallKicker">YOUR SOURCING APP</div>
+        <h2 id="plug-install-title">The Plug.<br/><em>One tap away.</em></h2>
+        <p id="plug-install-message">Install The Plug on your device for a direct home-screen shortcut to your sourcing requests, account and private conversations with Frank.</p>
+        <div className="plugInstallBenefits"><span><b>01</b><strong>Quick access</strong><small>Open The Plug from your home screen.</small></span><span><b>02</b><strong>Your requests</strong><small>Return to your sourcing journey and account.</small></span><span><b>03</b><strong>Private by account</strong><small>Keep your conversations in your member space.</small></span></div>
+        <button type="button" className="plugInstallPrimary" onClick={() => void install()}>{installPrompt ? "Install The Plug →" : installPlatform === "ios" ? "Show iPhone install steps →" : "Show install steps →"}</button>
+        <button type="button" className="plugInstallSecondary" onClick={dismissInstall}>Continue in browser</button>
+        <p className="plugInstallFootnote">No app-store search needed. Your browser will guide the installation.</p>
+      </section>
     </div>
   ) : installState === "embedded" ? (
     <div style={embeddedInstallStyle} role="alertdialog" aria-modal="true" aria-labelledby="plug-embedded-title" aria-describedby="plug-embedded-message">
@@ -235,7 +250,7 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     {offline && <div className="offlineBanner" role="status" aria-live="polite"><span aria-hidden="true">⚡</span> Offline · The Plug is still being built, but this device can keep the app shell available. Requests may wait for reconnection.</div>}
     {!offline && reconnecting && <div className="offlineBanner reconnectingBanner" role="status" aria-live="polite"><span aria-hidden="true">↻</span> Reconnected · The Plug is syncing and checking for the latest information.</div>}
     {installCard}
-    {installHelpAvailable && installState === "hidden" && !offline && <button type="button" onClick={() => setInstallHelpOpen(true)} style={{position:"fixed",right:16,bottom:16,zIndex:1000,border:"1px solid rgba(8,102,255,.2)",borderRadius:999,padding:"10px 14px",background:"#fff",color:"#084db8",fontWeight:800,boxShadow:"0 4px 16px rgba(0,0,0,.12)"}}>🌐 Install help</button>}
+
     {installHelpOpen && <div style={{...embeddedInstallStyle, zIndex: 10001}} role="presentation" onClick={() => setInstallHelpOpen(false)}>
       <section role="dialog" aria-modal="true" aria-labelledby="plug-install-help-title" aria-describedby="plug-install-help-message" onClick={event => event.stopPropagation()} style={{width: "100%", maxWidth: 360, borderRadius: 12, padding: "22px 20px 16px", background: "#fff", color: "#202124", boxShadow: "0 8px 32px rgba(0,0,0,.28)"}}>
         <h2 id="plug-install-help-title" style={{fontSize: 18, fontWeight: 700, margin: "0 0 12px"}}>🌐 How to install The Plug</h2>
