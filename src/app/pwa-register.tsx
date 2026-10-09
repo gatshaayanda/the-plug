@@ -201,7 +201,7 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   const installCard = installState === "native" && installPrompt ? (
     <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Install ${APP_NAME}`}>
       <div><strong>Install {APP_NAME}</strong><span>Get the app on this device for faster access.</span></div>
-      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={() => void install()}>Install app</button><button type="button" onClick={dismissInstall}>Not now</button></div>
+      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" onClick={() => setInstallHelpOpen(true)}>How to install</button><button type="button" onClick={dismissInstall}>Not now</button><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={() => void install()}>Install app</button></div>
     </div>
   ) : installState === "embedded" ? (
     <div style={embeddedInstallStyle} role="alertdialog" aria-modal="true" aria-labelledby="plug-embedded-title" aria-describedby="plug-embedded-message">
@@ -218,7 +218,7 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   ) : installState === "ios" ? (
     <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Add ${APP_NAME} to your Home Screen`}>
       <div><strong>Add {APP_NAME} to your Home Screen</strong><span>In Safari, tap Share, choose <b>Add to Home Screen</b>, then tap Add.</span></div>
-      <div className="pwaInstallActions" style={{display:"flex",justifyContent:"flex-end"}}><button type="button" onClick={dismissInstall}>Got it</button></div>
+      <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" onClick={() => setInstallHelpOpen(true)}>How to install</button><button type="button" onClick={dismissInstall}>Not now</button></div>
     </div>
   ) : installState === "browser-menu" ? (
     <div className="pwaInstallInfo" style={installShellStyle} role="dialog" aria-label={`Install ${APP_NAME}`}>
