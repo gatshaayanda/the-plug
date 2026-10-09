@@ -96,14 +96,15 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     } else if (embedded) {
       setInstallState("embedded");
     } else if (env.ios) {
-      setInstallState("ios");
+      // Keep the page usable; iOS install instructions are opened on demand.
+      setInstallState("hidden");
     }
 
     // Normal browser visits must remain usable. Never replace the page with an
     // install card on a timer; offer lightweight help only after the user has
     // had a chance to explore, and respect their dismissal for this session.
     const installTimer = window.setTimeout(() => {
-      if (env.standalone || embedded || env.ios) return;
+      if (env.standalone || embedded) return;
       if (sessionStorage.getItem("theplug-install-dismissed") === "1") return;
       setInstallHelpAvailable(true);
     }, 8000);
@@ -180,6 +181,7 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   function dismissInstall() {
     sessionStorage.setItem("theplug-install-dismissed", "1");
     setInstallState("hidden");
+    setInstallHelpAvailable(false);
   }
 
   function openBrowser() {
