@@ -34,7 +34,6 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   const [updateReady, setUpdateReady] = useState<ServiceWorker | null>(null);
   const [embeddedAndroid, setEmbeddedAndroid] = useState(initialEmbedded && initialAndroid);
   const [installHelpOpen, setInstallHelpOpen] = useState(false);
-  const [installHelpAvailable, setInstallHelpAvailable] = useState(false);
   const [installPlatform, setInstallPlatform] = useState<"android" | "ios" | "other">("other");
   const embeddedActionRef = useRef<HTMLButtonElement | null>(null);
   const reloadForUpdate = useRef(false);
@@ -106,7 +105,6 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     const appInstalled = () => {
       setInstallPrompt(null);
       setInstallState("hidden");
-      setInstallHelpAvailable(false);
     };
     window.addEventListener("theplug-open-install", requestInstall);
     window.addEventListener("appinstalled", appInstalled);
@@ -182,7 +180,6 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     const choice = await installPrompt.userChoice;
     setInstallPrompt(null);
     setInstallState("hidden");
-    if (choice.outcome === "accepted") setInstallHelpAvailable(false);
   }
 
   function dismissInstall() {
@@ -216,7 +213,7 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
         <div className="plugInstallKicker">YOUR SOURCING APP</div>
         <h2 id="plug-install-title">The Plug.<br/><em>One tap away.</em></h2>
         <p id="plug-install-message">Install The Plug on your device for a direct home-screen shortcut to your sourcing requests, account and private conversations with Frank.</p>
-        <div className="plugInstallBenefits"><span><b>01</b><strong>Quick access</strong><small>Open The Plug from your home screen.</small></span><span><b>02</b><strong>Your requests</strong><small>Return to your sourcing journey and account.</small></span><span><b>03</b><strong>Private by account</strong><small>Keep your conversations in your member space.</small></span></div>
+        <div className="plugInstallModalBenefits"><span><b>01</b><strong>Quick access</strong><small>Open The Plug from your home screen.</small></span><span><b>02</b><strong>Your requests</strong><small>Return to your sourcing journey and account.</small></span><span><b>03</b><strong>Private by account</strong><small>Keep your conversations in your member space.</small></span></div>
         <button type="button" className="plugInstallPrimary" onClick={() => void install()}>{installPrompt ? "Install The Plug →" : installPlatform === "ios" ? "Show iPhone install steps →" : "Show install steps →"}</button>
         <button type="button" className="plugInstallSecondary" onClick={dismissInstall}>Continue in browser</button>
         <p className="plugInstallFootnote">No app-store search needed. Your browser will guide the installation.</p>
