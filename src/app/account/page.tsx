@@ -44,6 +44,8 @@ export default function AccountPage(){
    if(user?.isAnonymous){const linked=await linkWithPopup(user,provider);const saved=await getCustomerProfile(linked.user.uid);if(saved)setProfile(saved)}
    else if(!user){const result=await signInWithPopup(auth,provider);const now=new Date().toISOString();const saved=await getCustomerProfile(result.user.uid);if(saved)setProfile(saved);else{const nextProfile={uid:result.user.uid,name:result.user.displayName??"",email:result.user.email??"",phone:"",preferredDeliveryLocation:"",notes:"",createdAt:now,updatedAt:now};await saveCustomerProfile(nextProfile);setProfile(nextProfile)}}
    setMessage("Your The Plug account is connected.");
+   const destination=new URLSearchParams(window.location.search).get("next");
+   if(destination&&destination.startsWith("/")&&!destination.startsWith("//"))window.location.assign(destination);
   }catch(error){setMessage(authMessage(error))}finally{setBusy(false)}
  }
 
