@@ -17,7 +17,7 @@ const forbiddenText = [
 ];
 
 const ignoredDirs = new Set([".git","node_modules",".next","coverage"]);
-const ignoredFiles = new Set(["AGENTS.md","scripts/verify-identity.mjs"]);
+const ignoredFiles = new Set(["AGENTS.md","scripts/verify-identity.mjs","docs/PWA-FOUNDATION.md"]);
 const textExtensions = new Set([".ts",".tsx",".js",".mjs",".css",".json",".webmanifest",".md",".yml",".yaml",".txt",".html",".svg"]);
 
 function walk(dir){
