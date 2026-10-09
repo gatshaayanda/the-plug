@@ -2,7 +2,7 @@
 import Link from "next/link";
 import {GoogleAuthProvider,browserLocalPersistence,linkWithPopup,onAuthStateChanged,setPersistence,signInWithPopup,signOut,type User} from "firebase/auth";
 import {useEffect,useState} from "react";
-import {auth} from "@/lib/firebase/client";
+import {auth,hasFirebaseWebConfig} from "@/lib/firebase/client";
 import NotificationSettings from "@/components/NotificationSettings";
 import CustomerConversations from "@/components/CustomerConversations";
 import {getCustomerProfile,isAdminUser,saveCustomerProfile,type CustomerProfile} from "@/lib/firebase/data";
@@ -12,7 +12,8 @@ function authMessage(error:unknown){
  const code=typeof error==="object"&&error&&"code" in error?String((error as {code?:unknown}).code):"";
  if(code==="auth/popup-closed-by-user")return "Google sign-in was cancelled.";
  if(code==="auth/popup-blocked")return "Your browser blocked the Google sign-in window. Allow pop-ups for The Plug and try again.";
- if(code==="auth/unauthorized-domain")return "Google sign-in is not available from this website yet. The Plug is still being connected to its production Firebase project.";
+ if(code==="auth/unauthorized-domain")return "Google sign-in is not enabled for this website yet. Please contact Frank on WhatsApp while The Plug finishes setup.";
+ if(code==="auth/configuration-not-found"||code==="auth/operation-not-allowed")return "Google sign-in is not available yet. The Plug's sign-in setup is incomplete; please contact Frank on WhatsApp for now.";
  return error instanceof Error?error.message:"Google sign-in could not be completed.";
 }
 const terminal=new Set(["Delivered","Collected","Cancelled"]);
@@ -38,7 +39,9 @@ export default function AccountPage(){
  },[]);
 
  async function google(){
-  if(!authReady||busy)return;setBusy(true);setMessage("");
+  if(!authReady||busy)return;
+  if(!hasFirebaseWebConfig){setMessage("Google sign-in is not available yet because The Plug's member sign-in setup is incomplete. Please contact Frank on WhatsApp for now.");return;}
+  setBusy(true);setMessage("");
   try{
    const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:"select_account"});
    if(user?.isAnonymous){const linked=await linkWithPopup(user,provider);const saved=await getCustomerProfile(linked.user.uid);if(saved)setProfile(saved)}
@@ -61,7 +64,7 @@ export default function AccountPage(){
   <section className="orderCard accountHome" style={{maxWidth:920,margin:"0 auto"}}>
    <div className="accountHero"><div><span className="kicker">My The Plug</span><h1>Your sourcing.</h1><p>Your sourcing requests, quotes, progress and private conversations in one place. Frank’s private update feed and member offers are the next layer being connected.</p></div>{user&&<span className="accountStatus">{user.isAnonymous?"Finish account setup":"Member account connected"}</span>}</div>
    {user&&!user.isAnonymous&&<div className="requestBand memberSetup"><strong>Make your member space ready</strong><p>Check your WhatsApp details, then enable and test notifications on this device if you want alerts.</p><div className="actions"><a className="button buttonLight" href="#profile">Complete profile ↓</a><a className="button buttonPrimary" href="#notifications">Set up notifications →</a></div></div>}
-   {(!user||user.isAnonymous)&&<section className="accountConnect accountConnectPrimary"><div><strong>Join The Plug.</strong><p>Use Google to keep your sourcing requests and private conversations together. The private update feed and member offers are being connected next. If you started a task before signing in, you will return to it.</p></div><button className="googleSignInButton" type="button" onClick={()=>void google()} disabled={busy||!authReady}><span>{!authReady?"Checking session…":busy?"Connecting…":user?.isAnonymous?"Connect Google account":"Continue with Google"}</span></button></section>}
+   {(!user||user.isAnonymous)&&<section className="accountConnect accountConnectPrimary"><div><strong>Join The Plug.</strong><p>Use Google to keep your sourcing requests and private conversations together. The private update feed and member offers are being connected next. If you started a task before signing in, you will return to it.</p></div><button className="googleSignInButton" type="button" onClick={()=>void google()} disabled={busy||!authReady||!hasFirebaseWebConfig}><span>{!authReady?"Checking session…":busy?"Connecting…":!hasFirebaseWebConfig?"Sign-in setup incomplete":user?.isAnonymous?"Connect Google account":"Continue with Google"}</span></button></section>}
    {user&&!user.isAnonymous&&profile&&<><p className="accountIntro">{user.isAnonymous?"Guest account · same device":"Google account connected"} · {profile.email||"Add your email below"}</p>
     {requests.length===0?<article className="feedEmpty"><strong>No sourcing requests yet.</strong><p>Find something in the catalogue or send Frank a screenshot of what you want.</p><Link className="button buttonPrimary" href="/request">Start a sourcing request</Link></article>:<section className="accountSection"><div className="panelHeading"><div><span className="kicker">Requests</span><h2>Your sourcing requests.</h2></div></div><div className="feedList">{requests.map(request=>{const complete=terminal.has(request.status);const quote=request.quotedPrice!==undefined?" · Quote P"+request.quotedPrice.toFixed(2):"";return <article className="feedItem" key={request.id}><div className="feedMarker">{complete?"✓":"•"}</div><div className="feedBody"><div className="feedTop"><strong>{request.status}</strong><small>{new Date(request.updatedAt).toLocaleString()}</small></div><p>{request.product}{request.size?" · "+request.size:""}{request.colour?" · "+request.colour:""}{quote}</p><div className="feedActions"><span>{request.depositPaid!==undefined&&request.depositRequired!==undefined?"Deposit P"+request.depositPaid.toFixed(2)+" / P"+request.depositRequired.toFixed(2):"No deposit recorded yet"}</span><Link className="button buttonLight" href={"/requests/"+request.id}>Track request</Link></div></div></article>})}</div></section>}
    </>}
