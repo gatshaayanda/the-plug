@@ -198,8 +198,8 @@ export default function PwaRegister() {
     {installCard}
     {installHelpOpen && <div style={{...embeddedInstallStyle, zIndex: 10001}} role="presentation" onClick={() => setInstallHelpOpen(false)}>
       <section role="alertdialog" aria-modal="true" aria-labelledby="plug-install-help-title" aria-describedby="plug-install-help-message" onClick={event => event.stopPropagation()} style={{width: "100%", maxWidth: 360, borderRadius: 8, padding: "22px 20px 16px", background: "#fff", color: "#202124", boxShadow: "0 8px 32px rgba(0,0,0,.28)"}}>
-        <h2 id="plug-install-help-title" style={{fontSize: 18, fontWeight: 600, margin: "0 0 12px"}}>How to install The Plug</h2>
-        <p id="plug-install-help-message" style={{fontSize: 14, lineHeight: 1.5, margin: "0 0 22px"}}>To continue with The Plug, tap the ⋮ three-dot menu and choose <b>Open in browser</b> or <b>Open in Chrome</b>. Then use your browser menu to install The Plug.</p>
+        <h2 id="plug-install-help-title" style={{fontSize: 18, fontWeight: 600, margin: "0 0 12px"}}>🌐 Open The Plug in your browser</h2>
+        <p id="plug-install-help-message" style={{fontSize: 14, lineHeight: 1.5, margin: "0 0 22px"}}>📲 To install The Plug, open it in Chrome first. Tap the ⋮ menu and choose <b>Open in browser</b> or <b>Open in Chrome</b>. Then open the browser menu again and choose <b>Install app</b>.</p>
         <div style={{display: "flex", justifyContent: "flex-end"}}><button type="button" style={{background: "#0866FF", color: "#fff", minWidth: 72}} onClick={() => setInstallHelpOpen(false)}>OK</button></div>
       </section>
     </div>}
