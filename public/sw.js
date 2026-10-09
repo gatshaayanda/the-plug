@@ -1,4 +1,4 @@
-const CACHE_VERSION = "theplug-shell-v9";
+const CACHE_VERSION = "theplug-shell-v10";
 const SHELL_CACHE = CACHE_VERSION;
 const STATIC_LIMIT = 100;
 const PUBLIC_PAGE_LIMIT = 12;
