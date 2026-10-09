@@ -14,7 +14,7 @@ function authMessage(error:unknown){
  if(code==="auth/popup-blocked")return "Your browser blocked the Google sign-in window. Allow pop-ups for The Plug and try again.";
  if(code==="auth/unauthorized-domain")return "Google sign-in is not enabled for this website yet. Please contact Frank on WhatsApp while The Plug finishes setup.";
  if(code==="auth/configuration-not-found"||code==="auth/operation-not-allowed")return "Google sign-in is not available yet. The Plug's sign-in setup is incomplete; please contact Frank on WhatsApp for now.";
- return error instanceof Error?error.message:"Google sign-in could not be completed.";
+ if(code.startsWith("auth/")||code.startsWith("app/"))return "Google sign-in could not be completed because The Plug’s sign-in setup is not ready. Please contact Frank on WhatsApp for now.";\n return "Google sign-in could not be completed. Please try again later or contact Frank on WhatsApp.";
 }
 const terminal=new Set(["Delivered","Collected","Cancelled"]);
 
