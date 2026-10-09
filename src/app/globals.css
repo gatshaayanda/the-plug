@@ -372,6 +372,11 @@ h1 em{font-style:normal;color:var(--plug-blue);text-shadow:0 0 22px rgba(8,102,2
 .plugInstallPrimary:hover{background:#0757dc}
 .plugInstallSecondary{margin-top:8px;border:1px solid #dedede;background:#fff;color:#333;font-size:.82rem}
 .plugInstallFootnote{margin:13px 0 0;text-align:center;color:#888;font-size:.65rem;line-height:1.45}
+.plugInstallSteps{margin-top:22px;padding-top:18px;border-top:1px solid #ececec}
+.plugInstallSteps>strong{display:block;font-size:1rem;letter-spacing:-.02em}
+.plugInstallSteps p{margin:10px 0 18px;color:#555;font-size:.86rem;line-height:1.65}
+.plugInstallSteps .plugInstallPrimary{margin-top:4px}
+
 @keyframes plugInstallEnter{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:560px){.plugInstallModal{padding:23px 20px 20px;border-radius:22px}.plugInstallTop{margin-bottom:22px}.plugInstallModal h2{font-size:3.25rem}.plugInstallModalBenefits{margin:17px 0}.plugInstallModalBenefits>span{padding:9px 0}}
 @media(prefers-reduced-motion:reduce){.plugInstallModal{animation:none}}
