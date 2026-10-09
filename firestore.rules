@@ -202,6 +202,68 @@ service cloud.firestore {
       }
     }
 
+    match /sourcingRequests/{requestId} {
+      function validSourcingRequest() {
+        return request.resource.data.keys().hasOnly([
+            'customerId',
+            'customerName',
+            'phone',
+            'product',
+            'size',
+            'colour',
+            'notes',
+            'attachment',
+            'createdAt',
+            'updatedAt',
+            'status',
+            'deliveryMethod'
+          ])
+          && request.resource.data.keys().hasAll([
+            'customerId',
+            'customerName',
+            'phone',
+            'product',
+            'size',
+            'colour',
+            'notes',
+            'attachment',
+            'createdAt',
+            'updatedAt',
+            'status',
+            'deliveryMethod'
+          ])
+          && request.resource.data.customerId == request.auth.uid
+          && request.resource.data.customerName is string
+          && request.resource.data.phone is string
+          && request.resource.data.product is string
+          && request.resource.data.product.size() > 0
+          && request.resource.data.size is string
+          && request.resource.data.colour is string
+          && request.resource.data.notes is string
+          && request.resource.data.createdAt is string
+          && request.resource.data.updatedAt is string
+          && request.resource.data.status == 'New Request'
+          && request.resource.data.deliveryMethod in ['delivery', 'collection']
+          && (
+            request.resource.data.attachment == null
+            || (
+              request.resource.data.attachment is map
+              && request.resource.data.attachment.keys().hasOnly(['url', 'name', 'type', 'size'])
+              && request.resource.data.attachment.url is string
+              && request.resource.data.attachment.name is string
+              && request.resource.data.attachment.type is string
+              && request.resource.data.attachment.size is number
+              && request.resource.data.attachment.size <= 10485760
+            )
+          );
+      }
+
+      allow create: if signedIn() && !isAdmin() && validSourcingRequest();
+      allow read: if isAdmin() || (signedIn() && resource.data.customerId == request.auth.uid);
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
     match /dailyReconciliations/{date} {
       allow read: if isAdmin();
       allow create, update: if isAdmin() && validReconciliation();
