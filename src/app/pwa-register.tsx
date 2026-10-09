@@ -33,12 +33,14 @@ export default function PwaRegister() {
   const [installState, setInstallState] = useState<InstallState>("hidden");
   const [updateReady, setUpdateReady] = useState<ServiceWorker | null>(null);
   const [embeddedAndroid, setEmbeddedAndroid] = useState(false);
+  const [embeddedBlockVisible, setEmbeddedBlockVisible] = useState(false);
   const reloadForUpdate = useRef(false);
 
   useEffect(() => {
     setOffline(!navigator.onLine);
     const env = environment();
     setEmbeddedAndroid(env.embedded && env.android);
+    setEmbeddedBlockVisible(env.embedded);
 
     const retryPendingOrderNotifications = async () => {
       const user = auth.currentUser;
@@ -179,7 +181,20 @@ export default function PwaRegister() {
     </div>
   ) : null;
 
+  const embeddedBlock = embeddedBlockVisible ? (
+    <div style={{ position: "fixed", inset: 0, zIndex: 2147483647, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(0,0,0,.82)", color: "#111318", fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif" }} role="dialog" aria-modal="true" aria-label="Open The Plug in your browser">
+      <div style={{ width: "100%", maxWidth: 520, display: "grid", gap: 16, padding: 22, borderRadius: 20, background: "#fff", boxShadow: "0 24px 80px rgba(0,0,0,.35)" }}>
+        <div style={{ display: "grid", gap: 8 }}>
+          <strong style={{ fontSize: 18, lineHeight: 1.2 }}>🌐 OPEN THE PLUG IN YOUR BROWSER</strong>
+          <span style={{ fontSize: 15, lineHeight: 1.5, color: "#555" }}>You&apos;re viewing The Plug inside another app. The first step is to tap the <b>⋮ three-dot menu</b>, then choose <b>Open in browser</b> or <b>Open in Chrome</b>.</span>
+        </div>
+        <button type="button" onClick={() => setEmbeddedBlockVisible(false)} style={{ justifySelf: "end", border: 0, borderRadius: 10, padding: "10px 14px", background: "#0866FF", color: "#fff", fontWeight: 800, cursor: "pointer" }}>GOT IT</button>
+      </div>
+    </div>
+  ) : null;
+
   return <>
+    {embeddedBlock}
     {offline && <div className="offlineBanner" role="status" aria-live="polite"><span aria-hidden="true">⚡</span> Offline · The Plug is still being built, but this device can keep the app shell available. Requests may wait for reconnection.</div>}
     {!offline && reconnecting && <div className="offlineBanner reconnectingBanner" role="status" aria-live="polite"><span aria-hidden="true">↻</span> Reconnected · The Plug is syncing and checking for the latest information.</div>}
     {installCard}
