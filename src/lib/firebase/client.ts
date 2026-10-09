@@ -6,17 +6,17 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
 const firebaseConfig = {
   // Public Firebase web config is injected by the deployment environment.
   // Build/CI must also be able to prerender client routes when those env vars are absent.
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? "build-placeholder",
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? "build-placeholder.firebaseapp.com",
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? "build-placeholder",
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? "build-placeholder.appspot.com",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "build-placeholder",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID ?? "build-placeholder",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "build-placeholder",
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "build-placeholder.firebaseapp.com",
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "build-placeholder",
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "build-placeholder.appspot.com",
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "build-placeholder",
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "build-placeholder",
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Production must supply real web config. Keep a harmless build fallback for CI/prerender,
-// but let the UI detect missing config before starting an authentication flow.
+// Production must supply real web config. Empty Vercel variables are treated as missing too;
+// build fallbacks keep prerender safe while hasFirebaseWebConfig prevents auth actions.
 export const hasFirebaseWebConfig = Boolean(
   process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
   process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN &&
