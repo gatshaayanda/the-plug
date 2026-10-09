@@ -182,7 +182,7 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", keepDialogFocused, true);
     };
-  }, [installState]);
+  }, [installState, installHelpOpen]);
 
   async function install() {
     if (!installPrompt) {
