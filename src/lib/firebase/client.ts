@@ -15,6 +15,16 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
+// Production must supply real web config. Keep a harmless build fallback for CI/prerender,
+// but let the UI detect missing config before starting an authentication flow.
+export const hasFirebaseWebConfig = Boolean(
+  process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
+  process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN &&
+  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID &&
+  process.env.NEXT_PUBLIC_FIREBASE_APP_ID &&
+  process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+);
+
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
