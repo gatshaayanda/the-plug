@@ -34,6 +34,7 @@ export default function PwaRegister() {
   const [updateReady, setUpdateReady] = useState<ServiceWorker | null>(null);
   const [embeddedAndroid, setEmbeddedAndroid] = useState(false);
   const [installHelpOpen, setInstallHelpOpen] = useState(false);
+  const embeddedActionRef = useRef<HTMLButtonElement | null>(null);
   const reloadForUpdate = useRef(false);
 
   useEffect(() => {
@@ -132,6 +133,31 @@ export default function PwaRegister() {
     };
   }, []);
 
+  useEffect(() => {
+    if (installState !== "embedded") return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    embeddedActionRef.current?.focus();
+
+    const keepDialogFocused = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      if (event.key === "Tab") {
+        event.preventDefault();
+        embeddedActionRef.current?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", keepDialogFocused, true);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", keepDialogFocused, true);
+    };
+  }, [installState]);
+
   async function install() {
     if (!installPrompt) return;
     await installPrompt.prompt();
@@ -169,14 +195,14 @@ export default function PwaRegister() {
       <div className="pwaInstallActions" style={{display:"flex",gap:8,justifyContent:"flex-end",flexWrap:"wrap"}}><button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={() => void install()}>Install app</button><button type="button" onClick={dismissInstall}>Not now</button></div>
     </div>
   ) : installState === "embedded" ? (
-    <div style={embeddedInstallStyle} role="dialog" aria-modal="true" aria-label="Open The Plug in your browser">
+    <div style={embeddedInstallStyle} role="dialog" aria-modal="true" aria-labelledby="plug-embedded-title" aria-describedby="plug-embedded-message">
       <div className="pwaInstallInfo" style={{...installShellStyle, position: "relative", left: "auto", right: "auto", bottom: "auto", width: "100%", maxWidth: 520, margin: 0}}>
         <div>
-          <strong><span aria-hidden="true">🌐 </span>OPEN THE PLUG IN YOUR BROWSER</strong>
-          <span>The Plug opened inside another app. Tap the <b>⋮ three-dot menu</b> and choose <b>Open in browser</b> or <b>Open in Chrome</b> to continue.</span>
+          <strong id="plug-embedded-title"><span aria-hidden="true">🌐 </span>OPEN THE PLUG IN YOUR BROWSER</strong>
+          <span id="plug-embedded-message">{embeddedAndroid ? <>Tap below to open The Plug in Chrome. Then open the <b>⋮ menu</b> and choose <b>Install app</b>.</> : <>The Plug opened inside another app. Use that app’s menu to open this page in your browser, then look for <b>Install app</b> in the browser menu.</>}</span>
         </div>
         <div className="pwaInstallActions" style={{display:"flex",justifyContent:"flex-end"}}>
-          <button type="button" style={{background:"#0866FF",color:"#fff"}} onClick={openBrowser}>{embeddedAndroid ? "OPEN IN CHROME" : "OPEN IN BROWSER"}</button>
+          <button ref={embeddedActionRef} type="button" style={{background:"#0866FF",color:"#fff"}} onClick={openBrowser}>{embeddedAndroid ? "OPEN IN CHROME" : "OPEN IN BROWSER"}</button>
         </div>
       </div>
     </div>
