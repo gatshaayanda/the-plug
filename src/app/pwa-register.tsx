@@ -192,7 +192,7 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
       return;
     }
     await installPrompt.prompt();
-    const choice = await installPrompt.userChoice;
+    await installPrompt.userChoice;
     setInstallPrompt(null);
     setInstallState("hidden");
   }
