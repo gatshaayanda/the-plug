@@ -93,3 +93,9 @@ The BOEMO foundation commit remains a reference for infrastructure behavior only
 - Before claiming Google sign-in works, verify the production Vercel environment contains the required The Plug-specific NEXT_PUBLIC_FIREBASE_* values, Google provider is enabled in that Firebase project, and the actual production domain is authorized. Never copy credentials or project settings from BOEMO or another client.
 - When the install or auth experience loops, inspect route tree, PWA root component lifecycle, service-worker fetch/cache strategy, production deployment source SHA, and Vercel environment variable presence before changing code. Cache-version bumps alone are not a fix.
 - UX principle: offer a clear install value proposition on the landing page before asking for installation. Respectful dismissal must leave the user on the route they chose. The browser/OS remains the final installation consent surface. Use platform instructions only when the browser cannot provide a native install event and a supported manual path exists; don't create generic Android/desktop browser-menu fallback instructions when the event is absent.
+
+
+## PWA manifest single source of truth (2026-10-10)
+- In this Next.js App Router project, `src/app/manifest.ts` is the canonical generated manifest route and must contain the complete installability metadata, including explicit 192×192 and 512×512 PNG icons. Do not assume `public/manifest.webmanifest` is what Chrome receives when the generated route exists.
+- Whenever manifest/icon installability metadata changes, bump the service-worker cache version in `public/sw.js` so an older cached `/manifest.webmanifest` cannot keep Chrome evaluating stale metadata.
+- Verify the generated production manifest and each declared icon URL, then inspect Chrome's installability diagnostics before claiming the native prompt works.
