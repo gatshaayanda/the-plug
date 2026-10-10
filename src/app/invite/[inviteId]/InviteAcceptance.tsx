@@ -2,7 +2,7 @@
 import Link from "next/link";
 import {useEffect,useState} from "react";
 import {GoogleAuthProvider,linkWithPopup,onAuthStateChanged,signInAnonymously,signInWithPopup,type User} from "firebase/auth";
-import {doc,getDoc,onSnapshot,Timestamp,updateDoc,writeBatch} from "firebase/firestore";
+import {doc,getDoc,Timestamp,updateDoc,writeBatch} from "firebase/firestore";
 import {auth,db,hasFirebaseWebConfig} from "@/lib/firebase/client";
 
 type Invite={id:string;inviterUid:string;inviterName:string;status:string;expiresAt:Timestamp;recipientUid?:string};
