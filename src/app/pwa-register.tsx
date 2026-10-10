@@ -69,7 +69,7 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   const [updateReady, setUpdateReady] = useState<ServiceWorker | null>(null);
   const [embeddedAndroid, setEmbeddedAndroid] = useState(initialEmbedded && initialAndroid);
   const [installHelpOpen, setInstallHelpOpen] = useState(false);
-  const [installPlatform, setInstallPlatform] = useState<"android" | "ios" | "other">("other");
+  const [installPlatform, setInstallPlatform] = useState<"android" | "ios" | "other">("ios");
   const embeddedActionRef = useRef<HTMLButtonElement | null>(null);
   const reloadForUpdate = useRef(false);
 
@@ -119,13 +119,8 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
       const prompt = event as InstallPromptEvent;
       installPromptRef.current = prompt;
       setInstallPrompt(prompt);
-      // Match PurePress/Admin Hub: show a branded, non-blocking card when the
-      // browser makes native installation available, but only on the public home.
-      if (!current.embedded && window.location.pathname === "/" && !dismissedRecently()) {
-        setInstallHelpOpen(false);
-        setInstallPlatform(current.ios ? "ios" : current.android ? "android" : "other");
-        setInstallState("native");
-      }
+      // Retain the one-shot native event for the user's explicit Install click.
+      // Do not interrupt page load with a second, custom install screen.
     };
 
     window.addEventListener("online", online);
@@ -146,12 +141,6 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     } else if (embedded) {
       // Embedded browsers are a compatibility gate, not an install promotion.
       setInstallState("embedded");
-    } else if (window.location.pathname === "/" && !dismissedRecently()) {
-      // Keep the install journey visible on the public landing page even when the
-      // browser withholds beforeinstallprompt. In that case the card provides
-      // platform-specific manual steps instead of leaving the CTA dead.
-      setInstallHelpOpen(!installPromptRef.current && !isIosSafari());
-      setInstallState("native");
     }
 
     const requestInstall = () => {
@@ -161,12 +150,18 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
         setInstallState("embedded");
         return;
       }
-      // Explicit Install clicks always open the branded journey. When the browser
-      // supplied beforeinstallprompt, its native prompt is used; otherwise the
-      // journey explains the supported manual path for the detected platform.
-      setInstallPlatform(current.ios ? "ios" : current.android ? "android" : "other");
-      setInstallHelpOpen(!installPromptRef.current);
-      setInstallState("native");
+      if (installPromptRef.current) {
+        // Invoke the browser's native prompt directly from the customer's click.
+        void install();
+        return;
+      }
+      // iOS Safari has no beforeinstallprompt event; preserve only its supported path.
+      // Do not replace the Android/desktop native prompt with a menu-instruction modal.
+      if (isIosSafari()) {
+        setInstallPlatform("ios");
+        setInstallHelpOpen(true);
+        setInstallState("native");
+      }
     };
     const appInstalled = () => {
       installPromptRef.current = null;
@@ -304,35 +299,21 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   const installCard = installState === "native" ? (
     <div style={installShellStyle} role="presentation">
       <section className="plugInstallModal" role="dialog" aria-modal="false" aria-labelledby="plug-install-title" aria-describedby="plug-install-message">
-        <div className="plugInstallTop"><span className="plugInstallMark">P</span><span className="plugInstallTag">THE PLUG · BOTSWANA</span><button type="button" className="plugInstallClose" aria-label="Continue in browser" onClick={dismissInstall}>×</button></div>
+        <div className="plugInstallTop"><span className="plugInstallMark">P</span><span className="plugInstallTag">THE PLUG · BOTSWANA</span><button type="button" className="plugInstallClose" aria-label="Close install prompt" onClick={dismissInstall}>×</button></div>
         <div className="plugInstallKicker">YOUR SOURCING APP</div>
         <h2 id="plug-install-title">The Plug.<br/><em>One tap away.</em></h2>
         <p id="plug-install-message">Install The Plug on your device for a direct home-screen shortcut to your sourcing requests, account and private conversations with Frank.</p>
         {installHelpOpen ? (
           <div className="plugInstallSteps" role="status" aria-live="polite">
-            {installPlatform === "ios" ? (
-              <>
-                <strong>Add The Plug from Safari</strong>
-                <p>Open this page in <b>Safari</b>, tap <b>Share</b>, choose <b>Add to Home Screen</b>, then tap <b>Add</b>.</p>
-              </>
-            ) : installPlatform === "android" ? (
-              <>
-                <strong>Add The Plug from Chrome</strong>
-                <p>In <b>Chrome</b>, tap the <b>⋮ menu</b> and choose <b>Install app</b> or <b>Add to Home screen</b>, then confirm. If you opened this page inside WhatsApp or another app, first use <b>Open in Chrome</b>.</p>
-              </>
-            ) : (
-              <>
-                <strong>Install The Plug from your browser</strong>
-                <p>In <b>Chrome</b> or <b>Edge</b>, use the install icon in the address bar if shown, or open the browser menu and choose <b>Install The Plug</b>.</p>
-              </>
-            )}
-            <button type="button" className="plugInstallPrimary" onClick={dismissInstall}>Continue in browser</button>
+            <strong>Add The Plug from Safari</strong>
+            <p>Open this page in <b>Safari</b>, tap <b>Share</b>, choose <b>Add to Home Screen</b>, then tap <b>Add</b>.</p>
+            <button type="button" className="plugInstallPrimary" onClick={dismissInstall}>Done</button>
           </div>
         ) : (
           <>
             <div className="plugInstallModalBenefits"><span><b>01</b><strong>Quick access</strong><small>Open The Plug from your home screen.</small></span><span><b>02</b><strong>Your requests</strong><small>Return to your sourcing journey and account.</small></span><span><b>03</b><strong>Private by account</strong><small>Keep your conversations in your member space.</small></span></div>
-            <button type="button" className="plugInstallPrimary" onClick={() => void install()}>{installPrompt ? "Install The Plug →" : "Show install steps →"}</button>
-            <button type="button" className="plugInstallSecondary" onClick={dismissInstall}>Continue in browser</button>
+            <button type="button" className="plugInstallPrimary" onClick={() => void install()}>Install The Plug →</button>
+            <button type="button" className="plugInstallSecondary" onClick={dismissInstall}>Not now</button>
           </>
         )}
         <p className="plugInstallFootnote">No app-store search needed. Your browser will guide the installation.</p>
