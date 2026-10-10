@@ -293,19 +293,38 @@ service cloud.firestore {
       allow read: if isAdmin() || isOwner(uid) || resource.data.showInCircle == true;
       allow create, update: if isOwner(uid)
         && request.auth.token.firebase.sign_in_provider != 'anonymous'
-        && request.resource.data.keys().hasOnly(['uid','displayName','sharePurchases','showInCircle','interests','updatedAt'])
+        && request.resource.data.keys().hasOnly(['uid','displayName','sharePurchases','showInCircle','updatedAt'])
         && request.resource.data.uid == uid
         && request.resource.data.displayName is string
         && request.resource.data.sharePurchases in ['private','friends','public']
         && request.resource.data.showInCircle is bool
-        && request.resource.data.updatedAt is string
-        && (!request.resource.data.keys().hasAny(['interests']) || (
-          request.resource.data.interests is map
+        && request.resource.data.updatedAt is string;
+      allow delete: if false;
+    }
+
+    match /memberFeedPreferences/{uid} {
+      function isConnectedMember(otherUid) {
+        return exists(/databases/$(database)/documents/friendConnections/$(request.auth.uid + '_' + otherUid))
+          || exists(/databases/$(database)/documents/friendConnections/$(otherUid + '_' + request.auth.uid));
+      }
+      function validFeedPreferences() {
+        return request.resource.data.keys().hasOnly(['uid','shareInterests','interests','updatedAt'])
+          && request.resource.data.keys().hasAll(['uid','shareInterests','interests','updatedAt'])
+          && request.resource.data.uid == uid
+          && request.resource.data.shareInterests is bool
+          && request.resource.data.interests is map
           && request.resource.data.interests.keys().hasOnly(['newDrops','seasonalBuys','loyaltyUpdates'])
           && request.resource.data.interests.newDrops is bool
           && request.resource.data.interests.seasonalBuys is bool
           && request.resource.data.interests.loyaltyUpdates is bool
-        ));
+          && request.resource.data.updatedAt is string;
+      }
+      allow read: if isAdmin() || isOwner(uid)
+        || (signedIn() && request.auth.token.firebase.sign_in_provider != 'anonymous'
+          && resource.data.shareInterests == true && isConnectedMember(uid));
+      allow create, update: if isOwner(uid)
+        && request.auth.token.firebase.sign_in_provider != 'anonymous'
+        && validFeedPreferences();
       allow delete: if false;
     }
 
