@@ -293,12 +293,19 @@ service cloud.firestore {
       allow read: if isAdmin() || isOwner(uid) || resource.data.showInCircle == true;
       allow create, update: if isOwner(uid)
         && request.auth.token.firebase.sign_in_provider != 'anonymous'
-        && request.resource.data.keys().hasOnly(['uid','displayName','sharePurchases','showInCircle','updatedAt'])
+        && request.resource.data.keys().hasOnly(['uid','displayName','sharePurchases','showInCircle','interests','updatedAt'])
         && request.resource.data.uid == uid
         && request.resource.data.displayName is string
         && request.resource.data.sharePurchases in ['private','friends','public']
         && request.resource.data.showInCircle is bool
-        && request.resource.data.updatedAt is string;
+        && request.resource.data.updatedAt is string
+        && (!request.resource.data.keys().hasAny(['interests']) || (
+          request.resource.data.interests is map
+          && request.resource.data.interests.keys().hasOnly(['newDrops','seasonalBuys','loyaltyUpdates'])
+          && request.resource.data.interests.newDrops is bool
+          && request.resource.data.interests.seasonalBuys is bool
+          && request.resource.data.interests.loyaltyUpdates is bool
+        ));
       allow delete: if false;
     }
 
