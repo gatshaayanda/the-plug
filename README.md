@@ -26,3 +26,7 @@ See AGENTS.md for the implementation contract.
 
 ## Notifications
 Customer and operations notifications use Firebase Cloud Messaging. Notification permission is requested only from the user's explicit settings action.
+
+## Customer journey analytics
+
+The admin dashboard records server-side journey events for request-flow entry, account confirmation, request submission, sharing and invites, notification choices, and external catalogue/Instagram visits. Admin activity is excluded from customer journey counts. Event access is governed by Firestore rules; review the rules and analytics route together when changing event names or payloads.
