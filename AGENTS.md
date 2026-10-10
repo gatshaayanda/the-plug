@@ -31,11 +31,11 @@ The Plug is a Botswana sneaker and apparel sourcing/order PWA for Frank's side b
 The Plug is the customer's primary storefront and ongoing customer relationship—not merely a landing page that sends people to WhatsApp or Instagram. Homepage copy must be concise and product-led; do not explain the business model to the customer.
 
 ### Required homepage shape
-1. **The main event is a featured-finds slideshow/feed** populated only by real items Frank has published and marked available. Each item should show its image, concise name, actual price/offer where set, and a direct action to ask about/request it. Never invent a product, price, stock or availability.
-2. **A single, always-visible sourcing request card/action** sits beside or immediately after the featured area. It is the alternate route when the customer wants something not shown.
-3. Keep a small account/requests entry in navigation and a discreet admin entry in the footer. Do not add homepage explainer sections for Plug Circle, account value, request steps, deal philosophy, sourcing philosophy, or repeated calls to action. The account, request flow and notification opt-in should deliver the engagement loop when relevant.
-4. WhatsApp catalogue and Instagram are footer-level fallback discovery links, not main homepage sections or competing primary buttons.
-5. If no featured items are published, show one compact honest empty state in the featured area and keep the sourcing request card prominent. Never fill the space with promotional commentary or pretend content.
+1. **Editorial hero + featured-finds rail:** fashion-media art direction and a horizontal feed of real items Frank has published, with uploaded image, concise name, confirmed price where set, and a direct ask/request action.
+2. **Live offers rail:** a separate homepage section for real offers Frank has published and marked active. Expired, paused, scheduled, draft and archived offers never appear as live; an honest empty state is expected until Frank publishes one.
+3. **A compact Plug Circle/member-value band:** show the return loop—requests, published drops/offers, relevant optional notifications and confirmed rewards—without fake points, false urgency, or promising membership/discounts before trusted eligibility is recorded.
+4. **One clear sourcing action** for anything not listed. Account/requests and install stay easy to reach; WhatsApp catalogue and Instagram are secondary footer links.
+5. Empty states should feel art-directed but remain concise and honest. Never use fake products, prices, stock, discounts, countdowns, winners or activity.
 
 ### Publishing and empty states
 - The admin must eventually be able to create/edit/draft/schedule/publish/pause/archive/expire featured finds and deals. Published status and validity timestamps are the source of truth for public visibility.
@@ -67,7 +67,7 @@ The Plug is the customer's primary storefront and ongoing customer relationship�
 - Reward/loyalty and “order lotto” outcomes must be recorded, auditable, and tied to clear rules. Never randomly or automatically claim a winner/discount without an admin-recorded outcome.
 - Keep admin lightweight: sourcing requests/orders, quote/deposit recording, customer communication, announcements/offers, and verified-data preparation. Do not build an ERP.
 - The verified product inventory file and unresolved-data list are a later deliverable, after the customer journey and admin publishing workflow are ready. Do not build or pay for catalogue integration until available data sources are inspected and the inventory requirements are known.
-- Do not create a second product-entry system by default. WhatsApp Business remains the current catalogue source of truth until a deliberate migration is approved. Links/screenshots do not prove stock, current price, sizes, authenticity or sourcing availability.
+- WhatsApp Business remains the source of truth for the full external catalogue. The Plug deliberately has a separate curated editorial publishing system for homepage featured finds and live offers; it is not a full inventory mirror. Frank manages those records in Admin (draft, publish, pause, schedule with start/end time, archive, reorder, upload images, and optionally set a confirmed price). Only The Plug's own published/in-date records appear on its storefront. Links/screenshots do not prove stock, current price, sizes, authenticity or sourcing availability.
 
 ## Data and security
 - Firebase rules are the security boundary, not just UI hiding. Customer profiles, requests, messages, tokens and orders must be owner-scoped; admin writes must be role-controlled.
@@ -182,3 +182,12 @@ This is a reusable product pattern, not a one-off The Plug workaround. Reproduce
 - Future admin publishing should configure featured finds, deal terms/validity, announcements, customer-facing fallback copy and audience preferences from one managed source of truth. Drafts must remain private; expired/archived content must not appear active. Keep the customer flow useful before this admin exists, then connect the same records to storefront/feed/notifications rather than hard-coding a parallel system.
 - Repeat shopping and referral behaviour are opportunities, not permission to spam: marketing notifications must be opt-in, service/request notifications must remain distinguishable, and any draw/reward must have clear published rules, eligibility, duplicate-entry handling, auditable selection and an admin-recorded outcome.
 - Treat a saved request as an inquiry, not a confirmed order. Only Frank's recorded quote and the customer's explicit approval should move it into the commercial flow. Never claim the business has received a message, deposit or upload unless the corresponding operation is confirmed.
+
+
+## Editorial storefront and publishing system — current product direction
+- Treat The Plug as a fashion-media storefront and customer-retention product, not a long explainer landing page. The sequence is editorial hero → real featured finds → real live offers → concise Plug Circle return loop → sourcing action.
+- Admin "Storefront studio" manages curated featured finds and offers separately from the full WhatsApp Business catalogue. It supports image uploads, confirmed optional prices, audience, lifecycle state, start/end timestamps, ordering, editing, pausing, archiving and deletion.
+- Public content comes from Firestore \`storefrontContent\`; never hard-code sample items. Public reads are limited to published records for everyone, then filtered by active date. Circle-audience content is not publicly exposed; do not claim its member-facing display is complete until trusted membership-gated reads and the account feed are verified.
+- Firestore rules are the security boundary. Storefront writes require the existing admin role. Images use the dedicated \`storefrontMedia\` Storage path, admin-write/public-read, image MIME only and a 12 MB limit.
+- This publishing system is a curated editorial layer, not a duplicate of the entire WhatsApp catalogue. Frank must still confirm availability, price, sizes and fulfilment before a request becomes an order.
+- Keep motion subtle and respect reduced-motion preferences. No false scarcity, coercive notifications, invented discounts or gamification that rewards meaningless clicks.
