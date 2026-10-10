@@ -1,6 +1,6 @@
 "use client";
 import {useEffect,useState} from "react";
-import {collection,doc,getDoc,getDocs,query,setDoc,where,writeBatch} from "firebase/firestore";
+import {collection,doc,getDoc,getDocs,query,where,writeBatch} from "firebase/firestore";
 import type {User} from "firebase/auth";
 import {db} from "@/lib/firebase/client";
 type ShareScope="private"|"friends"|"public";
