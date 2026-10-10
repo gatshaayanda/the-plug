@@ -9,7 +9,7 @@ export default function CommunityFeed(){
  const[items,setItems]=useState<Activity[]>([]),[memberCount,setMemberCount]=useState<number|null>(null),[loaded,setLoaded]=useState(false),[failed,setFailed]=useState(false);const feedRef=useRef<HTMLElement|null>(null);const trackedView=useRef(false);
  useEffect(()=>{const node=feedRef.current;if(!node||trackedView.current)return;if(typeof IntersectionObserver==="undefined"){trackedView.current=true;void trackPlugJourney("community_feed_opened",{source:"homepage"});return;}const observer=new IntersectionObserver(entries=>{if(entries.some(entry=>entry.isIntersecting)&&!trackedView.current){trackedView.current=true;void trackPlugJourney("community_feed_opened",{source:"homepage"});observer.disconnect();}},{threshold:0.25});observer.observe(node);return()=>observer.disconnect()},[]);
  useEffect(()=>{
-  let settled=false;const timeout=window.setTimeout(()=>{if(!settled){setLoaded(true);setFailed(true);}},4000);
+  let settled=false;const timeout=window.setTimeout(()=>{if(!settled){setLoaded(true);setFailed(true);}},1500);
   const stopActivity=onSnapshot(query(collection(db,"communityActivity"),where("status","==","published"),where("audience","==","public")),snap=>{settled=true;window.clearTimeout(timeout);setItems(snap.docs.map(d=>({id:d.id,...d.data()} as Activity)).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).slice(0,8));setLoaded(true);setFailed(false)},()=>{settled=true;window.clearTimeout(timeout);setItems([]);setLoaded(true);setFailed(true)});
   const stopMembers=onSnapshot(query(collection(db,"memberSettings"),where("showInCircle","==",true)),snap=>setMemberCount(snap.size),()=>setMemberCount(null));
   return()=>{window.clearTimeout(timeout);stopActivity();stopMembers()};
