@@ -525,3 +525,13 @@ h1 em{font-style:normal;color:var(--plug-blue);text-shadow:0 0 22px rgba(8,102,2
 .plugCommunityEmpty{border:1px dashed #c5c1b8;border-radius:12px;padding:18px;color:#656565;font-size:.84rem;line-height:1.5}
 @media(max-width:760px){.plugCommunityRail{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.plugCommunityFeed{padding:30px 0}.plugCommunityHead{align-items:flex-start}.plugCircleCountPublic{min-width:88px;padding:10px}.plugCommunityRail{grid-template-columns:1fr}}
+
+
+.memberActivityColumns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+.memberActivityColumns>div{min-width:0}
+.memberActivityColumns h3{font-size:.95rem;margin:0 0 9px}
+.memberActivityColumns article{display:grid;gap:7px;padding:13px 0;border-top:1px solid #353535}
+.memberActivityColumns article>span{font-size:.62rem;letter-spacing:.07em;color:#b9d3ff;font-weight:900}
+.memberActivityColumns article strong{font-size:.9rem;overflow-wrap:anywhere}
+.memberActivityColumns article small{font-size:.73rem;color:#a8a8a8}
+@media(max-width:620px){.memberActivityColumns{grid-template-columns:1fr}}
