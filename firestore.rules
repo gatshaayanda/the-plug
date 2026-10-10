@@ -361,6 +361,48 @@ service cloud.firestore {
         && (resource.data.memberA == request.auth.uid || resource.data.memberB == request.auth.uid));
     }
 
+    match /communityActivity/{activityId} {
+      function validPublishedActivity() {
+        let sourcePath = /databases/$(database)/documents/sourcingRequests/$(request.resource.data.sourceRequestId);
+        let settingsPath = /databases/$(database)/documents/memberSettings/$(request.resource.data.ownerUid);
+        return request.resource.data.keys().hasOnly(['ownerUid','sourceRequestId','productLabel','audience','status','createdAt','updatedAt','publishedAt'])
+          && request.resource.data.keys().hasAll(['ownerUid','sourceRequestId','productLabel','audience','status','createdAt','updatedAt','publishedAt'])
+          && request.resource.data.ownerUid is string
+          && request.resource.data.sourceRequestId is string
+          && request.resource.data.productLabel is string
+          && request.resource.data.productLabel.size() > 0
+          && request.resource.data.productLabel.size() <= 120
+          && request.resource.data.audience in ['friends','public']
+          && request.resource.data.status == 'published'
+          && request.resource.data.createdAt is string
+          && request.resource.data.updatedAt is string
+          && request.resource.data.publishedAt is string
+          && exists(sourcePath)
+          && get(sourcePath).data.customerId == request.resource.data.ownerUid
+          && get(sourcePath).data.status in ['Delivered','Collected']
+          && exists(settingsPath)
+          && get(settingsPath).data.sharePurchases == request.resource.data.audience;
+      }
+
+      allow read: if isAdmin()
+        || (signedIn() && resource.data.ownerUid == request.auth.uid)
+        || (resource.data.status == 'published' && resource.data.audience == 'public')
+        || (signedIn() && resource.data.status == 'published' && resource.data.audience == 'friends'
+          && resource.data.ownerUid != request.auth.uid
+          && (
+            (resource.data.ownerUid < request.auth.uid
+              && exists(/databases/$(database)/documents/friendConnections/$(resource.data.ownerUid + '_' + request.auth.uid)))
+            || (request.auth.uid < resource.data.ownerUid
+              && exists(/databases/$(database)/documents/friendConnections/$(request.auth.uid + '_' + resource.data.ownerUid)))
+          ));
+      allow create: if isAdmin() && validPublishedActivity();
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','updatedAt'])
+        && request.resource.data.status in ['published','archived']
+        && request.resource.data.updatedAt is string;
+      allow delete: if isAdmin() || (signedIn() && resource.data.ownerUid == request.auth.uid);
+    }
+
     match /dailyReconciliations/{date} {
       allow read: if isAdmin();
       allow create, update: if isAdmin() && validReconciliation();
