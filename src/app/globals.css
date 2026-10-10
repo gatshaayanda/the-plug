@@ -496,3 +496,14 @@ h1 em{font-style:normal;color:var(--plug-blue);text-shadow:0 0 22px rgba(8,102,2
 .memberCircleList article>span{font-size:.82rem;color:#c5c5c5}
 .memberCircleEmpty{border:1px dashed #454545;border-radius:11px;padding:14px;color:#aaa;font-size:.84rem;line-height:1.5}
 @media(max-width:520px){.memberInviteLink{grid-template-columns:1fr}.memberInviteLink label{grid-column:auto}.memberCircleList article{align-items:flex-start;flex-direction:column}}
+
+
+.memberPrivacyOptions{border:1px solid #3c3c3c;border-radius:12px;padding:14px;margin:18px 0 12px;display:grid;gap:0}
+.memberPrivacyOptions legend{padding:0 6px;font-size:.8rem;font-weight:900;color:#d7d7d7}
+.memberPrivacyOptions label,.memberDirectoryChoice{display:flex;align-items:flex-start;gap:11px;padding:12px 2px;border-bottom:1px solid #303030;cursor:pointer}
+.memberPrivacyOptions label:last-child{border-bottom:0}
+.memberPrivacyOptions input,.memberDirectoryChoice input{width:18px;height:18px;flex:0 0 18px;margin-top:3px;accent-color:#0866ff}
+.memberPrivacyOptions label span,.memberDirectoryChoice span{display:grid;gap:4px}
+.memberPrivacyOptions strong,.memberDirectoryChoice strong{font-size:.87rem}
+.memberPrivacyOptions small,.memberDirectoryChoice small{font-size:.78rem;color:#b7b7b7;line-height:1.45}
+.memberDirectoryChoice{border:1px solid #3c3c3c;border-radius:12px;padding:14px;margin:12px 0 18px}
