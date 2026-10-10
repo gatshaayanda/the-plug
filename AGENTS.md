@@ -28,14 +28,14 @@ The Plug is a Botswana sneaker and apparel sourcing/order PWA for Frank's side b
 - If Firebase web configuration is unavailable, show a clear fallback and direct WhatsApp route; do not pretend a local/anonymous session or request submission succeeded.
 
 ## Storefront hierarchy and merchandising — non-negotiable
-The Plug is the customer's primary storefront and ongoing customer relationship—not merely a landing page that sends people to WhatsApp or Instagram.
+The Plug is the customer's primary storefront and ongoing customer relationship—not merely a landing page that sends people to WhatsApp or Instagram. Homepage copy must be concise and product-led; do not explain the business model to the customer.
 
-### Required homepage order
-1. **Featured finds published by Frank inside The Plug.** Show current, useful product/find cards first when live published content exists.
-2. **Live deals and discounts published by Frank inside The Plug.** Show only real, active, in-date offers with their actual terms. Expired, paused, draft or scheduled offers must not appear as active.
-3. **Plug Circle / customer account value.** Explain real benefits and let customers view their requests, private conversations, updates and eligibility. Creating an account is not proof of confirmed Plug Circle membership; member-only benefits must be gated by the actual recorded membership state.
-4. **“Find something that isn’t listed” sourcing journey.** Keep this available and easy to reach. Accept a product URL, social post/reel link, photo/screenshot or PDF, product details, size/colour, budget, timeline, notes, and whether the customer is shopping for themself or someone else. Preserve repeat requests/history when the customer returns.
-5. **WhatsApp catalogue and Instagram fallback links.** Keep them accessible, but place them after The Plug's own content, account/member value and unlisted-item journey. Use them as alternate discovery when no relevant live content is available—not as the default homepage destination.
+### Required homepage shape
+1. **The main event is a featured-finds slideshow/feed** populated only by real items Frank has published and marked available. Each item should show its image, concise name, actual price/offer where set, and a direct action to ask about/request it. Never invent a product, price, stock or availability.
+2. **A single, always-visible sourcing request card/action** sits beside or immediately after the featured area. It is the alternate route when the customer wants something not shown.
+3. Keep a small account/requests entry in navigation and a discreet admin entry in the footer. Do not add homepage explainer sections for Plug Circle, account value, request steps, deal philosophy, sourcing philosophy, or repeated calls to action. The account, request flow and notification opt-in should deliver the engagement loop when relevant.
+4. WhatsApp catalogue and Instagram are footer-level fallback discovery links, not main homepage sections or competing primary buttons.
+5. If no featured items are published, show one compact honest empty state in the featured area and keep the sourcing request card prominent. Never fill the space with promotional commentary or pretend content.
 
 ### Publishing and empty states
 - The admin must eventually be able to create/edit/draft/schedule/publish/pause/archive/expire featured finds and deals. Published status and validity timestamps are the source of truth for public visibility.
@@ -43,7 +43,7 @@ The Plug is the customer's primary storefront and ongoing customer relationship�
 - If there are no published finds or active deals, show an intentional, honest empty state that points first to the unlisted-item sourcing journey. Only then offer WhatsApp/Instagram as alternate places to browse.
 - Do not label a customer “Plug Circle” or unlock member-only pricing/rewards merely because they opened an account, linked Google, or submitted a request. Membership confirmation and benefits require explicit trusted data.
 - Keep admin entry discreet at the bottom of the customer-facing page, but treat that link as navigation only. Protect every admin route and data write with server/auth/Firestore role checks; hiding a link is not security.
-- The first screen should make the product value clear without repeating the same message in multiple sections. Use concise, concrete copy and one clear primary action. “Ask Frank to source it” remains a strong secondary journey, not the only reason to use The Plug.
+- Keep homepage copy extremely concise: featured slideshow + sourcing request, then a small route to requests/account. No long explanations, repetitive feature cards, multiple “why us” sections, or large standalone Plug Circle/deals explainer sections. The interface itself should lead the user into the next step.
 - Before claiming this hierarchy is fully functional, verify the published-content schema, admin CRUD, Firestore/Storage rules, expiry handling, mobile layout, and real production records. A visual empty-state design is not a substitute for the publishing system.
 
 ## Customer sourcing and commercial workflow
