@@ -332,8 +332,10 @@ service cloud.firestore {
           && request.resource.data.keys().hasAll(['memberA','memberB','inviteId','createdAt'])
           && request.resource.data.memberA is string
           && request.resource.data.memberB is string
-          && request.resource.data.memberA < request.resource.data.memberB
-          && connectionId == request.resource.data.memberA + '_' + request.resource.data.memberB
+          && (
+            connectionId == request.resource.data.memberA + '_' + request.resource.data.memberB
+            || connectionId == request.resource.data.memberB + '_' + request.resource.data.memberA
+          )
           && request.resource.data.inviteId is string
           && request.resource.data.createdAt is string
           && existsAfter(invitePath)
@@ -390,10 +392,8 @@ service cloud.firestore {
         || (signedIn() && resource.data.status == 'published' && resource.data.audience == 'friends'
           && resource.data.ownerUid != request.auth.uid
           && (
-            (resource.data.ownerUid < request.auth.uid
-              && exists(/databases/$(database)/documents/friendConnections/$(resource.data.ownerUid + '_' + request.auth.uid)))
-            || (request.auth.uid < resource.data.ownerUid
-              && exists(/databases/$(database)/documents/friendConnections/$(request.auth.uid + '_' + resource.data.ownerUid)))
+            exists(/databases/$(database)/documents/friendConnections/$(resource.data.ownerUid + '_' + request.auth.uid))
+            || exists(/databases/$(database)/documents/friendConnections/$(request.auth.uid + '_' + resource.data.ownerUid))
           ));
       allow create: if isAdmin() && validPublishedActivity();
       allow update: if isAdmin()
