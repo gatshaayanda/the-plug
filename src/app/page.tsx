@@ -15,7 +15,7 @@ export default function Home() {
       <header className="plugNav"><div className="plugContainer plugNavInner">
         <Link href="/" className="plugBrand"><span className="plugMark">P</span><span><strong>THE PLUG</strong><small>Sneakers · Apparel · Sourcing</small></span></Link>
         <nav className="plugLinks"><a href="#member-value">Your space</a><a href="#catalogue">Catalogue</a></nav>
-        <div className="plugActions"><Link href="/account" className="plugButton plugButtonPrimary">Start a request →</Link><button type="button" onClick={openInstallPrompt} className="plugButton plugButtonGhost">Install app</button></div>
+        <div className="plugActions"><Link href="/request" className="plugButton plugButtonPrimary">Start a request →</Link><button type="button" onClick={openInstallPrompt} className="plugButton plugButtonGhost">Install app</button></div>
       </div></header>
 
       <section className="plugHero plugInstallHero"><div className="plugContainer plugHeroGrid">
