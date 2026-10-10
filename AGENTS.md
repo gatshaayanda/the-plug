@@ -12,6 +12,13 @@ The Plug is a Botswana sneaker and apparel sourcing/order PWA for Frank's side b
 - Read this file first. Inspect actual source, route tree, Firebase rules/config, recent commits, and deployment before changing code. Do not invent state.
 - Make the smallest controlled changes, preserve working behavior, inspect the resulting diff, run verification, and report exact commit/deployment state. Never claim a push, fix, notification, request, or deployment succeeded without evidence.
 
+## Accessibility and visual QA — required for every change
+- Text must remain plainly readable against its actual rendered background on mobile and desktop. Never rely on inherited/default colors in new or modified sections; set intentional foreground and background colors for headings, body copy, links, controls, helper text and disabled/loading/error states.
+- Use WCAG 2.2 AA contrast as the baseline: at least 4.5:1 for normal text and 3:1 for large text and meaningful UI boundaries/icons. Do not use low-contrast gray-on-black, blue-on-blue, or muted helper text just for visual subtlety.
+- Check hover, keyboard focus, expanded/collapsed, loading, empty, error, and narrow mobile states. Focus indicators must be visible, not transparent outlines.
+- Before committing a visual change, inspect the exact CSS selectors and their cascade, then verify affected content at mobile and desktop widths. Aesthetic polish never overrides legibility.
+- Interactive disclosure controls must describe the action that will happen next (e.g. “Show member benefits” / “Hide member benefits”), expose `aria-expanded`, and reference the controlled region with `aria-controls`. The icon is supplementary and should be hidden from assistive technology when the label already communicates the action.
+
 ## Customer experience — frictionless start, durable membership
 - The default entry is **start without a sign-in**. Do not make Google sign-in, a password, or installation a prerequisite for exploring The Plug or starting a sourcing request.
 - Where private customer data needs an authenticated identity, use Firebase Anonymous Authentication as the initial device session, only when The Plug's real Firebase web configuration is present. Do not fabricate placeholder credentials in the browser or create an anonymous identity when auth configuration is missing.
