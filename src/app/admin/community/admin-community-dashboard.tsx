@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import {useEffect,useState} from "react";
-import {doc,getDoc,onSnapshot,setDoc,updateDoc} from "firebase/firestore";
+import {doc,getDoc,setDoc,updateDoc} from "firebase/firestore";
 import {db} from "@/lib/firebase/client";
 import {subscribeToAllPlugRequests,type PlugRequest} from "@/lib/firebase/plug-data";
 type ActivityRow={request:PlugRequest;sharePurchases:"private"|"friends"|"public";activityExists:boolean;published:boolean};
