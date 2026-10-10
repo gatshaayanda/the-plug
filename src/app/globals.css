@@ -535,3 +535,7 @@ h1 em{font-style:normal;color:var(--plug-blue);text-shadow:0 0 22px rgba(8,102,2
 .memberActivityColumns article strong{font-size:.9rem;overflow-wrap:anywhere}
 .memberActivityColumns article small{font-size:.73rem;color:#a8a8a8}
 @media(max-width:620px){.memberActivityColumns{grid-template-columns:1fr}}
+
+
+.inviteExistingAccount{margin-top:14px;padding-top:14px;border-top:1px solid #393939}
+.inviteExistingAccount p{font-size:.78rem;color:#aaa;line-height:1.5}
