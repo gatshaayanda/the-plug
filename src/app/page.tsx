@@ -1,27 +1,68 @@
 "use client";
 import Link from "next/link";
 
-const WHATSAPP_CATALOG="https://wa.me/c/26776411150";
-const WHATSAPP="https://wa.me/26776411150";
+const WHATSAPP_CATALOG = "https://wa.me/c/26776411150";
+const WHATSAPP = "https://wa.me/26776411150";
 
-function openInstallPrompt(){window.dispatchEvent(new Event("theplug-open-install"))}
+function openInstallPrompt() {
+  window.dispatchEvent(new Event("theplug-open-install"));
+}
 
-export default function Home(){
- return <main className="plugSite plugInstallLanding">
-  <div className="plugNotice"><div className="plugContainer"><span>🇧🇼 Botswana</span><strong>If we can source it, you can get it.</strong><a href={WHATSAPP}>WhatsApp +267 76 411 150</a></div></div>
-  <header className="plugNav"><div className="plugContainer plugNavInner"><Link href="/" className="plugBrand"><span className="plugMark">P</span><span><strong>THE PLUG</strong><small>Sneakers · Apparel · Sourcing</small></span></Link><nav className="plugLinks"><a href="#why-install">Why install</a><a href="#catalogue">Catalogue</a><a href="#how">How it works</a></nav><div className="plugActions"><Link href="/account" className="plugButton plugButtonGhost">Join with Google</Link><button type="button" onClick={openInstallPrompt} className="plugButton plugButtonPrimary">Install The Plug ↓</button></div></div></header>
+export default function Home() {
+  return (
+    <main className="plugSite plugInstallLanding">
+      <div className="plugNotice"><div className="plugContainer"><span>🇧🇼 Botswana</span><strong>If we can source it, you can get it.</strong><a href={WHATSAPP}>WhatsApp +267 76 411 150</a></div></div>
+      <header className="plugNav"><div className="plugContainer plugNavInner">
+        <Link href="/" className="plugBrand"><span className="plugMark">P</span><span><strong>THE PLUG</strong><small>Sneakers · Apparel · Sourcing</small></span></Link>
+        <nav className="plugLinks"><a href="#member-value">Membership</a><a href="#how">How it works</a><a href="#catalogue">Catalogue</a></nav>
+        <div className="plugActions"><Link href="/account" className="plugButton plugButtonPrimary">Join with Google →</Link><button type="button" onClick={openInstallPrompt} className="plugButton plugButtonGhost">Install app</button></div>
+      </div></header>
 
-  <section className="plugHero plugInstallHero"><div className="plugContainer plugHeroGrid"><div className="plugInstallHeroCopy"><span className="plugKicker">YOUR SOURCING APP · BOTSWANA</span><h1>Your Plug.<br/><em>One tap</em><br/>away.</h1><p>Bring The Plug to your home screen. Keep your sourcing requests, account and private conversations with Frank close—without having to find the link again.</p><div className="plugHeroActions"><button type="button" onClick={openInstallPrompt} className="plugButton plugButtonPrimary plugInstallHeroButton">Install The Plug <span aria-hidden="true">↗</span></button><Link href="/account" className="plugButton plugButtonDark">Join with Google →</Link></div><p className="plugInstallNote"><span aria-hidden="true">✓</span> Built for your phone · <span aria-hidden="true">✓</span> One tap from your home screen · <span aria-hidden="true">✓</span> No separate app-store search</p><a className="plugInstallTextLink" href="#how">See how installation works ↓</a></div>
-   <div className="plugInstallVisual" aria-label="Preview of The Plug on a phone home screen"><div className="plugInstallGlow"/><div className="plugPhone"><div className="plugPhoneStatus"><span>9:41</span><span>●●● ▰</span></div><div className="plugPhoneHeader"><span className="plugPhoneMark">P</span><span><b>THE PLUG</b><small>SNEAKERS · APPAREL</small></span><span className="plugPhoneDots">•••</span></div><div className="plugPhoneTitle"><small>YOUR SOURCING SPACE</small><strong>See it.<br/><em>Send it.</em></strong><span>If we can source it, you can get it.</span></div><div className="plugPhonePanel"><span className="plugPhoneIcon">↗</span><span><b>Start a request</b><small>Send Frank the item you want.</small></span><span>›</span></div><div className="plugPhonePanel"><span className="plugPhoneIcon plugPhoneIconRed">✉</span><span><b>Your conversations</b><small>Keep your details together.</small></span><span>›</span></div><div className="plugPhoneBottom"><span>⌂<small>Home</small></span><span>▤<small>Requests</small></span><span>◉<small>Account</small></span></div></div><div className="plugInstallFloat plugInstallFloatTop"><span>✦</span><div><b>THE PLUG</b><small>Ready when you are.</small></div></div><div className="plugInstallFloat plugInstallFloatBottom"><span>↗</span><div><b>Install once</b><small>Open in one tap.</small></div></div></div>
-  </div></section>
+      <section className="plugHero plugInstallHero"><div className="plugContainer plugHeroGrid">
+        <div className="plugInstallHeroCopy">
+          <span className="plugKicker">YOUR CUSTOMER SPACE · BOTSWANA</span>
+          <h1>Find what you want.<br/><em>Keep it moving.</em></h1>
+          <p>The Plug helps you and Frank keep the important parts of sourcing together: your requests, the details you shared, private conversations and order progress.</p>
+          <div className="plugHeroActions"><Link href="/account" className="plugButton plugButtonPrimary plugInstallHeroButton">Join The Plug with Google <span aria-hidden="true">→</span></Link><a href={WHATSAPP_CATALOG} target="_blank" rel="noreferrer" className="plugButton plugButtonDark">Browse catalogue ↗</a></div>
+          <p className="plugInstallNote"><span aria-hidden="true">✓</span> Your requests in one place · <span aria-hidden="true">✓</span> Private conversations · <span aria-hidden="true">✓</span> Clear order follow-up</p>
+          <a className="plugInstallTextLink" href="#how">See how membership works ↓</a>
+        </div>
+        <div className="plugInstallVisual" aria-label="Preview of The Plug member space"><div className="plugInstallGlow"/><div className="plugPhone">
+          <div className="plugPhoneStatus"><span>THE PLUG</span><span>●●● ▰</span></div>
+          <div className="plugPhoneHeader"><span className="plugPhoneMark">P</span><span><b>YOUR MEMBER SPACE</b><small>SOURCING · CONVERSATIONS</small></span><span className="plugPhoneDots">•••</span></div>
+          <div className="plugPhoneTitle"><small>YOUR NEXT FIND</small><strong>See it.<br/><em>Send it.</em></strong><span>Frank confirms the quote and next steps with you.</span></div>
+          <div className="plugPhonePanel"><span className="plugPhoneIcon">↗</span><span><b>Sourcing requests</b><small>Keep product details together.</small></span><span>›</span></div>
+          <div className="plugPhonePanel"><span className="plugPhoneIcon plugPhoneIconRed">✉</span><span><b>Private conversations</b><small>Follow up with Frank.</small></span><span>›</span></div>
+          <div className="plugPhoneBottom"><span>⌂<small>Home</small></span><span>▤<small>Requests</small></span><span>◉<small>Account</small></span></div>
+        </div><div className="plugInstallFloat plugInstallFloatTop"><span>✦</span><div><b>THE PLUG</b><small>Your sourcing, together.</small></div></div><div className="plugInstallFloat plugInstallFloatBottom"><span>↗</span><div><b>Join once</b><small>Pick up where you left off.</small></div></div></div>
+      </div></section>
 
-  <section id="why-install" className="plugInstallBenefits"><div className="plugContainer"><div className="plugSectionHead"><div><span className="plugKicker">Why install The Plug?</span><h2>Closer to the things you want.</h2><p>Installing adds The Plug to your device like an app. Your browser still handles the secure installation step.</p></div></div><div className="plugInstallBenefitGrid"><article><span className="plugBenefitNumber">01</span><div className="plugBenefitIcon">⌂</div><h3>Right on your home screen</h3><p>Open The Plug directly instead of searching your chats or browser history for the link.</p></article><article><span className="plugBenefitNumber">02</span><div className="plugBenefitIcon">↗</div><h3>Your sourcing journey together</h3><p>Sign in with Google to keep requests, account details and private conversations in one place.</p></article><article><span className="plugBenefitNumber">03</span><div className="plugBenefitIcon">✦</div><h3>Made for repeat visits</h3><p>Return to The Plug when you spot a pair, find a look or want to ask Frank about sourcing something.</p></article></div></div></section>
+      <section id="member-value" className="plugInstallBenefits"><div className="plugContainer">
+        <div className="plugSectionHead"><div><span className="plugKicker">More than a catalogue link</span><h2>A better way to follow through.</h2><p>WhatsApp is still where Frank’s live catalogue and direct contact live. The Plug adds a member account around your own sourcing journey.</p></div></div>
+        <div className="plugInstallBenefitGrid">
+          <article><span className="plugBenefitNumber">01</span><div className="plugBenefitIcon">↗</div><h3>Tell Frank what you want</h3><p>Share a product name, link or screenshot with your size, colour and notes in one request.</p></article>
+          <article><span className="plugBenefitNumber">02</span><div className="plugBenefitIcon">✉</div><h3>Keep your follow-up together</h3><p>Return to your account for request history, recorded status and private conversations.</p></article>
+          <article><span className="plugBenefitNumber">03</span><div className="plugBenefitIcon">✦</div><h3>Stay in the loop</h3><p>Member updates and any offers will be shown when Frank actually publishes them. No made-up discounts or promises.</p></article>
+        </div>
+      </div></section>
 
-  <section id="how" className="plugSection plugHow plugInstallHow"><div className="plugContainer"><div className="plugSectionHead"><div><span className="plugKicker">Get it on your device</span><h2>Install. Open. Get started.</h2><p>Tap the install button and follow the prompt for your browser. If your browser does not offer one, The Plug will show the right steps for your device.</p></div><button type="button" onClick={openInstallPrompt} className="plugButton plugButtonPrimary">Install The Plug →</button></div><div className="plugSteps"><article><b>01</b><h3>Install The Plug</h3><p>Use the branded install prompt and confirm in your browser. On iPhone, open this page in Safari and use Share → Add to Home Screen.</p></article><article><b>02</b><h3>Join with Google</h3><p>Create or connect your member account so your requests and private conversations stay together.</p></article><article><b>03</b><h3>Send what you want</h3><p>Browse the WhatsApp catalogue or send Frank a product link, photo, size and colour preference.</p></article><article><b>04</b><h3>Follow up in The Plug</h3><p>Check your account and return to your sourcing journey. Frank confirms the quote and expected timing for each request.</p></article></div></div></section>
+      <section id="how" className="plugSection plugHow plugInstallHow"><div className="plugContainer">
+        <div className="plugSectionHead"><div><span className="plugKicker">Your first visit</span><h2>Join. Share. Follow through.</h2><p>Start with your member account. Set up alerts if you want them, then use The Plug when you need Frank to source something.</p></div><Link href="/account" className="plugButton plugButtonPrimary">Join with Google →</Link></div>
+        <div className="plugSteps">
+          <article><b>01</b><h3>Join with Google</h3><p>Your account keeps private requests and conversations connected to you.</p></article>
+          <article><b>02</b><h3>Check your details</h3><p>Add the right WhatsApp number and delivery preference so Frank can follow up.</p></article>
+          <article><b>03</b><h3>Send what you want</h3><p>Share a product, size, colour and screenshot if helpful. You can also browse the WhatsApp catalogue.</p></article>
+          <article><b>04</b><h3>Confirm before paying</h3><p>Frank confirms the current quote and expected timing. A request is not a stock confirmation or an order payment.</p></article>
+        </div>
+      </div></section>
 
-  <section id="catalogue" className="plugSection plugCatalogueSection"><div className="plugContainer plugCatalogueGrid"><div><span className="plugKicker">The catalogue stays simple</span><h2>Products on WhatsApp.<br/><em>Your journey in The Plug.</em></h2><p>The Plug does not ask Frank to maintain a second product catalogue. Browse the live WhatsApp catalogue, then use The Plug for your account and sourcing requests.</p><a href={WHATSAPP_CATALOG} target="_blank" rel="noreferrer" className="plugButton plugButtonDark">Browse WhatsApp catalogue ↗</a></div><div className="plugCatalogueCard"><span className="plugCatalogueBadge">LIVE BUSINESS CATALOGUE</span><div className="plugCatalogueMark">P</div><strong>See something?</strong><p>Send the product link or screenshot to Frank. Current prices, sizes and sourcing availability are confirmed with the business.</p><a href={WHATSAPP} target="_blank" rel="noreferrer">WhatsApp Frank · +267 76 411 150 →</a></div></div></section>
+      <section id="catalogue" className="plugSection plugCatalogueSection"><div className="plugContainer plugCatalogueGrid">
+        <div><span className="plugKicker">The catalogue stays simple</span><h2>Products on WhatsApp.<br/><em>Your journey in The Plug.</em></h2><p>Frank keeps his existing WhatsApp catalogue as the source of truth. You do not need to maintain another list or assume that a pictured item is in stock.</p><a href={WHATSAPP_CATALOG} target="_blank" rel="noreferrer" className="plugButton plugButtonDark">Browse WhatsApp catalogue ↗</a></div>
+        <div className="plugCatalogueCard"><span className="plugCatalogueBadge">LIVE BUSINESS CATALOGUE</span><div className="plugCatalogueMark">P</div><strong>Found something?</strong><p>Share the product link or screenshot with Frank. Current price, size and sourcing availability are confirmed directly.</p><a href={WHATSAPP} target="_blank" rel="noreferrer">WhatsApp Frank · +267 76 411 150 →</a></div>
+      </div></section>
 
-  <section id="contact" className="plugContact"><div className="plugContainer plugContactGrid"><div><span className="plugKicker">Have something in mind?</span><h2>Show us what you want.</h2><p>If it exists somewhere, The Plug can try to source it. Send a screenshot, your size and any colour preference.</p></div><div className="plugContactCard"><strong>+267 76 411 150</strong><span>Call or WhatsApp Frank</span><div><Link href="/request" className="plugButton plugButtonPrimary">Start a sourcing request</Link><a className="plugButton plugButtonDark" href={WHATSAPP}>WhatsApp Frank</a></div></div></div></section>
-  <footer className="plugFooter"><div className="plugContainer"><strong>THE PLUG</strong><span>Sneakers · Apparel · Sourcing in Botswana</span><button type="button" onClick={openInstallPrompt}>Install The Plug ↑</button><Link href="/admin">Admin</Link></div></footer>
- </main>;
+      <section id="contact" className="plugContact"><div className="plugContainer plugContactGrid"><div><span className="plugKicker">Need a hand?</span><h2>Start with what you want.</h2><p>Join The Plug to keep your request and follow-up together, or contact Frank directly if you need help.</p></div><div className="plugContactCard"><strong>+267 76 411 150</strong><span>Call or WhatsApp Frank</span><div><Link href="/request" className="plugButton plugButtonPrimary">Start a sourcing request</Link><a className="plugButton plugButtonDark" href={WHATSAPP}>WhatsApp Frank</a></div></div></div></section>
+      <footer className="plugFooter"><div className="plugContainer"><strong>THE PLUG</strong><span>Sneakers · Apparel · Sourcing in Botswana</span><button type="button" onClick={openInstallPrompt}>Install app ↑</button><Link href="/account">Member account</Link><Link href="/admin">Admin</Link></div></footer>
+    </main>
+  );
 }
