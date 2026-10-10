@@ -380,3 +380,17 @@ h1 em{font-style:normal;color:var(--plug-blue);text-shadow:0 0 22px rgba(8,102,2
 @keyframes plugInstallEnter{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:560px){.plugInstallModal{padding:23px 20px 20px;border-radius:22px}.plugInstallTop{margin-bottom:22px}.plugInstallModal h2{font-size:3.25rem}.plugInstallModalBenefits{margin:17px 0}.plugInstallModalBenefits>span{padding:9px 0}}
 @media(prefers-reduced-motion:reduce){.plugInstallModal{animation:none}}
+
+
+/* The Plug storefront hierarchy: own finds/deals first, external discovery last. */
+.plugTextLink,.plugCatalogueFallback{position:relative;display:inline-block;margin-top:14px;color:#0866ff;font-size:.84rem;font-weight:900;text-decoration:none}
+.plugTextLink:hover,.plugCatalogueFallback:hover{text-decoration:underline}
+.plugDealEmpty{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:26px;margin-top:24px;padding:30px;border:1px solid #e5e7eb;border-radius:20px;background:linear-gradient(135deg,#fff,#f7f8fb)}
+.plugDealEmpty .plugCatalogueMark{margin:0;flex:none}
+.plugDealEmpty strong{display:block;font-size:1.25rem;letter-spacing:-.04em;color:#111}
+.plugDealEmpty p{max-width:620px;color:#666;font-size:.9rem;line-height:1.65;margin:8px 0 18px}
+.plugExternalFallback{padding:46px 0;background:#f4f5f8}
+.plugExternalFallback h2{margin:12px 0;font-family:Arial,Helvetica,sans-serif;font-size:clamp(2rem,4vw,3rem);letter-spacing:-.06em;color:#111}
+.plugExternalFallback p{max-width:650px;color:#666;line-height:1.7}
+.plugExternalFallback .plugHeroActions{margin-top:20px}
+@media(max-width:700px){.plugDealEmpty{grid-template-columns:1fr;padding:23px}.plugExternalFallback{padding:38px 0}}
