@@ -618,23 +618,6 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .plugEditorialHome .plugMemberLoop :focus-visible{outline:3px solid #c8dcff!important;outline-offset:3px}
 
 
-/* Account setup: compact, actionable onboarding aligned with the editorial storefront. */
-.memberSetup{margin:22px 0 26px;padding:21px;border:1px solid #454545;border-radius:15px;background:#111;color:#f7f7f7}
-.memberSetupHeading{margin-bottom:16px}
-.memberSetupHeading h2{margin:8px 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.55rem,3vw,2.15rem);font-weight:500;line-height:1.1;color:#fff}
-.memberSetupHeading p{max-width:660px;margin:0;color:#e2e2e2;font-size:.87rem;line-height:1.55}
-.memberSetupGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.memberSetupCard{display:grid;align-content:start;gap:10px;min-width:0;padding:15px;border:1px solid #505050;border-radius:11px;background:#191919;color:#fff;text-decoration:none;transition:border-color .18s ease,background .18s ease,transform .18s ease}
-.memberSetupCard>span{color:#c8dcff;font-size:.62rem;font-weight:950;letter-spacing:.09em}
-.memberSetupCard>strong{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#fff;font-size:.94rem;line-height:1.3}
-.memberSetupCard>strong b{color:#c8dcff;font-size:1rem}
-.memberSetupCard>small{color:#e0e0e0;font-size:.78rem;line-height:1.5}
-.memberSetupCard:hover{border-color:#c8dcff;background:#202020;transform:translateY(-1px)}
-.memberSetupCard:focus-visible{outline:3px solid #c8dcff;outline-offset:3px;border-color:#c8dcff}
-@media(max-width:520px){.memberSetup{padding:16px}.memberSetupGrid{grid-template-columns:1fr}.memberSetupCard{padding:14px}}
-@media(prefers-reduced-motion:reduce){.memberSetupCard{transition:none}.memberSetupCard:hover{transform:none}}
-
-
 /* Clear, step-by-step member setup. Keep the request itself easy to find. */
 .memberSetup{margin:18px 0 22px;padding:clamp(16px,3vw,24px);border:1px solid #353535;border-radius:16px;background:linear-gradient(145deg,#171717,#0d0d0d);color:#fff}
 .memberSetupHeading h2{margin:8px 0;font-size:clamp(1.55rem,3vw,2.15rem);font-weight:750;letter-spacing:-.035em;line-height:1.08;color:#fff}
@@ -653,3 +636,10 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .memberSharedInterests p{margin:7px 0 0;color:#ddd;font-size:.78rem;line-height:1.5}
 @media(max-width:520px){.memberSetupGrid{grid-template-columns:1fr}.memberSetupCard{padding:14px}}
 @media(prefers-reduced-motion:reduce){.memberSetupCard{transition:none}}
+
+/* Non-interactive onboarding states are distinct from actionable links. */
+.memberSetupCardLater{cursor:default;border-style:dashed;border-color:#5b5b5b;background:#141414}
+.memberSetupCardLater:hover{border-color:#5b5b5b;background:#141414;transform:none}
+.memberSetupCardComplete{border-color:#55745b;background:#1a2a1e}
+.memberSetupCardComplete>span{color:#c2e8c9}
+.memberSetupCardComplete>strong b{color:#c2e8c9}
