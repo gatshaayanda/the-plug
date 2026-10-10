@@ -325,6 +325,42 @@ service cloud.firestore {
       allow delete: if isAdmin() || (signedIn() && resource.data.inviterUid == request.auth.uid && resource.data.status == 'pending');
     }
 
+    match /friendConnections/{connectionId} {
+      function validAcceptedInvite() {
+        let invitePath = /databases/$(database)/documents/friendInvites/$(request.resource.data.inviteId);
+        return request.resource.data.keys().hasOnly(['memberA','memberB','inviteId','createdAt'])
+          && request.resource.data.keys().hasAll(['memberA','memberB','inviteId','createdAt'])
+          && request.resource.data.memberA is string
+          && request.resource.data.memberB is string
+          && request.resource.data.memberA < request.resource.data.memberB
+          && connectionId == request.resource.data.memberA + '_' + request.resource.data.memberB
+          && request.resource.data.inviteId is string
+          && request.resource.data.createdAt is string
+          && existsAfter(invitePath)
+          && getAfter(invitePath).data.status == 'accepted'
+          && getAfter(invitePath).data.recipientUid == request.auth.uid
+          && (
+            (getAfter(invitePath).data.inviterUid == request.resource.data.memberA
+              && getAfter(invitePath).data.recipientUid == request.resource.data.memberB)
+            || (getAfter(invitePath).data.inviterUid == request.resource.data.memberB
+              && getAfter(invitePath).data.recipientUid == request.resource.data.memberA)
+          );
+      }
+
+      allow get: if isAdmin() || (signedIn()
+        && (!exists(/databases/$(database)/documents/friendConnections/$(connectionId))
+          || resource.data.memberA == request.auth.uid
+          || resource.data.memberB == request.auth.uid));
+      allow list: if isAdmin() || (signedIn()
+        && (resource.data.memberA == request.auth.uid || resource.data.memberB == request.auth.uid));
+      allow create: if signedIn()
+        && request.auth.token.firebase.sign_in_provider != 'anonymous'
+        && validAcceptedInvite();
+      allow update: if false;
+      allow delete: if isAdmin() || (signedIn()
+        && (resource.data.memberA == request.auth.uid || resource.data.memberB == request.auth.uid));
+    }
+
     match /dailyReconciliations/{date} {
       allow read: if isAdmin();
       allow create, update: if isAdmin() && validReconciliation();
