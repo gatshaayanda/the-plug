@@ -547,3 +547,25 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .plugProductExpanded{margin-top:12px;padding:13px;background:#f5f4f0;border:1px solid #d8d5cc}
 .plugProductExpanded p{margin:0 0 12px;color:#62615d;font-size:.8rem;line-height:1.5}
 .plugProductExpandedAction{display:inline-flex;align-items:center;min-height:40px;padding:9px 12px;background:#111;color:#fff;font-size:.72rem;font-weight:900}
+
+
+/* Clear, tactile calls to action: shimmer is decorative, never the only cue. */
+.plugMemberLoopToggle{position:relative;overflow:hidden;isolation:isolate;box-shadow:0 0 0 1px rgba(185,211,255,.08);transition:transform .18s ease,border-color .18s ease,background .18s ease}
+.plugMemberLoopToggle:before,.plugJourneyContinue:before{content:"";position:absolute;inset:-40% auto -40% -55%;width:36%;transform:skewX(-20deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);pointer-events:none;animation:plugCtaShimmer 4.8s ease-in-out infinite;z-index:-1}
+.plugMemberLoopToggle:hover,.plugJourneyContinue:hover{transform:translateY(-1px)}
+.plugMemberLoopToggle:active,.plugJourneyContinue:active{transform:translateY(1px) scale(.99)}
+.plugMemberLoopToggle:focus-visible,.plugJourneyContinue:focus-visible{outline:3px solid #b9d3ff;outline-offset:3px}
+.plugMemberLoopToggle span{display:inline-grid;place-items:center;min-width:25px;min-height:25px;border:1px solid #686868;border-radius:50%;font-size:1.05rem}
+@keyframes plugCtaShimmer{0%,62%{left:-55%}82%,100%{left:130%}}
+.plugJourneyShell{max-width:900px;margin:0 auto}
+.plugJourneyTop{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.plugJourneySteps{display:flex;gap:7px;margin:0 0 22px;padding:0;list-style:none}
+.plugJourneySteps li{flex:1;height:4px;border-radius:99px;background:#393939}
+.plugJourneySteps li.isActive{background:#b9d3ff;box-shadow:0 0 12px rgba(185,211,255,.3)}
+.plugJourneyContinue{position:relative;overflow:hidden;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:48px;padding:12px 18px;border:1px solid #b9d3ff;border-radius:999px;background:#b9d3ff;color:#101010;font-weight:950;cursor:pointer;box-shadow:0 0 18px rgba(185,211,255,.14);transition:transform .18s ease,box-shadow .18s ease}
+.plugJourneyContinue:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.plugJourneySecondary{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 14px;border:1px solid #494949;border-radius:999px;color:#eee;font-weight:800}
+.plugJourneyActions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:20px}
+.plugJourneyCopy{max-width:680px;color:#c6c6c6;line-height:1.6}
+.plugJourneyNumber{display:inline-block;color:#b9d3ff;font-size:.7rem;font-weight:950;letter-spacing:.12em;text-transform:uppercase}
+@media(prefers-reduced-motion:reduce){.plugMemberLoopToggle:before,.plugJourneyContinue:before{animation:none!important;display:none}.plugMemberLoopToggle,.plugJourneyContinue{transition:none}}
