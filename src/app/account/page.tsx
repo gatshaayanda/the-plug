@@ -14,7 +14,7 @@ import MemberActivityFeed from "@/components/MemberActivityFeed";
 function authMessage(error:unknown){
  const code=typeof error==="object"&&error&&"code" in error?String((error as {code?:unknown}).code):"";
  if(code==="auth/popup-closed-by-user")return "Google sign-in was cancelled.";
- if(code==="auth/credential-already-in-use"||code==="auth/account-exists-with-different-credential")return "That Google account already has a separate The Plug account. Your current activity has not been moved. Keep using this session for now and contact Frank before switching accounts.";
+ if(code==="auth/credential-already-in-use"||code==="auth/account-exists-with-different-credential")return "That Google account already has a separate The Plug account. Your current activity has not been merged. Keep this session open; choose the existing account only when you’re sure which history you need.";
  if(code==="auth/popup-blocked")return "Your browser blocked the Google sign-in window. Allow pop-ups for The Plug and try again.";
  if(code==="auth/unauthorized-domain")return "Google sign-in is not enabled for this website yet. Try again later; your current session has not been changed.";
  if(code==="auth/configuration-not-found"||code==="auth/operation-not-allowed")return "Google sign-in is not available yet. The Plug's sign-in setup is incomplete. Try again later.";
