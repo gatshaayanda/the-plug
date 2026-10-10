@@ -278,7 +278,7 @@ service cloud.firestore {
           && request.resource.data.createdAt is string && request.resource.data.updatedAt is string
           && (!request.resource.data.keys().hasAny(['price']) || (request.resource.data.price is number && request.resource.data.price >= 0));
       }
-      allow read: if isAdmin() || (resource.data.status == 'published' && resource.data.audience == 'everyone');
+      allow read: if isAdmin() || (resource.data.status in ['published','scheduled'] && resource.data.audience == 'everyone');
       allow create: if isAdmin() && validStorefrontContent();
       allow update: if isAdmin() && validStorefrontContent();
       allow delete: if isAdmin();
