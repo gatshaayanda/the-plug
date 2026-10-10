@@ -55,7 +55,7 @@ self.addEventListener("fetch", event => {
   if (url.pathname.startsWith("/api/")) return;
 
   const isNavigation = request.mode === "navigate" || request.headers.get("accept")?.includes("text/html");
-  const isPrivate = /^\\/(?:account|request|requests|orders|admin|invite)(?:\\/|$)/.test(url.pathname);
+  const isPrivate = /^\/(?:account|request|requests|orders|admin|invite)(?:\/|$)/.test(url.pathname);
 
   // Private/member routes are network-only. Never serve a cached account/request page as
   // a substitute for a different route or when the authenticated page cannot be fetched.
