@@ -24,9 +24,9 @@ export default function InviteAcceptance({inviteId}:{inviteId:string}){
    const data=snap.data() as Omit<Invite,"id">;
    if(data.status!=="pending"||!(data.expiresAt instanceof Timestamp)||data.expiresAt.toMillis()<=Date.now())throw new Error("This invite has expired. Ask your friend for a new one.");
    if(data.inviterUid===confirmedUser.uid)throw new Error("You cannot accept your own invite.");
-   const pair=[data.inviterUid,confirmedUser.uid].sort();const connectionId=pair.join("_");const acceptedAt=new Date().toISOString();const batch=writeBatch(db);
+   const pair=[data.inviterUid,confirmedUser.uid].sort();const connectionId=pair.join("_");const connectionRef=doc(db,"friendConnections",connectionId);const existingConnection=await getDoc(connectionRef);const acceptedAt=new Date().toISOString();const batch=writeBatch(db);
    batch.update(inviteRef,{status:"accepted",recipientUid:confirmedUser.uid,acceptedAt});
-   batch.set(doc(db,"friendConnections",connectionId),{memberA:pair[0],memberB:pair[1],inviteId,createdAt:acceptedAt});
+   if(!existingConnection.exists())batch.set(connectionRef,{memberA:pair[0],memberB:pair[1],inviteId,createdAt:acceptedAt});
    await batch.commit();setInvite({...data,id:inviteId,status:"accepted",recipientUid:confirmedUser.uid});setAccepted(true);setMessage("You’re connected. Your friend’s activity will follow the privacy choices each of you makes.");
   }catch(error){setMessage(error instanceof Error?error.message:"The invitation could not be accepted. Please try again.")}finally{setBusy(false)}
  }
