@@ -63,7 +63,6 @@ function clearDismissal() {
 export default function PwaRegister({ initialEmbedded = false, initialAndroid = false }: { initialEmbedded?: boolean; initialAndroid?: boolean }) {
   const [offline, setOffline] = useState(false);
   const [reconnecting, setReconnecting] = useState(false);
-  const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
   const installPromptRef = useRef<InstallPromptEvent | null>(null);
   const [installState, setInstallState] = useState<InstallState>(initialEmbedded ? "embedded" : "hidden");
   const [updateReady, setUpdateReady] = useState<ServiceWorker | null>(null);
@@ -118,7 +117,6 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
       event.preventDefault();
       const prompt = event as InstallPromptEvent;
       installPromptRef.current = prompt;
-      setInstallPrompt(prompt);
       // Retain the one-shot native event for the user's explicit Install click.
       // Do not interrupt page load with a second, custom install screen.
     };
@@ -165,7 +163,6 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
     };
     const appInstalled = () => {
       installPromptRef.current = null;
-      setInstallPrompt(null);
       setInstallHelpOpen(false);
       setInstallState("hidden");
       clearDismissal();
@@ -256,7 +253,6 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
       // generic Chrome-menu instructions when the native prompt fails.
     } finally {
       installPromptRef.current = null;
-      setInstallPrompt(null);
       setInstallHelpOpen(false);
       setInstallState("hidden");
     }
