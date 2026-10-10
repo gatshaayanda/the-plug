@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import {useEffect,useState} from "react";
-import {GoogleAuthProvider,linkWithPopup,onAuthStateChanged,signInAnonymously,type User} from "firebase/auth";
+import {GoogleAuthProvider,linkWithPopup,onAuthStateChanged,signInAnonymously,signInWithPopup,type User} from "firebase/auth";
 import {doc,getDoc,onSnapshot,Timestamp,updateDoc,writeBatch} from "firebase/firestore";
 import {auth,db,hasFirebaseWebConfig} from "@/lib/firebase/client";
 
