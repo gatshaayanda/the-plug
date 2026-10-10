@@ -27,6 +27,7 @@ export default function AccountPage(){
  const[user,setUser]=useState<User|null>(null),[profile,setProfile]=useState<CustomerProfile|null>(null),[requests,setRequests]=useState<PlugRequest[]>([]),[busy,setBusy]=useState(false),[authReady,setAuthReady]=useState(false),[message,setMessage]=useState("");
  const suppressAutoAnonymous=useRef(false);
 
+ useEffect(()=>{const params=new URLSearchParams(window.location.search);if(params.has("submitted"))setMessage("Your request is saved. Frank will review it and confirm availability, final price and timing. Nothing is ordered or charged yet.");},[]);
  useEffect(()=>{
   let stopRequests=()=>{};
   void setPersistence(auth,browserLocalPersistence).catch(()=>{});
