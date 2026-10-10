@@ -4,6 +4,7 @@ import {collection,onSnapshot,query,where} from "firebase/firestore";
 import {useEffect,useMemo,useRef,useState} from "react";
 import {db} from "@/lib/firebase/client";
 import {trackPlugJourney} from "@/lib/firebase/journey-analytics";
+import PlugLoadingState from "@/components/PlugLoadingState";
 type StorefrontItem={id:string;type:"find"|"deal";title:string;description:string;imageUrl:string;price?:number;status:string;audience:string;startsAt?:string;endsAt?:string;ctaLabel?:string;sortOrder?:number;updatedAt?:string};
 function isLive(item:StorefrontItem,now:number){return (item.status==="published"||item.status==="scheduled")&&item.audience==="everyone"&&(!item.startsAt||new Date(item.startsAt).getTime()<=now)&&(!item.endsAt||new Date(item.endsAt).getTime()>=now);}
 function money(value:number){return new Intl.NumberFormat("en-BW",{style:"currency",currency:"BWP",maximumFractionDigits:2}).format(value);}
