@@ -12,15 +12,20 @@ The Plug is a Botswana sneaker and apparel sourcing/order PWA for Frank's side b
 - Read this file first. Inspect actual source, route tree, Firebase rules/config, recent commits, and deployment before changing code. Do not invent state.
 - Make the smallest controlled changes, preserve working behavior, inspect the resulting diff, run verification, and report exact commit/deployment state. Never claim a push, fix, notification, request, or deployment succeeded without evidence.
 
-## Customer experience — account-first
-- The intended customer model is an account-based member experience, not guest-first. Google sign-in should be the clear, low-friction entry path.
-- Do not silently create anonymous customer accounts or let customers submit sourcing requests as guests. A customer must be signed in with a persistent account before using private feed, private messages, saved profile, sourcing requests, and order tracking.
-- Public landing/discovery content may explain The Plug and link to the WhatsApp catalogue/contact, but clearly signal that member features require an account. Keep the value proposition visible before asking the customer to sign in.
-- Preserve a return path through sign-in so a customer resumes the task they started. Handle cancelled/blocked popups, unauthorized domains, network failures and sign-out with actionable, non-technical messages.
-- After sign-in, guide customers to complete essential profile details, then offer notification setup and a real test. Notification permission remains controlled by the browser/OS; do not imply it can be forced or that permission alone proves delivery.
+## Customer experience — frictionless start, durable membership
+- The default entry is **start without a sign-in**. Do not make Google sign-in, a password, or installation a prerequisite for exploring The Plug or starting a sourcing request.
+- Where private customer data needs an authenticated identity, use Firebase Anonymous Authentication as the initial device session, only when The Plug's real Firebase web configuration is present. Do not fabricate placeholder credentials in the browser or create an anonymous identity when auth configuration is missing.
+- Explain the trade-off plainly: the initial private session is tied to the browser/device. Clearing site data, losing that browser session, or switching devices before linking a credential may make that history inaccessible. Do not describe anonymous auth as a permanent account.
+- Invite customers to **connect Google later** when the benefit is concrete (preserving access across devices, saved request history, and private conversations). Linking must use Firebase credential-linking so the anonymous UID and its data are preserved. Never silently sign the customer out of an anonymous session or overwrite it with a separate account.
+- Handle the case where a Google credential already belongs to another Firebase UID explicitly. Do not claim that data was merged or moved; preserve the current session and explain the safe next step. Do not implement cross-account migration without a reviewed, tested data migration plan and security-rule implications.
+- Phone sign-in and email/password may be offered as later alternatives, but do not add extra choice or OTP/password friction before validating the core customer journey. Google is an optional account-linking path, not a mandatory entrance gate.
+- Private feed, messages, customer profile, sourcing requests and orders remain authenticated and owner-scoped. Anonymous Firebase users are authenticated users for rules purposes, but must not be treated as verified phone/email identities or admins.
+- Preserve return paths through any account-linking/sign-in flow. Handle cancelled/blocked popups, unauthorized domains, network failures and sign-out with actionable, non-technical messages.
+- Show member value before asking for permissions. Notification permission is optional, requested only after explaining the actual benefit and when the notification feature is ready. Do not imply permission alone proves delivery.
 - Member value: private updates from Frank, new-drop/catalogue-reorganisation notices, published member offers, account-linked private inquiries, request/order status, and legitimate recorded rewards. Do not invent active offers, deadlines, winners, stock, balances or discounts.
 - Customers can privately reply to an announcement with its context attached. Keep conversations scoped to their authenticated customer ID; admins remain role-controlled.
 - The private feed must never feel empty: when there are no live posts, show clearly labelled evergreen programme information and examples of possible member benefits, not fake announcements or active promotions.
+- If Firebase web configuration is unavailable, show a clear fallback and direct WhatsApp route; do not pretend a local/anonymous session or request submission succeeded.
 
 ## Customer sourcing and commercial workflow
 1. Customer shares a listed item or submits a sourcing request while signed in.
@@ -72,12 +77,17 @@ The Plug is a Botswana sneaker and apparel sourcing/order PWA for Frank's side b
 - Use concise, purposeful emojis paired with words, visible action cues, clear status feedback and responsive layouts. Avoid stacked overlays, ambiguous buttons and decorative motion that competes with the task.
 
 ## UX and accessibility research standard
+- Account friction evidence: Baymard’s delayed-account-creation research finds that interrupting users with account creation before their primary task can distract or cause abandonment; apply this directionally to The Plug, while recognizing the cited study is ecommerce checkout research rather than a Botswana sourcing-app experiment. https://baymard.com/research-articles/delayed-account-creation
+- Firebase supports temporary anonymous accounts for protected data and credential linking to preserve that account’s data; this is the technical basis for frictionless entry, not a guarantee that an unlinked session survives cleared browser storage or device changes. https://firebase.google.com/docs/auth/web/anonymous-auth
+- Progressive disclosure: keep the initial choice set small and reveal account-security options when their benefit is relevant. https://www.nngroup.com/articles/progressive-disclosure/
 - Use current primary sources where possible: web.dev/MDN for PWA install behavior, Firebase documentation for push/auth, W3C WCAG for accessibility, and credible usability research (e.g. Nielsen Norman Group) for ecommerce hierarchy and feedback.
 - Make product imagery/selection controls prominent when real verified inventory is available; use search/filter and clear next actions rather than fake product data.
 - Use motion to signal state changes, focus or navigation—not as decoration. Respect `prefers-reduced-motion`, avoid flashing/continuous distracting motion, maintain visible focus, semantic headings, labels, keyboard operation, adequate contrast and comfortable touch targets.
 - Do not use psychological research as a pretext for dark patterns, false urgency, fake scarcity, guilt, or notification coercion. Explain member value honestly and let the customer make an informed choice.
 
 ## Verification
+- For the frictionless-start/auth checkpoint, inspect anonymous-session creation, persistence, credential linking, existing-Google-account conflicts, request submission, profile ownership, conversation privacy, Storage rules, and the actual production Firebase config/provider state. Verify that missing config cannot create fake users or imply a saved request.
+- Do not ask the user to paste Firebase rules just because anonymous sign-in is introduced: first compare the proposed changes with the repository’s current firestore.rules and storage.rules. If rules need changing, present the exact complete rules and the Firebase Console path, and wait for the user to paste/deploy them before claiming production writes are authorized.
 - Before a meaningful checkpoint run: `npx tsc --noEmit`, `npm run lint`, `npm run build`.
 - Inspect actual diff and repository status before committing. Verify public browser/deployment behavior when tools allow it.
 - Do not tell the user to QA before the source change is committed and the deployment is READY. If local verification is unavailable through repository tooling, state that limitation rather than pretending tests ran.

@@ -15,15 +15,15 @@ export default function Home() {
       <header className="plugNav"><div className="plugContainer plugNavInner">
         <Link href="/" className="plugBrand"><span className="plugMark">P</span><span><strong>THE PLUG</strong><small>Sneakers · Apparel · Sourcing</small></span></Link>
         <nav className="plugLinks"><a href="#member-value">Membership</a><a href="#how">How it works</a><a href="#catalogue">Catalogue</a></nav>
-        <div className="plugActions"><Link href="/account" className="plugButton plugButtonPrimary">Join with Google →</Link><button type="button" onClick={openInstallPrompt} className="plugButton plugButtonGhost">Install app</button></div>
+        <div className="plugActions"><Link href="/account" className="plugButton plugButtonPrimary">Get started — no sign-in →</Link><button type="button" onClick={openInstallPrompt} className="plugButton plugButtonGhost">Install app</button></div>
       </div></header>
 
       <section className="plugHero plugInstallHero"><div className="plugContainer plugHeroGrid">
         <div className="plugInstallHeroCopy">
           <span className="plugKicker">YOUR CUSTOMER SPACE · BOTSWANA</span>
           <h1>Find what you want.<br/><em>Keep it moving.</em></h1>
-          <p>The Plug helps you and Frank keep the important parts of sourcing together: your requests, the details you shared, private conversations and order progress.</p>
-          <div className="plugHeroActions"><Link href="/account" className="plugButton plugButtonPrimary plugInstallHeroButton">Join The Plug with Google <span aria-hidden="true">→</span></Link><a href={WHATSAPP_CATALOG} target="_blank" rel="noreferrer" className="plugButton plugButtonDark">Browse catalogue ↗</a></div>
+          <p>Start with The Plug straight away—no Google sign-in or password needed. Keep your requests, the details you share, private conversations and order progress together.</p>
+          <div className="plugHeroActions"><Link href="/account" className="plugButton plugButtonPrimary plugInstallHeroButton">Get started — no sign-in <span aria-hidden="true">→</span></Link><a href={WHATSAPP_CATALOG} target="_blank" rel="noreferrer" className="plugButton plugButtonDark">Browse catalogue ↗</a></div>
           <p className="plugInstallNote"><span aria-hidden="true">✓</span> Your requests in one place · <span aria-hidden="true">✓</span> Private conversations · <span aria-hidden="true">✓</span> Clear order follow-up</p>
           <a className="plugInstallTextLink" href="#how">See how membership works ↓</a>
         </div>
@@ -47,9 +47,9 @@ export default function Home() {
       </div></section>
 
       <section id="how" className="plugSection plugHow plugInstallHow"><div className="plugContainer">
-        <div className="plugSectionHead"><div><span className="plugKicker">Your first visit</span><h2>Join. Share. Follow through.</h2><p>Start with your member account. Set up alerts if you want them, then use The Plug when you need Frank to source something.</p></div><Link href="/account" className="plugButton plugButtonPrimary">Join with Google →</Link></div>
+        <div className="plugSectionHead"><div><span className="plugKicker">Your first visit</span><h2>Join. Share. Follow through.</h2><p>Start straight away. You can connect Google later if you want to protect your history and return from another device.</p></div><Link href="/account" className="plugButton plugButtonPrimary">Get started — no sign-in →</Link></div>
         <div className="plugSteps">
-          <article><b>01</b><h3>Join with Google</h3><p>Your account keeps private requests and conversations connected to you.</p></article>
+          <article><b>01</b><h3>Start without a sign-in</h3><p>Get going immediately. Connect Google later to help keep your history when you change devices.</p></article>
           <article><b>02</b><h3>Check your details</h3><p>Add the right WhatsApp number and delivery preference so Frank can follow up.</p></article>
           <article><b>03</b><h3>Send what you want</h3><p>Share a product, size, colour and screenshot if helpful. You can also browse the WhatsApp catalogue.</p></article>
           <article><b>04</b><h3>Confirm before paying</h3><p>Frank confirms the current quote and expected timing. A request is not a stock confirmation or an order payment.</p></article>
