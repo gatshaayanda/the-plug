@@ -20,15 +20,15 @@ export default function PlugLoadingState({message, onRetry}: PlugLoadingStatePro
       <div className="plugLoadingStateTop">
         <span className="plugLoadingStatePulse" aria-hidden="true" />
         <span>{takingLonger ? "Still connecting…" : message}</span>
-        <span className="plugLoadingStateLive">LIVE</span>
+        <span className="plugLoadingStateLive">SYNCING</span>
       </div>
       <div className="plugLoadingStateTrack" aria-hidden="true">
         <span />
       </div>
-      <p>{takingLonger ? "The connection is taking longer than usual. The Plug is still trying." : "Connecting to the latest updates…"}</p>
+      <p>{takingLonger ? "The connection is taking longer than usual. The Plug is still checking." : "Checking for published updates…"}</p>
       {takingLonger && onRetry && (
         <button type="button" className="plugLoadingStateRetry" onClick={onRetry}>
-          Retry connection ↻
+          Try again ↻
         </button>
       )}
     </div>
