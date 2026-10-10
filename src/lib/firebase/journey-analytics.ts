@@ -1,6 +1,8 @@
 "use client";
-import {signInAnonymously} from "firebase/auth";
+import {signInAnonymously,type User} from "firebase/auth";
 import {auth,hasFirebaseWebConfig} from "@/lib/firebase/client";
+
+let anonymousAuthPromise:Promise<User|null>|null=null;
 
 export type PlugJourneyEvent =
   | "request_flow_opened"
@@ -19,7 +21,7 @@ export type PlugJourneyEvent =
 
 type EventDetails={productLabel?:string;itemType?:"find"|"deal";source?:string;requestId?:string};
 export async function trackPlugJourney(event:PlugJourneyEvent,details:EventDetails={}){
- let user=auth.currentUser;if(!user&&hasFirebaseWebConfig){try{user=(await signInAnonymously(auth)).user}catch{return}}if(!user)return;
+ let user=auth.currentUser;if(!user&&hasFirebaseWebConfig){if(!anonymousAuthPromise)anonymousAuthPromise=signInAnonymously(auth).then(result=>result.user).catch(()=>null).finally(()=>{anonymousAuthPromise=null});user=await anonymousAuthPromise;}if(!user)return;
  const safeDetails={
   ...(typeof details.productLabel==="string"?{productLabel:details.productLabel.slice(0,120)}:{}),
   ...(details.itemType==="find"||details.itemType==="deal"?{itemType:details.itemType}:{}),
