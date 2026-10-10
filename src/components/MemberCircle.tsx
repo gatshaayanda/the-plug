@@ -15,7 +15,7 @@ export default function MemberCircle({user,displayName}:{user:User;displayName:s
   const stopB=onSnapshot(query(collection(db,"friendConnections"),where("memberB","==",user.uid)),snap=>setConnectionsB(snap.docs.map(d=>({id:d.id,...d.data()} as Connection))),()=>setMessage("Your friend list could not be loaded right now."));
   return()=>{stopInvites();stopA();stopB()};
  },[user]);
- const connections=[...new Map([...connectionsA,...connectionsB].map(connection=>[connection.id,connection])).values()];
+ const connections=[...new Map<string,Connection>([...connectionsA,...connectionsB].map(connection=>[connection.id,connection] as [string,Connection])).values()];
  async function createInvite(){
   if(user.isAnonymous||busy)return;
   setBusy(true);setMessage("");setInviteUrl("");
