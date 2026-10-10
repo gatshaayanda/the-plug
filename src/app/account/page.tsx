@@ -17,7 +17,7 @@ function authMessage(error:unknown){
  if(code==="auth/unauthorized-domain")return "Google sign-in is not enabled for this website yet. Try again later; your current session has not been changed.";
  if(code==="auth/configuration-not-found"||code==="auth/operation-not-allowed")return "Google sign-in is not available yet. The Plug's sign-in setup is incomplete. Try again later.";
  if(code.startsWith("auth/")||code.startsWith("app/"))return "Google sign-in could not be completed because The Plug’s sign-in setup is not ready. Try again later; your current session has not been changed.";
- return "Google sign-in could not be completed. Please try again later or contact Frank on WhatsApp.";
+ return "Google sign-in could not be completed. Please try again later. Your current session has not been changed.";
 }
 const terminal=new Set(["Delivered","Collected","Cancelled"]);
 
