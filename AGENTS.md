@@ -92,10 +92,45 @@ The BOEMO foundation commit remains a reference for infrastructure behavior only
 - Treat missing Firebase web configuration as a deployment configuration failure, not as a Firebase Auth user error. Never substitute fake placeholder project IDs/API keys in a live browser build and then expose raw Firebase exceptions. Keep build/prerender safe, detect configuration completeness before initializing Auth, and show a clear actionable message that Google sign-in is unavailable until the real The Plug Firebase web config is set.
 - Before claiming Google sign-in works, verify the production Vercel environment contains the required The Plug-specific NEXT_PUBLIC_FIREBASE_* values, Google provider is enabled in that Firebase project, and the actual production domain is authorized. Never copy credentials or project settings from BOEMO or another client.
 - When the install or auth experience loops, inspect route tree, PWA root component lifecycle, service-worker fetch/cache strategy, production deployment source SHA, and Vercel environment variable presence before changing code. Cache-version bumps alone are not a fix.
-- UX principle: offer a clear install value proposition on the landing page before asking for installation. Respectful dismissal must leave the user on the route they chose. The browser/OS remains the final installation consent surface. Use platform instructions only when the browser cannot provide a native install event and a supported manual path exists; don't create generic Android/desktop browser-menu fallback instructions when the event is absent.
+- UX principle: offer a clear install value proposition on the landing page before asking for installation. Respectful dismissal must leave the user on the route they chose. The browser/OS remains the final installation consent surface. If the native install event is absent, never leave the install control inert: show a branded, platform-specific fallback with concise steps, while continuing to investigate why native installability/event delivery is absent. Do not imply JavaScript can force a native prompt.
 
 
 ## PWA manifest single source of truth (2026-10-10)
 - In this Next.js App Router project, `src/app/manifest.ts` is the canonical generated manifest route and must contain the complete installability metadata, including explicit 192×192 and 512×512 PNG icons. Do not assume `public/manifest.webmanifest` is what Chrome receives when the generated route exists.
 - Whenever manifest/icon installability metadata changes, bump the service-worker cache version in `public/sw.js` so an older cached `/manifest.webmanifest` cannot keep Chrome evaluating stale metadata.
 - Verify the generated production manifest and each declared icon URL, then inspect Chrome's installability diagnostics before claiming the native prompt works.
+
+
+## Golden system: WhatsApp embedded browser → normal browser → install (2026-10-10)
+This is a reusable product pattern, not a one-off The Plug workaround. Reproduce it for new projects and audit/upgrade it in existing projects. Treat the full journey as one intentional, tested system with two separate states: **escape the embedded browser**, then **install from the real browser**.
+
+### Required customer journey
+1. **Entry from WhatsApp or another embedded browser:** detect the in-app browser reliably. Present one branded, accessible blocking gate in the initial render, explaining briefly why opening the normal browser matters. Do not stack overlays, use JavaScript alerts, or leave only a dismiss/cancel action.
+2. **One clear escape action:** provide one obvious primary action such as **OPEN IN CHROME** or **OPEN IN BROWSER**, using a valid platform-appropriate external-browser handoff/deep link when supported. Preserve a sensible fallback if the host app cannot launch the external browser. Do not claim the handoff succeeded unless it is observable.
+3. **Normal-browser landing:** once the customer reaches Chrome, Safari, Edge, or another supported browser, show the real app/landing page—not a loop back into the embedded-browser gate. The embedded-browser gate and install promotion are separate UI states and must not appear as competing overlays.
+4. **Visible install action:** in the normal browser, keep a clear branded **Install [App Name]** action available until the app is installed or running in standalone mode. Explain the concrete benefit briefly. Hide the install promotion in standalone mode and while the embedded-browser gate is active.
+5. **Native prompt first:** retain the `beforeinstallprompt` event when the browser fires it. On the customer's explicit install-button click, invoke that retained event directly from the user gesture. Do not insert a second Android/desktop instructions modal, another “continue in browser” step, or unrelated confirmation between the click and the native prompt.
+6. **Never silently fail:** if no native event is available, the install action must still respond. Open a branded, concise platform-specific help panel (iOS Safari Share → Add to Home Screen; Android Chrome install option; desktop Chrome/Edge install option) and show an actionable state. This fallback is a fallback—not proof the native prompt is broken permanently and not permission to stop investigating installability.
+7. **Respect the platform:** the browser/OS controls whether the native prompt is eligible and what it looks like. JavaScript cannot force it. iOS generally needs its supported manual installation path. Do not promise a prompt on every visit or automatically open a blocking install modal on page load.
+8. **Installed/dismissed states:** detect standalone/installed state and suppress the journey. If the product uses a dismissible install card, persist dismissal according to the project's documented policy and clear it after `appinstalled` where appropriate. A dismissal must not redirect the customer or block normal app use.
+9. **One controller/state machine:** use a single root PWA controller and stable event contract for install CTAs across routes. Do not add duplicate listeners, competing legacy prompts, nested gates, alert boxes, or route-navigation hacks. Keep the WhatsApp handoff gate independent from the install prompt state.
+
+### Required implementation and verification protocol
+- **START → INSPECT → BUILD → VERIFY → CHECKPOINT.** Read `AGENTS.md`, inspect the actual routes/layout, root PWA controller, install buttons, manifest, icon assets, service worker/cache strategy, browser detection/handoff logic, recent Git commits, and production deployment before editing. Do not assume a cloned project's inherited install system is correct.
+- For a new project, implement this journey deliberately from the start. For an existing project, map the current behavior against every step above and repair the smallest real cause; do not blindly copy code or cache-version bumps from another app.
+- Inspect manifest output and every declared icon URL; verify HTTPS, standalone/display metadata, service-worker registration/scope, event capture timing, and browser-specific installability diagnostics where tools permit. Make sure early `beforeinstallprompt` capture cannot be missed due to hydration/timing.
+- Test the two transitions separately: (A) opening from WhatsApp reaches the normal browser without an endless loop; (B) in the normal browser, the install button directly opens the native prompt when the event exists, and shows the branded fallback when it does not. Also test already-installed/standalone state and ordinary direct browser entry.
+- Check the actual changed diff, run available type/lint/build checks, commit/push, and verify the exact Vercel deployment for the new source SHA is **READY** before asking the user to test. Do not claim live behavior based on source code, an earlier deployment, or a cached page.
+- When a deployment is READY, report the commit and deployment state honestly. If public inspection is blocked or the browser cannot be driven with available tools, say exactly what could and could not be verified—never invent a successful test.
+- Preserve this pattern in the destination project's `AGENTS.md` after implementing it. Record app-specific paths, handoff method, install controller/event, manifest route, service-worker cache version, test evidence, and any unresolved browser/platform limitation.
+
+### Copyable acceptance checklist
+- [ ] WhatsApp embedded entry shows one branded blocking gate with one clear open-in-browser action.
+- [ ] The handoff reaches the normal browser and does not loop back into WhatsApp or strand the user.
+- [ ] Normal-browser page displays one clear branded install action.
+- [ ] When `beforeinstallprompt` exists, clicking Install invokes the native prompt directly.
+- [ ] When it does not exist, clicking Install opens helpful branded platform-specific guidance—never a dead button.
+- [ ] No stacked overlays, JavaScript alerts, duplicate controllers, or unrelated detours.
+- [ ] Standalone/installed state suppresses install UI; dismissal does not hijack navigation.
+- [ ] Manifest, icons, service worker, cache version, event timing, and installability were inspected.
+- [ ] The exact source commit's Vercel production deployment is READY before customer QA is requested.
