@@ -153,13 +153,12 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
         void install();
         return;
       }
-      // iOS Safari has no beforeinstallprompt event; preserve only its supported path.
-      // Do not replace the Android/desktop native prompt with a menu-instruction modal.
-      if (isIosSafari()) {
-        setInstallPlatform("ios");
-        setInstallHelpOpen(true);
-        setInstallState("native");
-      }
+      // Match the working Odi install flow: never let a visible install CTA silently
+      // do nothing when this browser has not emitted beforeinstallprompt.
+      const platform = current.ios ? "ios" : current.android ? "android" : "other";
+      setInstallPlatform(platform);
+      setInstallHelpOpen(true);
+      setInstallState("native");
     };
     const appInstalled = () => {
       installPromptRef.current = null;
@@ -240,8 +239,12 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   async function install() {
     const prompt = installPromptRef.current;
     if (!prompt) {
-      // iOS Safari has a documented manual path; other browsers remain untouched.
-      if (isIosSafari()) setInstallHelpOpen(true);
+      // Native install events are browser-controlled. Show the same explicit
+      // platform-specific fallback as Odi rather than silently returning.
+      const env = environment();
+      setInstallPlatform(env.ios ? "ios" : env.android ? "android" : "other");
+      setInstallHelpOpen(true);
+      setInstallState("native");
       return;
     }
     try {
@@ -301,9 +304,23 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
         <p id="plug-install-message">Install The Plug on your device for a direct home-screen shortcut to your sourcing requests, account and private conversations with Frank.</p>
         {installHelpOpen ? (
           <div className="plugInstallSteps" role="status" aria-live="polite">
-            <strong>Add The Plug from Safari</strong>
-            <p>Open this page in <b>Safari</b>, tap <b>Share</b>, choose <b>Add to Home Screen</b>, then tap <b>Add</b>.</p>
-            <button type="button" className="plugInstallPrimary" onClick={dismissInstall}>Done</button>
+            {installPlatform === "ios" ? (
+              <>
+                <strong>Add The Plug from Safari</strong>
+                <p>Open this page in <b>Safari</b>, tap <b>Share</b>, choose <b>Add to Home Screen</b>, then tap <b>Add</b>.</p>
+              </>
+            ) : installPlatform === "android" ? (
+              <>
+                <strong>Add The Plug from Chrome</strong>
+                <p>In Chrome, tap the <b>⋮ menu</b> and choose <b>Install app</b> or <b>Add to Home screen</b>. The wording depends on your Chrome version.</p>
+              </>
+            ) : (
+              <>
+                <strong>Install The Plug from your browser</strong>
+                <p>In Chrome or Edge, open the browser menu and choose <b>Install The Plug</b> or <b>Install page as app</b>, if offered.</p>
+              </>
+            )}
+            <button type="button" className="plugInstallPrimary" onClick={dismissInstall}>Got it</button>
           </div>
         ) : (
           <>
@@ -332,6 +349,24 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   return <>
     {offline && <div className="offlineBanner" role="status" aria-live="polite"><span aria-hidden="true">⚡</span> Offline · The Plug is still being built, but this device can keep the app shell available. Requests may wait for reconnection.</div>}
     {!offline && reconnecting && <div className="offlineBanner reconnectingBanner" role="status" aria-live="polite"><span aria-hidden="true">↻</span> Reconnected · The Plug is syncing and checking for the latest information.</div>}
+    {!environment().standalone && installState !== "embedded" && (
+      <button
+        type="button"
+        className="plugPwaInstallButton"
+        onClick={() => {
+          if (installPromptRef.current) {
+            void install();
+            return;
+          }
+          const env = environment();
+          setInstallPlatform(env.ios ? "ios" : env.android ? "android" : "other");
+          setInstallHelpOpen(true);
+          setInstallState("native");
+        }}
+      >
+        Install The Plug ↓
+      </button>
+    )}
     {installCard}
     {updateReady && <div className="pwaUpdate" role="status" aria-live="polite"><div><strong>The Plug update is ready</strong><span>Refresh when you are ready.</span></div><button type="button" className="button buttonPrimary" onClick={applyUpdate}>Refresh</button></div>}
   </>;
