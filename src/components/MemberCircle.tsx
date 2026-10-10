@@ -3,6 +3,7 @@ import {useEffect,useState} from "react";
 import {addDoc,collection,deleteDoc,doc,onSnapshot,query,Timestamp,where} from "firebase/firestore";
 import type {User} from "firebase/auth";
 import {db} from "@/lib/firebase/client";
+import {trackPlugJourney} from "@/lib/firebase/journey-analytics";
 
 type InviteRecord={id:string;status:string;inviterName?:string;expiresAt?:Timestamp;createdAt?:string};
 type Connection={id:string;memberA:string;memberB:string;createdAt?:string};
@@ -21,7 +22,7 @@ export default function MemberCircle({user,displayName}:{user:User;displayName:s
   setBusy(true);setMessage("");setInviteUrl("");
   try{
    const expiresAt=Timestamp.fromDate(new Date(Date.now()+7*24*60*60*1000));
-   const created=await addDoc(collection(db,"friendInvites"),{inviterUid:user.uid,inviterName:displayName.trim().slice(0,60)||"A Plug member",status:"pending",createdAt:new Date().toISOString(),expiresAt});
+   const created=await addDoc(collection(db,"friendInvites"),{inviterUid:user.uid,inviterName:displayName.trim().slice(0,60)||"A Plug member",status:"pending",createdAt:new Date().toISOString(),expiresAt});void trackPlugJourney("friend_invite_created",{source:"member_circle"});
    const url=window.location.origin+"/invite/"+created.id;setInviteUrl(url);
    try{if(navigator.share)await navigator.share({title:"Join me on The Plug",text:"Join my circle on The Plug.",url});else{await navigator.clipboard.writeText(url);setMessage("Invite link copied. Send it to your friend.")}}catch(error){if(error instanceof Error&&error.name==="AbortError"){setMessage("Invite created. You can still copy the link below.");}else setMessage("Invite created. Copy the link below to send it.")};
   }catch{setMessage("The invite could not be created. Check your connection and try again.")}finally{setBusy(false)}
