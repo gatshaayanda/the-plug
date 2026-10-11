@@ -26,7 +26,8 @@ export async function trackPlugJourney(event:PlugJourneyEvent,details:EventDetai
  let user=auth.currentUser;if(!user&&hasFirebaseWebConfig){if(!anonymousAuthPromise)anonymousAuthPromise=signInAnonymously(auth).then(result=>result.user).catch(()=>null).finally(()=>{anonymousAuthPromise=null});user=await anonymousAuthPromise;}if(!user)return;
  const safeDetails={
   ...(typeof details.productLabel==="string"?{productLabel:details.productLabel.slice(0,120)}:{}),
-  ...(details.itemType==="find"||details.itemType==="deal"?{itemType:details.itemType}:{}),\n  ...(typeof details.category==="string"?{category:details.category.slice(0,40)}:{}),
+  ...(details.itemType==="find"||details.itemType==="deal"?{itemType:details.itemType}:{}),
+  ...(typeof details.category==="string"?{category:details.category.slice(0,40)}:{}),
   ...(typeof details.source==="string"?{source:details.source.slice(0,40)}:{}),
   ...(typeof details.requestId==="string"?{requestId:details.requestId.slice(0,100)}:{})
  };
