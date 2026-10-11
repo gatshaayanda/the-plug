@@ -5,6 +5,7 @@ export type SavedFind = {
   imageUrl: string;
   price?: number;
   type: "find" | "deal";
+  category?: string;
   savedAt: string;
 };
 
@@ -22,7 +23,8 @@ export function readSavedFinds(): SavedFind[] {
       typeof item.title === "string" &&
       typeof item.description === "string" &&
       typeof item.imageUrl === "string" &&
-      (item.type === "find" || item.type === "deal") &&\n      (item.category === undefined || typeof item.category === "string") &&
+      (item.type === "find" || item.type === "deal") &&
+      (item.category === undefined || typeof item.category === "string") &&
       (item.price === undefined || (typeof item.price === "number" && Number.isFinite(item.price))) &&
       typeof item.savedAt === "string"
     );
