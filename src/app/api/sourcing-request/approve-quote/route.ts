@@ -18,7 +18,7 @@ function adminApp(){
 
 export async function POST(request:Request){
   try{
-    const match=(request.headers.get("authorization")||"").match(/^Bearer\\s+(.+)$/i);
+    const match=(request.headers.get("authorization")||"").match(/^Bearer\s+(.+)$/i);
     if(!match)return NextResponse.json({error:"Please restore your session and try again."},{status:401});
     const app=adminApp();
     const token=await getAuth(app).verifyIdToken(match[1]);
