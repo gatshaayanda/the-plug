@@ -17,7 +17,9 @@ export type PlugJourneyEvent =
   | "catalogue_opened"
   | "instagram_opened"
   | "product_share_clicked"
-  | "product_shared";
+  | "product_shared"
+  | "product_bookmarked"
+  | "product_unbookmarked";
 
 type EventDetails={productLabel?:string;itemType?:"find"|"deal";source?:string;requestId?:string};
 export async function trackPlugJourney(event:PlugJourneyEvent,details:EventDetails={}){
