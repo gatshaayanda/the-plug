@@ -322,6 +322,12 @@ This is a reusable product pattern, not a one-off The Plug workaround. Reproduce
 - `memberSettings` has a strict allow-list in Firestore rules. When saving it, replace the known preference document with its complete approved schema instead of merging unknown legacy fields. Do not weaken rules to accept arbitrary legacy keys.
 - Keep failures truthful and actionable. Log only the Firebase error code for diagnostics; never log customer preference payloads or private profile details.
 
+### Quote approval implementation checkpoint
+- Customer quote approval must be an explicit action in My Plug, not an admin checkbox that could imply consent. The authenticated customer endpoint verifies the Firebase ID token and request ownership server-side before recording approval.
+- Store `customerApprovedAt`, `customerApprovedPrice`, `customerApprovalSource`, and `customerApprovalUid`; approval is valid only for the exact currently quoted amount. If the quote changes, the customer must approve the new amount before the request can progress to deposit/sourcing.
+- The approval endpoint uses Firebase Admin credentials on the server and must return safe, actionable errors. It must never allow a customer to approve another customer's request, approve a missing quote, or approve a request outside the quote-ready states.
+- Verify the API with owner, unrelated customer, no-token, missing quote, stale approval after price change, repeated approval, and valid approval cases. Build success alone does not prove the live approval write works.
+
 ### Current admin surface and intended build order
 - `/admin` uses `AdminGate` and `PlugAdminDashboard`: sourcing-request queue, quote/deposit fields, delivery expectations, status progression, conversations and journey analytics. Keep customer-facing notifications truthful and tied to a confirmed successful request update.
 - `/admin/storefront` uses `StorefrontPublishing` for `storefrontContent` CRUD: find/deal type, title, description, optional confirmed price in pula, image URL, audience, status, start/end, CTA and sort order. Preserve draft/scheduled/published/paused/archived lifecycle and honest public empty states.
