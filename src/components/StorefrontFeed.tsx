@@ -12,7 +12,8 @@ function isLive(item:StorefrontItem,now:number){return (item.status==="published
 function money(value:number){return new Intl.NumberFormat("en-BW",{style:"currency",currency:"BWP",maximumFractionDigits:2}).format(value);}
 function ProductCard({item}:{item:StorefrontItem}){
  const url="/request?product="+encodeURIComponent(item.title)+(typeof item.price==="number"?"&price="+encodeURIComponent(String(item.price)):"")+"&itemType="+item.type;
- const[expanded,setExpanded]=useState(false),[saved,setSaved]=useState(false);\n const discountPercent=item.type==="deal"&&typeof item.price==="number"&&typeof item.originalPrice==="number"&&item.originalPrice>item.price?Math.round((1-item.price/item.originalPrice)*100):0;
+ const[expanded,setExpanded]=useState(false),[saved,setSaved]=useState(false);
+ const discountPercent=item.type==="deal"&&typeof item.price==="number"&&typeof item.originalPrice==="number"&&item.originalPrice>item.price?Math.round((1-item.price/item.originalPrice)*100):0;
  useEffect(()=>{const refresh=()=>setSaved(isFindSaved(item.id));refresh();window.addEventListener(savedFindsChangedEvent(),refresh);return()=>window.removeEventListener(savedFindsChangedEvent(),refresh)},[item.id]);
  function toggleDetails(){const next=!expanded;setExpanded(next);if(next)void trackPlugJourney(item.type==="deal"?"storefront_offer_opened":"storefront_find_opened",{productLabel:item.title,itemType:item.type,category:item.category||"Other",source:"storefront"});}
  function bookmark(){const wasSaved=toggleSavedFind({id:item.id,title:item.title,description:item.description,imageUrl:item.imageUrl,price:item.price,type:item.type,category:item.category||"Other"});setSaved(wasSaved);void trackPlugJourney(wasSaved?"product_bookmarked":"product_unbookmarked",{productLabel:item.title,itemType:item.type,category:item.category||"Other",source:"storefront"});}
