@@ -45,7 +45,8 @@ self.addEventListener("notificationclick", (event) => {
   }));
 });
 
-const CACHE_VERSION = "theplug-shell-v15";\nconst MEDIA_CACHE = "theplug-media-v1";
+const CACHE_VERSION = "theplug-shell-v15";
+const MEDIA_CACHE = "theplug-media-v1";
 const SHELL_CACHE = CACHE_VERSION;
 const STATIC_LIMIT = 100;
 const PUBLIC_PAGE_LIMIT = 12;
