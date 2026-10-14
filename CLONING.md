@@ -247,7 +247,7 @@ Record each platform separately; source inspection or a green build is not devic
 6. Record OS version, browser/version, tested URL and exact result as **PASS**, **FAIL**, **NOT RUN** or **BLOCKED**. Do not claim parity between Android and iOS; require an equally clear customer journey, not an identical browser API.
 
 Authoritative references:
-- Apple iPhone guide: https://support.apple.com/guide/iphone/turn-a-website-into-an-app-in-safari-iph7a6e5236/ios
+- Apple iPhone guide: https://support.apple.com/en-ie/guide/iphone/iphea86e5236/27/ios/27
 - MDN installability guide (including the iOS limitation for `beforeinstallprompt`): https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable
 - MDN install prompt trigger guide: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/How_to/Trigger_install_prompt
 
