@@ -211,3 +211,43 @@ Copy this table into the project brief or PR description for each clone. Replace
 
 **Status definitions:** PASS = evidence was observed for the stated acceptance condition; FAIL = observed behavior violates it; NOT RUN = no attempt was made; BLOCKED = attempted or planned but prevented by a named dependency, permission or unavailable environment. “CI passed” applies only to the exact SHA and checks shown in that run. Never use it as evidence of live Firebase, uploads, push receipt, deployment, offline behavior or physical-device QA.
 
+## Mandatory platform-specific PWA installation contract
+
+A PWA must not pretend that Android and iPhone expose the same installation API. Implement the best native path supported by the current browser, then give a truthful, actionable fallback. **Do not promise a one-tap iOS install from an in-page button.**
+
+### Android / Chromium
+
+- Capture `beforeinstallprompt` early enough that hydration cannot miss it; retain the one-shot event in the single root PWA controller.
+- The customer's explicit Install button must call the retained event's `prompt()` directly during that click, with no marketing modal or instructions step inserted first.
+- Clear the consumed event and handle `appinstalled` / standalone state. If no event is available, explain the browser's actual supported menu path; never claim a native prompt appeared when it did not.
+- Preserve the app name, short name, scope, start URL and valid PNG icon identity across the manifest, metadata, install prompt and installed launcher.
+
+### iPhone / iPad (iOS and iPadOS)
+
+- Safari does **not** implement `beforeinstallprompt`. There is no supported web API to force the iOS **Add to Home Screen** action or programmatically open the relevant Share-sheet command. A PWA cannot make iOS show Android's native install prompt; this is a platform limitation, not a missing JavaScript handler.
+- The first tap on the app's install CTA must immediately show the short, platform-specific steps—not a generic promotional panel followed by another button. Use truthful wording such as **Add to Home Screen** / **Finish adding to Home Screen**, while keeping the website usable without installation.
+- In Safari, instruct the user to open **Share** → **Add to Home Screen** → **Add**. If the action is not visible, scroll the Share-sheet actions and use **Edit Actions**. On iOS versions that show **Open as Web App**, leave it enabled for app-like launch.
+- On iOS 16.4 and later, other browsers may expose **Add to Home Screen** through their Share menu. If the option is missing or the browser's UI differs, offer the reliable recovery path: open the same full URL in Safari and repeat the steps. Do not tell every iPhone user that Safari is the only possible browser, and do not imply the site can open Apple's installation sheet itself.
+- Keep the instructions visible and readable, with the app's own name/icon, numbered steps and a clear close/dismiss action. Avoid dead buttons, fake progress, alerts, loops or claims that installation completed. Do not hide the install guidance just because `beforeinstallprompt` never fires on iOS.
+
+### Embedded browsers
+
+- Detect WhatsApp/social in-app browsers separately from the install flow. Offer a clear **Open in Browser** handoff, preserve the complete requested path/query, and provide copy-link/menu recovery if the embedded host blocks opening the external browser.
+- After handoff, the customer must be able to continue the original task without being forced to install.
+
+### Required verification before a new-app checkpoint
+
+Record each platform separately; source inspection or a green build is not device proof.
+
+1. **Android Chrome:** on a supported, not-yet-installed device, tap Install and verify the actual native prompt opens with the correct app name/icon; accept and verify launcher name/icon and standalone launch.
+2. **iPhone Safari:** tap the app CTA and verify it immediately presents the exact Share → Add to Home Screen steps; complete the actual Home Screen addition and verify the correct icon/name and app-like launch.
+3. **iPhone alternate browser:** test the browser's Share menu where available; verify the Safari recovery path if Add to Home Screen is missing.
+4. **Embedded browser:** test WhatsApp/social link handoff on Android and iOS, preserving the requested route.
+5. **Already installed / dismissed / unsupported:** verify installed-state behavior, native-prompt dismissal, fallback messaging and continued website use.
+6. Record OS version, browser/version, tested URL and exact result as **PASS**, **FAIL**, **NOT RUN** or **BLOCKED**. Do not claim parity between Android and iOS; require an equally clear customer journey, not an identical browser API.
+
+Authoritative references:
+- Apple iPhone guide: https://support.apple.com/guide/iphone/turn-a-website-into-an-app-in-safari-iph7a6e5236/ios
+- MDN installability guide (including the iOS limitation for `beforeinstallprompt`): https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable
+- MDN install prompt trigger guide: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/How_to/Trigger_install_prompt
+
