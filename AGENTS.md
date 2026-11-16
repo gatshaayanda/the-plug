@@ -350,3 +350,70 @@ This is a reusable product pattern, not a one-off The Plug workaround. Reproduce
 - Inspect Firestore and Storage rules as source, then separately verify which rules are deployed. Do not broaden the default-deny catch-all.
 - Deployment state is independent of Git merge state. Do not ask the owner to QA until the exact merged SHA has a READY deployment and the production alias is confirmed to point to it.
 
+
+
+## Storefront entrance, editorial art direction and international readiness — current product direction
+
+This section governs the first-visit storefront entrance and future international-readiness work. It is a direction to guide discovery and screen-by-screen design, not authorization to redesign adjacent screens or change transaction behavior without a separate review.
+
+### 1. First-visit objective and entrance principles
+
+- The first visit should quickly establish: (1) this is The Plug, (2) it sources sneakers and apparel, (3) the customer can browse real finds/offers or ask Frank to source something, and (4) a request is not a confirmed stock position, quote or purchase.
+- Do not add a blocking splash screen, mandatory welcome carousel, sign-in, language gate, country gate, notification prompt or install prompt before the customer can browse.
+- Preserve direct access to My Plug and the existing customer journey. Discovery must remain open without sign-in; authentication, account linking, notification permission and installation remain optional and contextual.
+- Design the entrance as an editorial storefront, not a generic e-commerce template or a dashboard. Keep product content and the next useful customer action ahead of lengthy explanations.
+- The current product statement remains: “If we can source it, you can get it.” Keep the Botswana origin visible and credible without implying that sales or service are restricted to Botswana.
+- Clearly distinguish real published Featured Finds from real active Live Offers. Never manufacture inventory, stock, scarcity, discount, urgency, testimonials, demand counts or customer activity to make the first screen feel busy.
+- The storefront should introduce the product's proposition before asking customers to understand membership, account architecture or operational details.
+
+### 2. Proposed visual genre
+
+- Working art-direction hypothesis: **Atmosphere + Character** for the public storefront; **Quiet** for product details, request submission, My Plug and payment/confirmation steps; **Data + Quiet** for owner operations.
+- Atmosphere means strong, authentic sneaker/apparel photography, deliberate crop and composition, considered lighting, depth and a recognisable editorial rhythm.
+- Character means distinctive but controlled typography, confident labels, memorable brand moments and purposeful interaction details. Do not make every section loud.
+- Quiet means removing visual competition when the customer is comparing a size/price, describing a product, reviewing a request or checking its status.
+- This is a hypothesis to validate against the real brand assets, customer audience and complete flow. Do not blindly copy WashRide, a luxury fashion brand or a generic sneaker marketplace.
+- Inspect current tokens and the actual rendered page before changing the visual system. Preserve brand recognition while reducing competing effects, arbitrary accents and card clutter. Keep text and controls readable to WCAG 2.2 AA.
+
+### 3. Motion, highlights and carousels
+
+- Motion is allowed when it directs attention, communicates a real state, gives an editorial transition or makes product imagery feel alive. It must not delay access, conceal content, create false urgency or imitate activity.
+- Prefer a small number of high-quality motion moments: a restrained entrance reveal, a deliberate image/typography transition, subtle hover/focus feedback, and a product rail that users can directly control.
+- Do not animate every card, every label, every background and every section at once. Avoid continuous parallax, flashing, fast marquees, auto-playing audio and large motion that causes layout shift.
+- Product rails should remain usable as horizontal content when motion is disabled. Manual previous/next and touch/trackpad scrolling must always work.
+- Any automatically moving carousel or ticker that runs for more than five seconds alongside other content must have a visible, keyboard-operable pause/stop control. Pause on hover and keyboard focus; do not resume against a user's explicit pause. Respect the operating system's prefers-reduced-motion setting; reduced-motion users should receive a static/manual experience and no automatic rotation.
+- Do not assume auto-rotation improves discovery. Test whether customers actually notice and use later items; a well-composed static rail may be better than a rotating hero. Do not put essential price, availability or action text on a slide that disappears before it can be read.
+- Keep movement smooth and restrained; never use animation as fake loading/progress. Loading and transaction feedback must describe actual work and actual outcomes.
+
+### 4. International audience: country, language and currency are separate settings
+
+- The business is Botswana-based and has prior international sales interest, including SADC countries, North America and the UK. The storefront should be designed to welcome international customers, but actual delivery/sourcing coverage and payment availability must be confirmed by the owner before being advertised.
+- Do not make a language selection double as a country selection. Language, country/market, display currency and settlement/payment currency are separate concepts and must be modelled separately.
+- Do not force a language or country modal on first visit. Begin with a clear English experience and Botswana/BWP as the business home-market defaults unless the customer has an explicit saved preference or selects another market. Provide a discreet, easy-to-find “Region & currency” control; language can be a separate preference when translations are genuinely ready.
+- Do not claim that all SADC countries, North America or the UK are serviceable until shipping, sourcing, payment, returns and customer-support constraints are confirmed for each market.
+- Keep UI translations separate from business/product content and separate from currency formatting. Use stable message keys and locale dictionaries (not duplicated page components or scattered inline ternaries); keep product names, brand names, user-authored notes and SKU-like identifiers untranslated. Add languages only after a complete glossary and fluent-speaker review.
+- Use locale-aware formatting (for example, Intl.NumberFormat) for currency, number and date presentation. Currency selection should set a currency code and formatting locale, not rewrite stored money values.
+
+### 5. Currency display and pricing truth
+
+- Keep authoritative business prices and transaction records in their explicitly recorded currency (currently BWP where Frank has entered a BWP price). Never overwrite or reinterpret the source price when a visitor changes display currency.
+- A converted foreign-currency amount may be shown as an **indicative estimate** only, with the source currency, rate date/provider and a clear note that Frank confirms the actual quote/payment currency and amount before commitment.
+- A free reference-rate API such as Frankfurter may be evaluated for indicative display conversion. Its rates are reference rates, not guaranteed payment/settlement quotes; do not describe them as live transaction rates. Cache rates, show the rate date, handle unsupported currencies/offline/API failure gracefully, and keep the original BWP amount visible. Do not fetch rates on every render or every keystroke.
+- Never silently round a converted amount into a guaranteed selling price, use a reference rate to settle/refund a transaction, or imply multi-currency payment is supported merely because a converted price is displayed.
+- Before accepting payment in a foreign currency, confirm payment provider support, settlement currency, fees/spread, refunds, chargebacks, taxes/duties, shipping and customer-facing terms. If these are not implemented, the transaction remains quoted and recorded in the confirmed business currency.
+- Design the data model so future market-specific price books can be introduced without changing the authoritative transaction record: distinguish source amount/currency, displayed estimate/currency, confirmed quote amount/currency, and payment/settlement amount/currency.
+- Country/market defaults may be suggested from the browser only where reliable and privacy-appropriate; never silently force a market, block browsing or treat IP-derived location as consent. A customer's explicit selection and saved preference take precedence.
+
+### 6. Research and evidence standard for entrance design
+
+- Research the complete first-visit and product-discovery task, not just visual inspiration. Compare curated sneaker/streetwear storefronts and established e-commerce flows for product image hierarchy, price/size visibility, product detail, save/request actions, mobile navigation and trust cues.
+- Use research as evidence to test design choices, not as a reason to apply dark patterns, false scarcity, forced sign-up, forced localization, autoplay or notification coercion.
+- Relevant references include the W3C WAI carousel guidance (https://www.w3.org/WAI/tutorials/carousels/), W3C ARIA carousel examples (https://www.w3.org/WAI/ARIA/apg/patterns/carousel/), WebAIM carousel guidance (https://webaim.org/techniques/carousels/), eye-tracking research on online product-image attention (https://www.jecr.org/node/672), Frankfurter API documentation (https://frankfurter.dev/), and ECB guidance that reference rates are informational rather than transaction quotes (https://www.ecb.europa.eu/stats/exchange_rates/html/index.en.html).
+- Research findings must be translated into concrete hypotheses and checked with The Plug's own audience and real product content. Do not present general psychology principles as proof that a particular animation or carousel will increase sales.
+
+### 7. Scope and approval boundary
+
+- The current scope is the homepage entrance and the international-readiness design direction only. Do not redesign the next screen, sourcing form, account, checkout or admin workspace until the owner has reviewed the entrance proposal and explicitly moved to that screen.
+- Before implementing the entrance, provide a concise screen map covering first paint, hero/brand moment, featured finds, live offers, community/member content, navigation and footer; specify desktop/mobile behavior, motion states, empty/loading/error states, data truth and acceptance tests.
+- Preserve existing Firebase, UploadThing, product publishing, saved finds, community/privacy, sourcing, purchase, receipt, admin authorization and PWA behavior unless a separate inspected requirement authorizes a change.
+- The existing PWA installation implementation is protected. Do not alter its controller, event capture, prompt lifecycle, service worker or install state machine as part of visual entrance work. Rebrand presentation only when needed and verify the protected behavior.
