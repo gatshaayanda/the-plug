@@ -888,22 +888,15 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 @media(max-width:560px){.plugPreferenceBar{width:calc(100% - 20px);gap:7px}.plugPreferenceBar label{flex:1 1 28%;min-width:0}.plugPreferenceBar select{width:100%;font-size:.7rem;padding:6px}.plugPreferenceBar>small{font-size:.61rem}}
 
 
-/* Keep the storefront's region, currency and language controls available while browsing. */
-.plugPreferenceBar{
-  position:sticky;
-  top:0;
-  z-index:50;
-  width:100%;
-  padding:12px max(16px,calc((100% - 1180px)/2)) 14px;
-  background:#0b0b0c;
-  border-bottom:1px solid #454545;
-  box-shadow:0 8px 20px rgba(0,0,0,.24);
-}
-/* The preference bar owns the sticky layer; let the regular site navigation scroll naturally. */
+/* Compact, visual market and language controls remain available while browsing. */
+.plugPreferenceBar{position:sticky;top:0;z-index:50;width:100%;min-height:46px;margin:0;padding:4px max(12px,calc((100% - 1180px)/2));display:flex;align-items:center;gap:8px;flex-wrap:nowrap;background:rgba(245,243,238,.96);backdrop-filter:blur(14px);border-bottom:1px solid #d8d5ce;box-shadow:0 3px 12px rgba(20,20,20,.07)}
+.plugPreferenceControl{display:flex;align-items:center;gap:6px;min-width:0;padding:3px 9px;border:1px solid #d5d1c8;border-radius:999px;background:#fff;color:#0866ff;font-size:.68rem;font-weight:800}
+.plugPreferenceControl select{appearance:none;max-width:160px;min-height:25px;border:0;padding:2px 3px;background:transparent;color:#111;font:inherit;cursor:pointer}
+.plugPreferenceControl select:focus-visible{outline:2px solid #0866ff;border-radius:4px}
+.plugPreferenceControl b{font-size:.6rem;color:#0866ff}
+.plugPreferenceBar>small{margin-left:auto;max-width:340px;font-size:.6rem;color:#777;line-height:1.25;text-align:right}
 .plugEditorialNav{position:relative;top:auto;z-index:1;}
-@media(max-width:560px){
-  .plugPreferenceBar{width:100%;padding:10px 10px 12px;}
-}
+@media(max-width:560px){.plugPreferenceBar{min-height:42px;padding:3px 7px;gap:5px}.plugPreferenceControl{gap:4px;padding:3px 6px;font-size:.58rem}.plugPreferenceControl select{max-width:112px;font-size:.66rem}.plugPreferenceBar>small{display:none}}
 
 
 /* Featured media is the foreground image; editorial overlays remain legible above it. */
@@ -920,9 +913,16 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .plugBriefcaseLink:hover{background:#111;color:#fff;border-color:#111}
 .plugBriefcaseLink:focus-visible{outline:3px solid #0866ff;outline-offset:3px}
 .plugLanguageIntro{color:#c6c6c6!important}
-.plugScrollReveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s cubic-bezier(.2,.75,.25,1)}
+.plugScrollReveal{opacity:0;transform:translate3d(0,30px,0) scale(.985);transition:opacity .72s ease,transform .72s cubic-bezier(.2,.75,.25,1);will-change:opacity,transform}
 .plugScrollReveal.is-visible{opacity:1;transform:translateY(0)}
-.plugProductCard.plugScrollReveal{transition-delay:.04s}
+.plugProductCard.plugScrollReveal{transition-delay:.08s}
+.plugProductRail .plugProductCard:nth-child(2).plugScrollReveal{transition-delay:.14s}
+.plugProductRail .plugProductCard:nth-child(3).plugScrollReveal{transition-delay:.2s}
+.plugProductRail .plugProductCard:nth-child(4).plugScrollReveal{transition-delay:.26s}
+.plugEditorialHeroCopy{animation:plugHeroCopyEnter .8s cubic-bezier(.2,.75,.25,1) both}
+.plugEditorialArtwork{animation:plugHeroArtworkEnter 1s cubic-bezier(.2,.75,.25,1) .08s both}
+@keyframes plugHeroCopyEnter{from{opacity:0;transform:translate3d(0,22px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes plugHeroArtworkEnter{from{opacity:0;transform:translate3d(0,18px,0) scale(.975)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
 @media(max-width:680px){.plugArtworkFooter{grid-template-columns:1fr;gap:7px;padding:15px 16px}.plugArtworkFooter>span:first-child{grid-column:auto}.plugArtworkFooter>span:last-child{text-align:left;white-space:normal}.plugEditorialFooter>div{gap:12px}.plugBriefcaseLink{width:38px;height:38px}}
 @media(prefers-reduced-motion:reduce){.plugScrollReveal,.plugBriefcaseLink{transition:none}.plugScrollReveal{opacity:1;transform:none}}
 
