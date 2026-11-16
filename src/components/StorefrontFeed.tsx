@@ -60,7 +60,34 @@ export default function StorefrontFeed(){const{t}=useStorefrontText();
  useEffect(()=>{const stop=onSnapshot(doc(db,"businessSettings","storefrontDisclaimer"),snapshot=>{const value=snapshot.data()?.disclaimer;if(typeof value==="string"&&value.trim())setDisclaimer(value.trim());else setDisclaimer(DEFAULT_STOREFRONT_DISCLAIMER);},()=>setDisclaimer(DEFAULT_STOREFRONT_DISCLAIMER));return()=>stop();},[]);
  const live=useMemo(()=>items.filter(item=>isLive(item,now)).sort((a,b)=>(a.sortOrder??999)-(b.sortOrder??999)),[items,now]),finds=live.filter(i=>i.type==="find"),deals=live.filter(i=>i.type==="deal");
  const spotlight=finds[0]??null;
- function move(rail:React.RefObject<HTMLDivElement|null>,direction:number){rail.current?.scrollBy({left:direction*Math.max(280,rail.current.clientWidth*.75),behavior:"smooth"});}useEffect(()=>{const dialog=spotlightDialog.current;if(!dialog)return;if(spotlightOpen&&!dialog.open){dialog.showModal();dialog.querySelector<HTMLButtonElement>(".plugModalClose")?.focus()}else if(!spotlightOpen&&dialog.open)dialog.close()},[spotlightOpen]);
+ function move(rail:React.RefObject<HTMLDivElement|null>,direction:number){rail.current?.scrollBy({left:direction*Math.max(280,rail.current.clientWidth*.75),behavior:"smooth"});}
+ useEffect(()=>{
+  const rails=[findRail.current,dealRail.current].filter((rail):rail is HTMLDivElement=>Boolean(rail));
+  if(!rails.length||window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const cleanups:Array<()=>void>=[];
+  for(const rail of rails){
+   let pausedUntil=0;
+   let pointerInside=false;
+   const pause=()=>{pausedUntil=Date.now()+9000;};
+   const onEnter=()=>{pointerInside=true;pause();};
+   const onLeave=()=>{pointerInside=false;pause();};
+   const events:[string,EventListener][]=[["pointerdown",pause],["touchstart",pause],["wheel",pause],["focusin",pause],["mouseenter",onEnter],["mouseleave",onLeave]];
+   events.forEach(([name,handler])=>rail.addEventListener(name,handler,{passive:true}));
+   const timer=window.setInterval(()=>{
+    if(pointerInside||Date.now()<pausedUntil||document.visibilityState!=="visible")return;
+    const first=rail.querySelector<HTMLElement>(".plugProductCard");
+    if(!first)return;
+    const style=window.getComputedStyle(rail);
+    const gap=parseFloat(style.columnGap||style.gap||"0")||0;
+    const step=first.getBoundingClientRect().width+gap;
+    const atEnd=rail.scrollLeft+rail.clientWidth>=rail.scrollWidth-12;
+    rail.scrollTo({left:atEnd?0:rail.scrollLeft+step,behavior:"smooth"});
+   },5000);
+   cleanups.push(()=>{window.clearInterval(timer);events.forEach(([name,handler])=>rail.removeEventListener(name,handler));});
+  }
+  return()=>cleanups.forEach(cleanup=>cleanup());
+ },[finds.length,deals.length,loaded]);
+useEffect(()=>{const dialog=spotlightDialog.current;if(!dialog)return;if(spotlightOpen&&!dialog.open){dialog.showModal();dialog.querySelector<HTMLButtonElement>(".plugModalClose")?.focus()}else if(!spotlightOpen&&dialog.open)dialog.close()},[spotlightOpen]);
  const retry=()=>{setLoaded(false);setFailed(false);setAttempt(value=>value+1)};
  const freshness=offlineCopy?(savedAt?`Showing saved public finds from ${new Date(savedAt).toLocaleString()}. Prices and availability may have changed.`:"Showing saved public finds. Prices and availability may have changed."):"";
  return <><section className="plugEditorialHero" aria-labelledby="plug-editorial-title"><div className="plugContainer plugEditorialHeroGrid"><div className="plugEditorialHeroCopy"><span className="plugKicker">{t("brandLine")}</span><h1 id="plug-editorial-title"><span>{t("heroTop")}</span><em>{t("heroBottom")}</em></h1><p>{t("heroIntro")}</p><div className="plugEditorialActions"><a className="plugEditorialPrimary" href="#featured">{t("explore")} <span aria-hidden="true">↘</span></a><Link className="plugEditorialSecondary" href="/request">{t("requestProduct")} ↗</Link></div><div className="plugEditorialIssue"><span>{t("rooted")}</span><span>{t("curated")}</span></div></div><div className="plugEditorialArtwork" aria-label={spotlight?(t("featuredFindPrefix")+spotlight.title):t("featuredArtwork")}>{spotlight?.imageUrl&&<img className="plugArtworkImage" src={spotlight.imageUrl} alt={spotlight.title} fetchPriority="high" loading="eager"/>}{spotlight?<div className="plugArtworkFooter"><div className="plugArtworkProductCopy"><span>{t("currentPick")}</span><strong>{spotlight.title}</strong><span><DisplayMoney value={spotlight.price!} compact/></span></div><button type="button" className="plugArtworkDetailsButton" onClick={()=>{setSpotlightOpen(true);void trackPlugJourney("storefront_find_opened",{productLabel:spotlight.title,itemType:"find",source:"hero"})}}>{t("viewDetails")} <span aria-hidden="true">↗</span></button></div>:<div className="plugArtworkFallback"><strong>THE<br/><em>PLUG.</em></strong><span>{t("heroFallback")}</span></div>}</div></div></section><dialog ref={spotlightDialog} className="plugFindDialog" aria-labelledby="plug-spotlight-title" onClose={()=>setSpotlightOpen(false)} onClick={event=>{if(event.target===event.currentTarget)setSpotlightOpen(false)}}>{spotlight&&<div className="plugFindDialogInner"><button type="button" className="plugModalClose" aria-label="Close details" onClick={()=>setSpotlightOpen(false)}>×</button><div className="plugFindDialogMedia"><img src={spotlight.imageUrl} alt={spotlight.title}/></div><div className="plugFindDialogCopy"><span className="plugFindDialogKicker">{t("currentPick")}</span><h2 id="plug-spotlight-title">{spotlight.title}</h2><strong className="plugFindDialogPrice"><DisplayMoney value={spotlight.price!}/></strong><p className="plugFindDialogDescription">{spotlight.description||t("askFrank")}</p><p className="plugFindDialogNote">{disclaimer}</p><div className="plugFindDialogActions"><Link className="plugProductExpandedAction" href={"/account?product="+encodeURIComponent(spotlight.title)+"&price="+encodeURIComponent(String(spotlight.price))+"&itemType=find"} onClick={()=>void trackPlugJourney("product_request_clicked",{productLabel:spotlight.title,itemType:"find",source:"hero_modal"})}>Continue in My Plug →</Link></div></div></div>}</dialog><section className="plugStoreSection" id="featured"><div className="plugContainer"><div className="plugStoreSectionHead"><div><span className="plugKicker">{t("currentEdit")}</span><h2>{t("featured")} <em>{t("featuredSuffix")}</em></h2><p>{t("latestPicks")}</p></div><div className="plugRailControls"><Link href="/saved" className="plugSavedFindsLink">{t("savedFinds")}</Link><button aria-label={t("previousFinds")} onClick={()=>move(findRail,-1)}>←</button><button aria-label={t("nextFinds")} onClick={()=>move(findRail,1)}>→</button></div></div>
