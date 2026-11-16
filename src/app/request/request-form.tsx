@@ -45,3 +45,4 @@ export default function RequestForm({embedded=false}:{embedded?:boolean}){
    <button className="button buttonPrimary plugSendRequest" type="submit" disabled={busy} aria-disabled={busy}>{busy?(stage==="upload"?(uploadProgress>0?"Uploading · "+uploadProgress+"%":"Preparing upload…"):"Saving your request…"):"Send request to Frank →"}</button>
   </form>
  </section></div></div>
+}
