@@ -981,3 +981,55 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .feedItemJustSubmitted{border-color:#0866ff;box-shadow:inset 3px 0 0 #0866ff,0 8px 24px rgba(8,102,255,.08)}
 .requestSavedMarker{display:inline-flex;margin-bottom:7px;padding:4px 8px;border-radius:999px;background:#e8f0ff;color:#064cc4;font-size:.62rem;font-weight:950;letter-spacing:.08em}
 @media(max-width:560px){.plugPreferenceBar label.plugPreferenceControl{min-height:32px;padding:3px 8px}.plugPreferenceControl select{max-width:92px;font-size:.68rem}.plugPreferenceBar>small{display:none}}
+
+
+/* The Plug storefront: Iteration13's clear service-selection affordance, adapted to the editorial product rail. */
+.plugProductCard{display:flex;flex-direction:column;min-height:100%;padding:0 0 4px}
+.plugProductImage{border-radius:3px}
+.plugProductMeta{align-items:flex-start;flex-wrap:wrap;min-height:38px}
+.plugProductMeta .plugProductPrice{display:flex;flex-direction:column;align-items:flex-end;gap:3px;text-align:right}
+.plugProductMeta .plugProductPrice .plugPriceConversion{align-items:flex-end}
+.plugProductCard h3{margin:10px 0 7px;line-height:1.08}
+.plugProductCard .plugProductExcerpt{min-height:2.6em;margin:0;color:#666;font-size:.82rem;line-height:1.5}
+.plugProductAction{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:48px;margin-top:auto;padding:0 15px;border:0;border-radius:3px;background:#0866ff;color:#fff;font-size:.78rem;font-weight:950;text-align:left;cursor:pointer;transition:background .18s ease,transform .18s ease,box-shadow .18s ease}
+.plugProductAction span{color:#fff;font-size:1.05rem}
+.plugProductAction:hover{background:#064fc7;transform:translateY(-2px);box-shadow:0 7px 18px rgba(8,102,255,.2)}
+.plugProductAction:focus-visible,.plugArtworkDetailsButton:focus-visible,.plugProductExpandedAction:focus-visible{outline:3px solid #111;outline-offset:3px}
+.plugArtworkFooter{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:14px;padding:18px 20px;background:linear-gradient(0deg,rgba(0,0,0,.8),rgba(0,0,0,.28))}
+.plugArtworkProductCopy{display:flex;min-width:0;flex-direction:column;gap:7px}
+.plugArtworkProductCopy>span:first-child{font-size:.57rem;color:#b8c9ff;letter-spacing:.13em}
+.plugArtworkProductCopy>strong{font-size:clamp(.95rem,1.5vw,1.25rem);line-height:1.15;letter-spacing:-.025em}
+.plugArtworkProductCopy .plugPriceConversion{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 10px}
+.plugArtworkProductCopy .plugPriceConversion>span{font-size:1.05rem;letter-spacing:0}
+.plugArtworkProductCopy .plugPriceConversion small{font-size:.59rem;letter-spacing:0;color:#d0d2d8}
+.plugArtworkDetailsButton{display:flex;align-items:center;justify-content:space-between;gap:16px;min-width:132px;min-height:44px;padding:0 13px;border:1px solid rgba(255,255,255,.7);border-radius:3px;background:#0866ff;color:#fff;font-size:.72rem;font-weight:950;cursor:pointer}
+.plugArtworkDetailsButton:hover{background:#fff;color:#111}
+.plugFindDialogActions .plugProductExpandedAction{display:flex;min-height:50px;padding:12px 16px;border:0;border-radius:3px;background:#0866ff;color:#fff;font-size:.8rem;font-weight:950;text-decoration:none}
+.plugFindDialogActions .plugProductExpandedAction:hover{background:#064fc7}
+.accountRequestStage{margin:20px 0 24px;padding:16px;border:1px solid #d9dce3;border-radius:12px;background:#f7f8fa}
+.accountRequestStageHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.accountRequestStageHead .kicker{color:#0866ff;font-size:.62rem;font-weight:950;letter-spacing:.12em}
+.accountRequestInner{width:100%}
+.accountRequestCard{width:100%;max-width:none!important;margin:0!important;padding:0!important;border:0!important;box-shadow:none!important;background:transparent!important}
+.accountRequestCard .accountHero{margin:0 0 12px;padding:0!important;background:transparent!important}
+.accountRequestCard .accountHero h2{margin:4px 0;font-size:1.55rem;line-height:1.05;letter-spacing:-.05em}
+.accountRequestCard .accountHero p{max-width:540px;margin:6px 0 0;font-size:.82rem;line-height:1.45}
+.accountRequestCard .requestBand{margin:0 0 14px;padding:12px 14px;border-radius:8px}
+.accountRequestCard .requestBand p{margin:5px 0 0;font-size:.76rem;line-height:1.45}
+.accountRequestCard .adminForm{gap:12px}
+.accountRequestCard .adminForm label{font-size:.8rem}
+.accountRequestCard .adminForm input,.accountRequestCard .adminForm select,.accountRequestCard .adminForm textarea{min-height:42px;padding:9px 11px;font-size:.86rem}
+.accountRequestCard .adminForm textarea{min-height:86px}
+.accountRequestCard .fieldGrid{gap:10px}
+.accountRequestCard .requestProgress{margin:12px 0}
+.accountRequestCard .orderTruth{font-size:.7rem}
+@media(max-width:680px){
+ .plugArtworkFooter{grid-template-columns:1fr;align-items:stretch;gap:11px;padding:15px}
+ .plugArtworkDetailsButton{width:100%;min-height:46px}
+ .plugProductAction{min-height:46px}
+ .accountRequestStage{margin:14px 0;padding:12px}
+}
+@media(prefers-reduced-motion:reduce){
+ .plugProductAction{transition:none}
+ .plugProductAction:hover{transform:none}
+}
