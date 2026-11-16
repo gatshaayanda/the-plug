@@ -32,7 +32,7 @@ function ProductCard({item,disclaimer}:{item:StorefrontItem;disclaimer:string}){
 }
 export default function StorefrontFeed(){const{t}=useStorefrontText();const[items,setItems]=useState<StorefrontItem[]>([]),[loaded,setLoaded]=useState(false),[failed,setFailed]=useState(false),[attempt,setAttempt]=useState(0),[now,setNow]=useState(()=>Date.now()),[offlineCopy,setOfflineCopy]=useState(false),[savedAt,setSavedAt]=useState<string|null>(null),[disclaimer,setDisclaimer]=useState(DEFAULT_STOREFRONT_DISCLAIMER),[selectionCount,setSelectionCount]=useState(0);useEffect(()=>{const refresh=()=>{try{const list=JSON.parse(localStorage.getItem("theplug:sourcing-selection:v1")||"[]");setSelectionCount(Array.isArray(list)?list.length:0)}catch{setSelectionCount(0)}};refresh();window.addEventListener("theplug:sourcing-selection-changed",refresh);window.addEventListener("storage",refresh);return()=>{window.removeEventListener("theplug:sourcing-selection-changed",refresh);window.removeEventListener("storage",refresh)}},[]);
  
- const[items,setItems]=useState<StorefrontItem[]>([]),[loaded,setLoaded]=useState(false),[failed,setFailed]=useState(false),[attempt,setAttempt]=useState(0),[now,setNow]=useState(()=>Date.now()),[offlineCopy,setOfflineCopy]=useState(false),[savedAt,setSavedAt]=useState<string|null>(null),[disclaimer,setDisclaimer]=useState(DEFAULT_STOREFRONT_DISCLAIMER),[selectionCount,setSelectionCount]=useState(0);
+ 
  const findRail=useRef<HTMLDivElement>(null),dealRail=useRef<HTMLDivElement>(null),spotlightDialog=useRef<HTMLDialogElement>(null);const[spotlightOpen,setSpotlightOpen]=useState(false);
  useEffect(()=>{
   const root=document.querySelector(".plugEditorialHome");
