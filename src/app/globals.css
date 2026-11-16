@@ -1383,3 +1383,14 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .accountRequestStage .plugSelectionReviewActions .button{min-height:46px;font-size:14px}
 .accountRequestStage .plugAccountBuilderEmpty{color:#171717}
 .accountRequestStage .plugAccountBuilderEmpty p{color:#414141;font-size:14px;line-height:1.5}
+
+
+/* Product thumbnails and complete pricing context in the sourcing review. */
+.plugSelectionReviewItems article>img,.plugBasketLine>img{width:54px;height:54px;flex:none;object-fit:cover;border-radius:7px;background:#eee}
+.plugSelectionReviewItems article>div{flex:1}
+.plugSelectionUnknownPrice{color:#454545;font-size:13px;line-height:1.45}
+.accountRequestStage .plugSelectionReviewHeading span{color:#333}
+.accountRequestStage .plugSelectionUnknownPrice{color:#333}
+.accountRequestStage .plugSelectionReviewItems article{align-items:center}
+.accountRequestStage .plugBasketLine{align-items:center}
+@media(max-width:520px){.plugSelectionReviewItems article>img,.plugBasketLine>img{width:48px;height:48px}}
