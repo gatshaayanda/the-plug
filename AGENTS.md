@@ -524,7 +524,7 @@ Research references:
 ### Scope and release discipline
 
 - This section defines the next customer-experience implementation direction. It does not authorize an unreviewed wholesale redesign or changes to payment, Firebase rules, UploadThing, account identity, admin, notifications, PWA install/offline behavior or commercial policy.
-- During the current homepage QA stage, collect feedback and keep changes limited to the agreed first screen. Do not start the next customer screen until the product owner approves moving on.
+- The product owner has now approved the next customer-flow stage: request details → private request submission → My Plug with the saved request visible → product-context private conversation. Keep changes limited to this sequence and preserve existing security, identity, payment and sourcing rules.
 - Before each next screen, inspect its current implementation and dependencies, propose the smallest improvement, update this contract if the approved behavior changes, then implement and verify that stage independently.
 
 
@@ -543,6 +543,28 @@ Research references:
 ## Landing-page language and engagement checkpoint — 2026-11-16
 - The public landing page has four selectable, locally remembered UI languages: English, Setswana, Afrikaans and French. Language remains independent of market/currency.
 - Translate the landing-page interface, editorial hero, product action labels, community presentation, member-benefit explainer and contextual customer guide. Product names, brand names, sizes, Frank-authored product descriptions, canonical BWP amounts and customer/business records stay in their authored language.
-- This is landing-page-only. Do not claim request, account, order or conversation routes are translated. Do not implement customer-account changes until the product owner explicitly approves that stage.
+- Language translation remains landing-page-only until the complete request, account, order and conversation journey has been translated and reviewed. Do not claim those routes are translated. The product owner approved the next staged request → My Plug → private conversation improvements on 2026-11-16; this approval does not authorize unrelated payment, identity, Firebase-rule or admin redesign.
 - Keep market and language controls sticky but compact and visual. Do not restore multi-line explanatory copy in the sticky strip.
 - Use restrained scroll reveals and a subtle hero entrance with a small product-card stagger. Respect `prefers-reduced-motion`; do not auto-advance rails or hijack scrolling.
+
+
+## Iteration14-style customer journey checkpoint — 2026-11-16
+
+The Plug's next approved stage applies the compact, visual, mobile-first app genre established by the Iteration14 direction and the current editorial landing page. The screen should communicate through product imagery, hierarchy, recognisable controls and clear next actions rather than long explanatory paragraphs.
+
+### Visual controls and storefront
+- Market and language remain independent preferences. The market selector should be a compact flag + currency control; the language selector should show the language's native name beside a language icon. Keep full accessible names and descriptive titles even when visible labels are shortened.
+- Keep currency disclosures concise. A foreign-currency amount is an estimate only; BWP remains the canonical storefront price and Frank confirms the final quote.
+- The hero's real uploaded product image is the primary visual. Layer it above decorative artwork backgrounds/textures and below readable overlays. If an image does not load, do not claim that the image is present; inspect the actual published record and URL.
+- To inspect Frank's selected homepage find: Admin → Storefront studio → Publishing queue → select the item → Edit. Verify Content type = Featured find, Audience = Everyone, Publication = Published, a valid BWP price, a real uploaded image preview/URL, valid start/expiry dates, and Display order (lower number appears first). The homepage hero uses the first currently eligible published find; it is not a separate manual hero record.
+- Never fabricate a featured item or replace Frank's uploaded product image with generated/sample imagery.
+
+### Approved customer path
+- The product details dialog leads to the request form with the selected product, item type and storefront-listed BWP price carried forward. Keep the commercial disclaimer: the listed price is not payment, stock reservation or final quote.
+- A successful submission goes directly to My Plug (/account?submitted=<requestId>). Do not leave the customer on a generic success page or make them navigate back to find the request.
+- My Plug must surface the just-submitted request first, visually identify it as saved, and keep optional account linking, notifications, privacy and circle setup collapsed until the customer chooses them. Never put Google linking or notification permission in front of submission.
+- Each sourcing request creates a private conversation with a title that identifies the requested product. The opening message carries the request's product, selected size/colour, link, budget, attachment and notes. Customer and Frank continue in that private conversation; keep request ownership and attachments private.
+- Preserve the guest/anonymous session and existing Google credential-linking behavior. Do not merge separate Firebase UIDs, force account creation, or change quote/deposit rules as part of visual work.
+- Use one clear primary action per step, short explanations, visible save/upload progress, retained form values on failure, and explicit recovery. No duplicate submit, no false success and no WhatsApp-only escape path.
+- Keep this sequence consistent in the storefront detail dialog, request form, My Plug tracker and customer/admin conversation views. Do not create a parallel chat or request system.
+- Design mobile-first at 320–390 CSS px, then refine tablet and desktop. Use progressive disclosure for optional details, visible focus, WCAG AA contrast, keyboard/back behavior and reduced-motion support. The interface should be visual first but never ambiguous.
