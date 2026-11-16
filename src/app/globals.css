@@ -1171,3 +1171,41 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 @media(max-width:560px){.plugRewardProgress article{padding:10px}}
 
 .adminPage .plugPaymentCapture{display:grid;gap:10px;padding:14px;border:1px solid #cbd5e1;border-radius:9px;background:#f7f9fc}.adminPage .plugPaymentCapture legend{padding:0 6px;color:#17263a;font-size:.82rem;font-weight:950}.adminPage .plugPaymentCapture small{color:#526071}.plugAdminPaymentList{display:grid;gap:6px}.plugAdminPaymentList>div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid #dce2e9;color:#344256;font-size:.72rem}.plugAdminPaymentList strong{color:#1758a8;white-space:nowrap}
+
+
+/* My Plug + Operations finishing pass: task-first hierarchy, visible focus and compact mobile controls. */
+.plugCareHeader .accountTopNav a:focus-visible,
+.adminPage .adminTabs button:focus-visible,
+.adminPage .adminPanel button:focus-visible,
+.plugReceipt>summary:focus-visible,
+.plugReceiptPaper button:focus-visible,
+.plugRewardItem:focus-within{outline:3px solid #075be0;outline-offset:3px}
+.plugRewardItem code{display:inline-flex;width:max-content;max-width:100%;padding:7px 10px;border:1px dashed #8ba9d6;border-radius:6px;background:#eef4ff;color:#174b99;font-size:.82rem;font-weight:900;overflow-wrap:anywhere}
+.plugRewardItem small{color:#555;font-size:.7rem;line-height:1.45}
+.plugRewardCount{white-space:nowrap}
+.plugReceipt>summary:after{content:"View acknowledgement";align-self:center;color:#1758a8;font-size:.68rem;font-weight:850}
+.plugReceipt[open]>summary:after{content:"Close"}
+.adminPage .adminTabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.adminPage .adminTabs button{min-width:0;min-height:42px;padding:9px 12px;font-weight:850}
+.adminPage .adminPanel .plugAdminRewards .panelHeading{margin-bottom:14px}
+.adminPage .plugAdminRewards .adminForm{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:900px}
+.adminPage .plugAdminRewards .adminForm label:nth-child(3){grid-column:1/-1}
+.adminPage .plugAdminRewards .adminForm button{justify-self:start}
+.adminPage .plugAdminRewards .journeyAnalyticsProducts>div{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.adminPage .plugAdminRewards .journeyAnalyticsProducts>div span{flex:1;min-width:180px}
+.adminPage .journeyAnalyticsGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:760px){
+ .adminPage .adminTabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .adminPage .plugAdminRewards .adminForm{grid-template-columns:1fr}
+ .adminPage .plugAdminRewards .adminForm label:nth-child(3){grid-column:auto}
+ .adminPage .journeyAnalyticsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .plugReceipt>summary{align-items:flex-start;flex-wrap:wrap}
+ .plugReceipt>summary:after{width:100%}
+}
+@media(max-width:420px){
+ .plugRewardProgress{grid-template-columns:1fr 1fr}
+ .plugRewardItem{padding:12px}
+ .plugReceiptPaper{padding:13px}
+ .plugReceiptPaper dl{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){.plugReceipt,.plugRewardItem{scroll-behavior:auto;transition:none!important}}
