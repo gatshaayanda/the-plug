@@ -901,9 +901,9 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 
 /* Featured media is the foreground image; editorial overlays remain legible above it. */
 .plugEditorialArtwork{isolation:isolate}
+.plugEditorialArtwork:before{z-index:-2}
+.plugEditorialArtwork:after{z-index:-1}
 .plugEditorialArtwork .plugArtworkImage{z-index:0}
-.plugEditorialArtwork:before{z-index:1}
-.plugEditorialArtwork:after{z-index:2}
 .plugEditorialArtwork .plugArtworkFooter,.plugEditorialArtwork .plugArtworkFallback{z-index:3}
 .plugArtworkFooter{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px 14px;padding:18px 20px}
 .plugArtworkFooter>span:first-child{grid-column:1/-1}
@@ -971,3 +971,13 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .plugInstallCompactActions .plugInstallSecondary{min-height:44px;margin:0;padding:10px 14px;width:auto}
 .plugInstallFootnote{margin-top:8px}
 @media(max-width:560px){.plugPwaInstallButton{left:auto;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));width:auto}.plugInstallModal{padding:15px}}
+
+
+/* Iteration14-style preference controls: visual first, still named for assistive technology. */
+.plugPreferenceBar label.plugPreferenceControl{min-height:34px;padding:4px 10px;gap:7px;color:#0866ff}
+.plugPreferenceControl select{max-width:112px;min-height:24px;padding:2px 14px 2px 2px;color:#111;font-size:.72rem;font-weight:850}
+.plugPreferenceControl select option{color:#111}
+.plugPreferenceBar>small{font-size:.58rem;color:#666;white-space:nowrap}
+.feedItemJustSubmitted{border-color:#0866ff;box-shadow:inset 3px 0 0 #0866ff,0 8px 24px rgba(8,102,255,.08)}
+.requestSavedMarker{display:inline-flex;margin-bottom:7px;padding:4px 8px;border-radius:999px;background:#e8f0ff;color:#064cc4;font-size:.62rem;font-weight:950;letter-spacing:.08em}
+@media(max-width:560px){.plugPreferenceBar label.plugPreferenceControl{min-height:32px;padding:3px 8px}.plugPreferenceControl select{max-width:92px;font-size:.68rem}.plugPreferenceBar>small{display:none}}
