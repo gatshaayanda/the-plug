@@ -568,3 +568,32 @@ The Plug's next approved stage applies the compact, visual, mobile-first app gen
 - Use one clear primary action per step, short explanations, visible save/upload progress, retained form values on failure, and explicit recovery. No duplicate submit, no false success and no WhatsApp-only escape path.
 - Keep this sequence consistent in the storefront detail dialog, request form, My Plug tracker and customer/admin conversation views. Do not create a parallel chat or request system.
 - Design mobile-first at 320–390 CSS px, then refine tablet and desktop. Use progressive disclosure for optional details, visible focus, WCAG AA contrast, keyboard/back behavior and reduced-motion support. The interface should be visual first but never ambiguous.
+
+
+## The Plug visual direction and Iteration13 customer-flow handoff — 2026-11-16
+
+### Design direction
+- Dominant genre: **Loud editorial retail**, expressed through real sneaker/apparel photography, confident typography, bold cobalt action cues and deliberate editorial composition. Secondary **Atmosphere** belongs in the featured hero artwork; secondary **Quiet + Data** belongs in My Plug, request progress, private conversations and operational records.
+- Keep the palette disciplined: ink/near-black, warm paper/neutral surfaces and The Plug cobalt as the principal action accent. Existing red may appear only as a small editorial accent; do not add more competing brand colours.
+- The homepage must be visual-first, not word-heavy: product photography, short section labels, compact price disclosures, obvious actions, concise navigation and clear spacing. Preserve Frank's real uploaded media and the published-content source of truth.
+- Use Iteration13's customer-first app shell and service-selection affordance as the interaction reference, not as a visual template to copy blindly. Relevant source standards: gatshaayanda/iteration13/docs/VISUAL-DIRECTION-STANDARD.md, docs/DESIGN-INTELLIGENCE-AND-EXPERIENCE-QUALITY-STANDARD.md, docs/OPERATIONAL-TRANSPARENCY-STANDARD.md, and the canonical WashRide reference docs/assets/washride-home-reference.jpeg. Apply the compact, mobile-first hierarchy, strong action buttons, restrained palette, purposeful motion, and real progress/status states.
+- The Plug homepage hero's featured item must have an explicit **View details** action beside the selected product and price. The hero and the featured rail both open the same kind of product-details modal. The action must be visible without guessing that an image or product title is clickable.
+- Featured product cards use a full-width, high-contrast **View details** action styled as a primary selection button (Iteration13's “Select service” clarity). Save remains a separate secondary action. Do not rely on a thin underlined text link as the only cue.
+- Motion is restrained and purposeful: hero entrance, section/card reveal and subtle image hover only; honour prefers-reduced-motion. No scroll hijack, auto-advancing rails or motion that obscures product/action clarity.
+
+### Canonical customer journey
+- **Storefront → View details modal → Continue in My Plug → selected item shown in the My Plug account request step → submit once → My Plug request tracker and private conversation.**
+- A product modal action must open /account?product=…&price=…&itemType=…, not send the customer to a standalone request-form page. The selected product, published price and item type are carried into the account composer.
+- The sourcing composer is an account step, not a separate customer destination. Reuse the existing RequestForm submission implementation, Firebase anonymous session, UploadThing upload, request persistence, conversation creation, and notification flow. Do not create a second request schema or duplicate save logic.
+- On successful submission, return to /account?submitted=<requestId>, show the saved request first and keep optional account linking, notifications and circle setup collapsed. Never show a generic success page as the primary destination.
+- The legacy /request route redirects into My Plug while preserving product query parameters. New request entry points should open the account step.
+- Keep the listed price as a historical storefront reference only. It is not payment, a stock reservation or a confirmed quote; Frank confirms availability and final price.
+- The customer should never need to infer what is clickable or where a selected product went. Show selected item context, one obvious primary action per step, and clear save/upload progress and recovery.
+- Do not change Firebase rules, customer identity semantics, payment/deposit rules, admin permissions or sourcing status transitions as part of this visual/flow rearrangement.
+
+### Verification for future changes
+- Check the full route sequence at mobile widths (320–390 CSS px) and desktop.
+- Verify hero View details opens its modal; modal action opens My Plug with the exact item, price and item type prefilled; no standalone request page appears.
+- Verify a successful request creates one private request and its product-context conversation, returns to My Plug, and visibly surfaces the saved request.
+- Verify request failure keeps the user in the account composer with entered values and no false success.
+- Check the actual hero/card images, focus states, readable contrast, reduced motion, and all empty/loading/error states.
