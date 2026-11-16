@@ -1227,3 +1227,33 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
  .plugProductCardFooter .plugProductAction{min-width:96px;padding:0 8px;font-size:.66rem}
  .plugProductCardCopy h3{font-size:.91rem}
 }
+
+
+/* Customer care request composer: selected item first, essentials visible, extras on demand. */
+.plugQuickRequestHead{display:grid;gap:7px;margin:0 0 16px}
+.plugQuickRequestHead h2{margin:0;font-size:clamp(1.35rem,4vw,1.8rem);line-height:1.08;letter-spacing:-.035em}
+.plugQuickRequestHead p{margin:0;color:#bdbdbd;font-size:.9rem;line-height:1.5;max-width:58ch}
+.plugSelectedFind{display:grid;gap:5px;padding:14px 15px;margin:0 0 16px;border:1px solid #343434;border-left:3px solid var(--plug-blue);border-radius:12px;background:#151515}
+.plugSelectedFind>span{font-size:.63rem;font-weight:950;letter-spacing:.1em;color:#9c9c9c}
+.plugSelectedFind strong{font-size:1rem;line-height:1.3}
+.plugSelectedFind small{color:#bcbcbc;font-size:.76rem;line-height:1.4}
+.plugQuickRequestForm{gap:14px}
+.plugQuickContactFields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.plugQuickContactFields label{min-width:0}
+.plugRequestMore{border:1px solid #353535;border-radius:12px;background:#121212;overflow:hidden}
+.plugRequestMore>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;cursor:pointer}
+.plugRequestMore>summary::-webkit-details-marker{display:none}
+.plugRequestMore>summary span{display:grid;gap:3px}
+.plugRequestMore>summary strong{font-size:.88rem}
+.plugRequestMore>summary small{font-size:.74rem;color:#aaa}
+.plugRequestMore>summary>b{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#252525;color:#fff;font-size:1rem}
+.plugRequestMore[open]>summary{border-bottom:1px solid #353535}
+.plugRequestMore[open]>summary>b{transform:rotate(45deg)}
+.plugRequestMoreBody{display:grid;gap:13px;padding:14px}
+.plugQuickRequestPromise{margin:0;color:#aaa;font-size:.78rem;line-height:1.5}
+.plugSendRequest{width:100%;min-height:50px;justify-content:center;font-weight:900}
+@media(max-width:560px){
+ .plugQuickContactFields{grid-template-columns:minmax(0,1fr)}
+ .plugQuickRequestForm{gap:12px}
+ .plugSelectedFind{padding:12px}
+}
