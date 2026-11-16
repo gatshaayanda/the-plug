@@ -597,3 +597,13 @@ The Plug's next approved stage applies the compact, visual, mobile-first app gen
 - Verify a successful request creates one private request and its product-context conversation, returns to My Plug, and visibly surfaces the saved request.
 - Verify request failure keeps the user in the account composer with entered values and no false success.
 - Check the actual hero/card images, focus states, readable contrast, reduced motion, and all empty/loading/error states.
+
+
+## My Plug customer-care app shell — 2026-11-16
+
+- Treat `/account` as the customer's persistent care app, not a long request form or a marketing/onboarding page. Use the compact app-shell pattern from Iteration13: brand identity, clearly labelled Store / My requests / Messages / My details destinations, concise account heading, readable status and one obvious next action.
+- Keep the core relationship tasks first: selected find/request composer when opened from a product; saved/current sourcing requests and their next step; private messages with Frank; then optional account linking, notifications, circle/privacy and external links. Google linking and optional setup must never compete with request submission or request tracking.
+- Use a quiet, high-contrast customer-care visual system: warm neutral page, white/light content surface, ink text, restrained cobalt for primary actions/status focus. Do not inherit low-contrast dark admin styling into customer account content. Explicitly style headings, body copy, muted labels, form controls, empty states, messages, request cards and focus states for readable contrast.
+- The customer app shell must remain compact and mobile-first. At phone widths, navigation becomes a small labelled grid, request cards stack cleanly, primary actions are full-width where useful, and no content or controls overflow horizontally. Preserve keyboard access, browser back behavior and reduced-motion preferences.
+- Do not add fake Receipts or Rewards destinations unless their underlying customer workflows and data are actually implemented. Link only to real destinations; show real request, quote, deposit, receipt and conversation records where they exist.
+- Keep the existing Firebase anonymous identity, Google linking behavior, request records, UploadThing attachments, private conversations and quote/deposit rules. Visual rearrangement must not create a parallel request or messaging system.
