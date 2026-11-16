@@ -476,7 +476,7 @@ service cloud.firestore {
     match /customerRewards/{rewardId} {
       allow read: if isAdmin() || (signedIn() && resource.data.customerId == request.auth.uid);
       allow create: if isAdmin()
-        && request.resource.data.keys().hasOnly(['customerId','customerName','title','description','code','issuedAt','status','sourceRequestId'])
+        && request.resource.data.keys().hasOnly(['customerId','customerName','title','description','code','expiresAt','issuedAt','status','sourceRequestId'])
         && request.resource.data.keys().hasAll(['customerId','customerName','title','description','issuedAt','status','sourceRequestId'])
         && request.resource.data.customerId is string
         && request.resource.data.customerName is string
