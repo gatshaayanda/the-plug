@@ -490,7 +490,10 @@ service cloud.firestore {
         && request.resource.data.sourceRequestId is string
         && exists(/databases/$(database)/documents/sourcingRequests/$(request.resource.data.sourceRequestId))
         && get(/databases/$(database)/documents/sourcingRequests/$(request.resource.data.sourceRequestId)).data.customerId == request.resource.data.customerId
-        && get(/databases/$(database)/documents/sourcingRequests/$(request.resource.data.sourceRequestId)).data.status in ['Delivered','Collected'];
+        && get(/databases/$(database)/documents/sourcingRequests/$(request.resource.data.sourceRequestId)).data.status in ['Delivered','Collected']
+        && get(/databases/$(database)/documents/sourcingRequests/$(request.resource.data.sourceRequestId)).data.keys().hasAny(['quotedPrice'])
+        && get(/databases/$(database)/documents/sourcingRequests/$(request.resource.data.sourceRequestId)).data.keys().hasAny(['depositPaid'])
+        && get(/databases/$(database)/documents/sourcingRequests/$(request.resource.data.sourceRequestId)).data.depositPaid >= get(/databases/$(database)/documents/sourcingRequests/$(request.resource.data.sourceRequestId)).data.quotedPrice;
       allow update: if isAdmin()
         && resource.data.status == 'available'
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','redeemedAt'])
