@@ -1337,3 +1337,49 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
  .plugLiveRecord:has(.plugLiveRecordPaper){display:block!important}
  .plugLiveRecordPaper>footer,.plugReceiptPaper>footer{color:#555!important}
 }
+
+
+/* Sourcing journey: selected product must travel with the customer into My Plug. */
+.plugProductExpandedAction{border:0;cursor:pointer;font:inherit;font-size:.82rem;font-weight:900}
+.plugProductExpandedAction:focus-visible{outline:3px solid #0866ff;outline-offset:3px}
+
+/* My Plug request stage: readable neutral form surfaces and explicit no-payment terms. */
+.accountRequestStage{color:#171717}
+.accountRequestStage .plugQuickRequestHead .kicker{color:#075be0;font-size:12px;font-weight:950;letter-spacing:.1em}
+.accountRequestStage .plugQuickRequestHead h2{color:#111;font-size:clamp(22px,4vw,29px);line-height:1.15}
+.accountRequestStage .plugQuickRequestHead p{color:#414141;font-size:15px;line-height:1.5}
+.accountRequestStage .plugSelectedFind{background:#fff;border:1px solid #cbd4e1;border-left:4px solid #0866ff;color:#171717;border-radius:9px}
+.accountRequestStage .plugSelectedFind>span{color:#075be0;font-size:12px;letter-spacing:.08em}
+.accountRequestStage .plugSelectedFind strong{color:#111;font-size:16px;line-height:1.4}
+.accountRequestStage .plugSelectedFind small{color:#414141;font-size:14px;line-height:1.5}
+.accountRequestStage .plugBasketLine{border-color:#e0e3e8}
+.accountRequestStage .plugBasketLine strong{color:#171717;font-size:14px}
+.accountRequestStage .plugBasketLine small{color:#454545;font-size:13px}
+.accountRequestStage .plugBasketLine .textLink{color:#064fc8;font-size:13px}
+.accountRequestStage .plugRequestMore{border:1px solid #b9c4d2;border-radius:9px;background:#fff;color:#171717}
+.accountRequestStage .plugRequestMore>summary{min-height:60px;padding:13px 15px;background:#fff;color:#171717}
+.accountRequestStage .plugRequestMore>summary strong{color:#111;font-size:16px;line-height:1.3}
+.accountRequestStage .plugRequestMore>summary small{color:#454545;font-size:14px;line-height:1.4}
+.accountRequestStage .plugRequestMore>summary>b{background:#e9eff8;color:#123e79}
+.accountRequestStage .plugRequestMore[open]>summary{border-bottom:1px solid #d8dee8}
+.accountRequestStage .plugRequestMoreBody{background:#fff;color:#171717;padding:15px}
+.accountRequestStage .plugRequestMoreBody>label,.accountRequestStage .plugQuickContactFields label{color:#171717;font-size:14px;font-weight:800;line-height:1.4}
+.accountRequestStage .plugRequestMoreBody label>span{color:#454545;font-size:13px;font-weight:500;line-height:1.45}
+.accountRequestStage .plugRequestMoreBody input:not([type=file]),.accountRequestStage .plugRequestMoreBody select,.accountRequestStage .plugRequestMoreBody textarea{min-height:46px;border:1px solid #737d8b;border-radius:7px;background:#fff;color:#171717;padding:11px 12px;font-size:15px;line-height:1.4}
+.accountRequestStage .plugRequestMoreBody input::placeholder,.accountRequestStage .plugRequestMoreBody textarea::placeholder{color:#595959;opacity:1}
+.accountRequestStage .plugRequestMoreBody input:focus,.accountRequestStage .plugRequestMoreBody select:focus,.accountRequestStage .plugRequestMoreBody textarea:focus{outline:3px solid rgba(8,102,255,.22);border-color:#075be0}
+.accountRequestStage .plugRequestMoreBody input[type=file]{max-width:100%;color:#222;font-size:14px}
+.accountRequestStage .plugRequestMoreBody small{color:#414141;font-size:13px;line-height:1.45}
+.accountRequestStage .plugRequestMoreBody .textLink{color:#064fc8}
+.accountRequestStage .plugQuickRequestPromise,.accountRequestStage .orderTruth{color:#414141;font-size:14px;line-height:1.5}
+.accountRequestStage .plugSendRequest,.accountRequestStage .buttonPrimary{min-height:48px;font-size:15px}
+.accountRequestStage .plugSelectionReviewHeading span{color:#414141;font-size:14px;line-height:1.5}
+.accountRequestStage .plugSelectionReviewItems article{border-color:#cbd1da}
+.accountRequestStage .plugSelectionReviewItems article strong{color:#171717;font-size:15px}
+.accountRequestStage .plugSelectionReviewItems article small{color:#454545;font-size:13px}
+.accountRequestStage .plugSelectionReviewItems article>b{color:#171717;font-size:14px}
+.accountRequestStage .plugSelectionReviewTotal span{color:#414141;font-size:14px}
+.accountRequestStage .plugSelectionReviewTotal strong{color:#111}
+.accountRequestStage .plugSelectionReviewActions .button{min-height:46px;font-size:14px}
+.accountRequestStage .plugAccountBuilderEmpty{color:#171717}
+.accountRequestStage .plugAccountBuilderEmpty p{color:#414141;font-size:14px;line-height:1.5}
