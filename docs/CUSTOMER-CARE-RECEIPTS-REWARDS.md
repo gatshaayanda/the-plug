@@ -8,7 +8,7 @@ The acknowledgement is deliberately not called a tax invoice or proof from a pay
 
 ## Rewards
 
-The rewards wallet is a private record of specific benefits issued by staff. A reward has a title, plain-language terms, optional code, optional expiry, source completed request, issue timestamp and status. Staff may issue against a Delivered or Collected request and mark an available reward redeemed. Customers cannot award or redeem themselves. No points, cash value, discount or automatic eligibility is implied.
+The rewards wallet is a private record of specific benefits issued by staff. A reward has a title, plain-language terms, optional code, optional expiry, source completed request, issue timestamp and status. Staff may issue only against a Delivered or Collected request whose cumulative recorded payments meet or exceed the confirmed quote, and mark an available reward redeemed. Customers cannot award or redeem themselves. No points, cash value, discount or automatic eligibility is implied.
 
 The account shows factual completed-purchase and reward-issued counts. No progress bar is shown until a real reward target and earning rules are defined.
 
