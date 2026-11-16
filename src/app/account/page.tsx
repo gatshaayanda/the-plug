@@ -29,7 +29,7 @@ function storefrontReference(notes:string){return notes.match(/Storefront listed
 const terminal=new Set(["Delivered","Collected","Cancelled"]);
 
 export default function AccountPage(){
- const[user,setUser]=useState<User|null>(null),[profile,setProfile]=useState<CustomerProfile|null>(null),[requests,setRequests]=useState<PlugRequest[]>([]),[busy,setBusy]=useState(false),[authReady,setAuthReady]=useState(false),[message,setMessage]=useState(""),[submittedRequestId,setSubmittedRequestId]=useState(""),[requestsReady,setRequestsReady]=useState(false),[requestIntent,setRequestIntent]=useState(false);
+ const[user,setUser]=useState<User|null>(null),[profile,setProfile]=useState<CustomerProfile|null>(null),[requests,setRequests]=useState<PlugRequest[]>([]),[busy,setBusy]=useState(false),[authReady,setAuthReady]=useState(false),[message,setMessage]=useState(""),[submittedRequestId,setSubmittedRequestId]=useState(""),[requestsReady,setRequestsReady]=useState(false),[requestIntent,setRequestIntent]=useState(false),[basketReady,setBasketReady]=useState(false),[basketCount,setBasketCount]=useState(0),[hasDirectProduct,setHasDirectProduct]=useState(false);
 
 
  useEffect(()=>{const refresh=()=>{try{const list=JSON.parse(localStorage.getItem("theplug:sourcing-selection:v1")||"[]");setBasketCount(Array.isArray(list)?list.length:0)}catch{setBasketCount(0)}setBasketReady(true)};refresh();window.addEventListener("theplug:sourcing-selection-changed",refresh);window.addEventListener("storage",refresh);return()=>{window.removeEventListener("theplug:sourcing-selection-changed",refresh);window.removeEventListener("storage",refresh)}},[]);
