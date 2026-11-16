@@ -454,3 +454,75 @@ The homepage is the first impression and must feel like a deliberate premium str
 - Use WCAG 2.2 and the existing Iteration13 interaction/operational-transparency standards for motion, keyboard operation, contrast, reduced motion and truthful states.
 - Before implementing entrance changes, capture current mobile and desktop behavior and map the current homepage components/data sources. Validate first paint, LCP/image behavior, layout stability, keyboard/touch controls, reduced-motion behavior, and manual carousel control on a real Android-sized viewport.
 - This is a direction and decision record, not permission to rewrite unrelated customer, purchase, admin, Firebase or offline workflows. Implement the first screen as a contained stage after the product owner reviews the proposed screen plan.
+
+## Mobile customer functions and navigation — next implementation contract (2026-11-16)
+
+Frank's latest feedback confirms the current product should remain mobile-first: the phone experience is the primary design target, with additional responsive refinement for laptop and iPad to follow. The objective is not to make the customer learn more screens. It is to make the important customer jobs obvious, direct and recoverable.
+
+### Product decision: organize around customer jobs, not feature screens
+
+- Design around the customer's simple mental model: **discover → understand → request → follow progress → return**.
+- Keep the homepage as the discovery surface. Keep **My Plug** as the single, recognizable home for a customer's saved finds, submitted requests, private updates and conversations. Do not scatter these into unrelated destinations.
+- Keep the My Plug entry visibly available in the mobile header on the homepage and relevant customer routes. Do not hide it behind a hamburger, footer-only link, account prompt or scroll-dependent control.
+- Use plain, action-led labels that describe the result: “View details”, “Request this”, “My Plug”, “View request”, “Reply to Frank”. Avoid internal feature names, ambiguous icons, and duplicate CTAs that lead to the same place.
+- A customer should not need to understand the difference between authentication, a profile, a member feed, a demand signal or a conversation to complete an ordinary request. Those are system concepts; expose them only when they help the customer's immediate task.
+- Do not add a new screen merely to explain a feature. Prefer a contextual inline explanation, a compact expandable section, or a clear status message when that is sufficient. Use a separate route only when the task genuinely needs its own space or a shareable destination.
+- Preserve browser and device Back behavior. Every detail/dialog/route must provide a clear way back to the prior task without losing entered request information or the customer's place in the storefront.
+
+### Required customer paths
+
+1. **First-time visitor:** land on the editorial storefront → browse real featured finds/live offers → open details → request a product. No account creation, install, notification permission, invitation or onboarding tour before the request.
+2. **Request submission:** keep the form focused and mobile-friendly; use clear field labels, appropriate phone keyboard/input types, sensible required/optional markers, attachment progress and actionable errors. Submit once; prevent accidental duplicate submissions. If saving fails, retain entered information and explain plainly that nothing was sent.
+3. **Successful request:** take the customer directly to My Plug with the new request visible first and a clear saved confirmation. Do not send them to a generic success page or make them search for their request.
+4. **Returning customer:** My Plug should make the next useful action obvious—open the current request, read/reply to Frank, check a recorded quote/deposit/status, or resume browsing. Keep request history and private conversations together in their customer context.
+5. **Account durability:** offer Google linking only after the core request has succeeded and explain the concrete benefit. Preserve the anonymous UID and its data when linking. Never force account setup to browse or submit.
+6. **Optional engagement:** notifications, friend invitations, interest preferences, privacy choices and installation are secondary, dismissible and revisitable. Never let these compete visually with the current request/status action.
+
+### Mobile-first interaction rules
+
+- Design and verify at 320–390 CSS px first, then tablet and desktop; do not merely shrink a desktop layout. Avoid horizontal page overflow, clipped controls, tiny tap targets, and long stacked forms.
+- Keep the current location and next action apparent on every key route. Use concise page titles, contextual back links, persistent My Plug access and visible progress/status where needed.
+- Minimize navigation depth and repeated data entry. Reuse known customer details only when their source and privacy permissions are clear; never ask for the same information twice without explaining why.
+- Keep one visually dominant primary action per step. Secondary actions must remain distinguishable and must not compete with submission, request progress or replying to Frank.
+- Use progressive disclosure for genuinely optional or advanced information, not to hide essential choices or make users hunt. Clearly label collapsed controls and expose expanded state accessibly.
+- Product cards must reveal the decision-critical facts available from trusted records. Do not bury confirmed price, offer validity, key product details or the request action in several nested screens. Never infer stock, delivery eligibility or a confirmed quote.
+- Dialogs and overlays must fit small screens, scroll internally when needed, have a clear close/back action, preserve context, and not trap the user. Prefer a normal route when the interaction is too long or complex for a dialog.
+- Keep touch controls comfortably tappable, keyboard/focus behavior intact, contrast at WCAG 2.2 AA, and reduced-motion support. Do not use auto-advancing content or scroll hijacking to move users through tasks.
+- Loading, upload, save, empty, offline and error states must say what is happening, what has or has not succeeded, and the next useful action. Never leave a customer staring at an indefinite spinner or a disabled button with no explanation.
+
+### Laptop and iPad responsiveness
+
+- Mobile is the source layout, not a separate degraded experience. Add tablet/laptop layouts by widening content, using available columns and improving card density without changing the task sequence or hiding familiar controls.
+- Preserve readable line lengths, balanced whitespace, stable image ratios and consistent navigation. Do not stretch phone-sized cards across wide screens or let wide layouts create a different information architecture.
+- Test portrait and landscape tablet, common laptop widths, keyboard navigation and browser zoom in addition to phone widths.
+
+### Evidence and behavioral psychology
+
+- Use recognition over recall: show familiar, descriptive labels and the customer's current request/status instead of expecting them to remember where a feature lives.
+- Reduce choice and decision load at each step: one clear next action, with secondary choices available when relevant. Do not remove meaningful control or conceal commercial terms in the name of simplicity.
+- Preserve orientation and control: users should know where they are, how they arrived, and how to go back. Avoid surprise route changes, forced tours, automatic scrolling and context-destroying overlays.
+- Use progressive disclosure only for optional complexity; keep essential information and primary actions visible.
+- Treat these as evidence-informed hypotheses, not guarantees of conversion. Validate them with short task-based tests with real customers/Frank, observing hesitation, wrong turns, repeated taps, backtracking, form abandonment and requests for help.
+
+Research references:
+- Baymard, Mobile E-Commerce UX: https://baymard.com/research/mcommerce-usability
+- Baymard, mobile disorientation and preserving navigation context: https://baymard.com/research-articles/mobile-commerce-design
+- Baymard, mobile UX audit and visible next actions: https://baymard.com/blog/ecommerce-ux-audit
+- Nielsen Norman Group, Mobile Website and Application Usability (navigation, forms, gestures, back behavior): https://www.nngroup.com/reports/mobile-website-and-application-usability/
+
+### QA acceptance checklist before calling the customer experience intuitive
+
+- A first-time visitor can identify how to browse and request without explanation or sign-in.
+- A customer can open a find, understand its available details, return to browsing, and request it without losing context.
+- A request can be submitted on a phone without unnecessary account setup or repeated fields; success is unmistakable.
+- Immediately after submission, the customer can see the saved request in My Plug.
+- A returning customer can locate the current request and reply to Frank without searching across unrelated screens.
+- My Plug remains visible/reachable on narrow mobile layouts and on all relevant customer routes.
+- No key task depends on swipe-only discovery, an icon without a label, a footer-only link, or an auto-moving carousel.
+- Test at least one first-time and one returning-customer task with a person who has not been coached. Record where they pause, misinterpret a label, backtrack or ask for help; fix observed friction before adding features.
+
+### Scope and release discipline
+
+- This section defines the next customer-experience implementation direction. It does not authorize an unreviewed wholesale redesign or changes to payment, Firebase rules, UploadThing, account identity, admin, notifications, PWA install/offline behavior or commercial policy.
+- During the current homepage QA stage, collect feedback and keep changes limited to the agreed first screen. Do not start the next customer screen until the product owner approves moving on.
+- Before each next screen, inspect its current implementation and dependencies, propose the smallest improvement, update this contract if the approved behavior changes, then implement and verify that stage independently.
