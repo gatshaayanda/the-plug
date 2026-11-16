@@ -473,6 +473,31 @@ service cloud.firestore {
       allow delete: if isAdmin() || (signedIn() && resource.data.ownerUid == request.auth.uid);
     }
 
+    match /customerRewards/{rewardId} {
+      allow read: if isAdmin() || (signedIn() && resource.data.customerId == request.auth.uid);
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['customerId','customerName','title','description','code','issuedAt','status','sourceRequestId'])
+        && request.resource.data.keys().hasAll(['customerId','customerName','title','description','issuedAt','status','sourceRequestId'])
+        && request.resource.data.customerId is string
+        && request.resource.data.customerName is string
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.description is string
+        && request.resource.data.description.size() > 0
+        && request.resource.data.issuedAt is string
+        && request.resource.data.status == 'available'
+        && request.resource.data.sourceRequestId is string
+        && exists(/databases/$(database)/documents/sourcingRequests/$(request.resource.data.sourceRequestId))
+        && get(/databases/$(database)/documents/sourcingRequests/$(request.resource.data.sourceRequestId)).data.customerId == request.resource.data.customerId
+        && get(/databases/$(database)/documents/sourcingRequests/$(request.resource.data.sourceRequestId)).data.status in ['Delivered','Collected'];
+      allow update: if isAdmin()
+        && resource.data.status == 'available'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','redeemedAt'])
+        && request.resource.data.status == 'redeemed'
+        && request.resource.data.redeemedAt is string;
+      allow delete: if false;
+    }
+
     match /customerJourneyEvents/{eventId} {
       allow read: if isAdmin();
       // Events are written only by the authenticated server route, never directly by clients.
