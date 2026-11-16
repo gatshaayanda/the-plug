@@ -125,8 +125,6 @@ export default function AccountPage(){
   <div className="orderHeader plugCareHeader"><Link href="/" className="logo"><span className="logoMark">P</span><span>THE PLUG<small>YOUR CUSTOMER CARE SPACE</small></span></Link><nav aria-label="My Plug navigation" className="accountTopNav"><Link href="/#featured" className="button buttonLight">Store</Link><a href="#requests" className="button buttonLight">My requests</a><a href="#messages" className="button buttonLight">Messages</a><a href="#receipts" className="button buttonLight">Receipts</a><a href="#rewards" className="button buttonLight">Rewards</a><a href="#profile" className="button buttonLight">My details</a></nav></div>
   <section className="orderCard accountHome" style={{maxWidth:920,margin:"0 auto"}}>
    <div className="accountHero"><div><span className="kicker">MY PLUG · CUSTOMER CARE</span><h1>Your Plug.</h1><p>Your finds, sourcing requests and conversations with Frank — together in one place.</p></div>{user&&profile&&<span className="accountStatus">{user.isAnonymous?"Guest session":"Google connected"}</span>}</div>{requestIntent&&<section className="accountRequestStage"><div className="accountRequestStageHead"><span className="kicker">YOUR SELECTED FIND</span><button type="button" className="textLink" onClick={()=>{window.history.replaceState(null,"","/account");setRequestIntent(false)}}>Back to requests</button></div><RequestForm embedded/></section>}
-}
-
 
 
 
