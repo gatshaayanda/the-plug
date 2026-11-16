@@ -1,6 +1,6 @@
 export type PlugMarket = "BW" | "ZA" | "NA" | "GB" | "US" | "CA";
 export type PlugCurrency = "BWP" | "ZAR" | "NAD" | "GBP" | "USD" | "CAD";
-export type PlugLanguage = "en";
+export type PlugLanguage = "en" | "tn" | "af" | "fr";
 
 export type StorefrontMarket = {
   code: PlugMarket;
@@ -12,12 +12,12 @@ export type StorefrontMarket = {
 };
 
 export const STOREFRONT_MARKETS: readonly StorefrontMarket[] = [
-  { code: "BW", name: "Botswana", flag: "🇧🇼", currency: "BWP", currencyLabel: "Pula", languages: ["en"] },
-  { code: "ZA", name: "South Africa", flag: "🇿🇦", currency: "ZAR", currencyLabel: "Rand", languages: ["en"] },
-  { code: "NA", name: "Namibia", flag: "🇳🇦", currency: "NAD", currencyLabel: "Namibian dollar", languages: ["en"] },
-  { code: "GB", name: "United Kingdom", flag: "🇬🇧", currency: "GBP", currencyLabel: "Pound sterling", languages: ["en"] },
-  { code: "US", name: "United States", flag: "🇺🇸", currency: "USD", currencyLabel: "US dollar", languages: ["en"] },
-  { code: "CA", name: "Canada", flag: "🇨🇦", currency: "CAD", currencyLabel: "Canadian dollar", languages: ["en"] },
+  { code: "BW", name: "Botswana", flag: "🇧🇼", currency: "BWP", currencyLabel: "Pula", languages: ["en", "tn", "af", "fr"] },
+  { code: "ZA", name: "South Africa", flag: "🇿🇦", currency: "ZAR", currencyLabel: "Rand", languages: ["en", "tn", "af", "fr"] },
+  { code: "NA", name: "Namibia", flag: "🇳🇦", currency: "NAD", currencyLabel: "Namibian dollar", languages: ["en", "tn", "af", "fr"] },
+  { code: "GB", name: "United Kingdom", flag: "🇬🇧", currency: "GBP", currencyLabel: "Pound sterling", languages: ["en", "tn", "af", "fr"] },
+  { code: "US", name: "United States", flag: "🇺🇸", currency: "USD", currencyLabel: "US dollar", languages: ["en", "tn", "af", "fr"] },
+  { code: "CA", name: "Canada", flag: "🇨🇦", currency: "CAD", currencyLabel: "Canadian dollar", languages: ["en", "tn", "af", "fr"] },
 ] as const;
 
 export const STOREFRONT_LANGUAGES: readonly { code: PlugLanguage; label: string; nativeName: string }[] = [
