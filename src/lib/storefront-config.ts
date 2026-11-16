@@ -22,6 +22,9 @@ export const STOREFRONT_MARKETS: readonly StorefrontMarket[] = [
 
 export const STOREFRONT_LANGUAGES: readonly { code: PlugLanguage; label: string; nativeName: string }[] = [
   { code: "en", label: "English", nativeName: "English" },
+  { code: "tn", label: "Setswana", nativeName: "Setswana" },
+  { code: "af", label: "Afrikaans", nativeName: "Afrikaans" },
+  { code: "fr", label: "French", nativeName: "Français" },
 ];
 
 export const DEFAULT_MARKET: PlugMarket = "BW";
