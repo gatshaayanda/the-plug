@@ -1058,3 +1058,92 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
  .plugProductAction{min-height:52px}
 }
 @media(prefers-reduced-motion:reduce){.plugProductAction,.plugArtworkDetailsButton{transition:none}}
+
+
+/* MY PLUG customer-care app shell — clear hierarchy, high contrast, one home. */
+.orderPage:has(.accountHome){min-height:100vh;background:#eeece6;color:#171717;padding:18px 0 64px}
+.orderPage:has(.accountHome) .orderWrap{width:min(1080px,calc(100% - 28px));margin:0 auto}
+.orderPage:has(.accountHome) .plugCareHeader{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:0 auto 14px;padding:12px 16px;background:#111;color:#fff;border-radius:12px}
+.plugCareHeader .logo{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:950;letter-spacing:.07em}
+.plugCareHeader .logo>span:last-child{display:grid;gap:3px}
+.plugCareHeader .logo small{font-size:.52rem;letter-spacing:.13em;color:#b8c7e7}
+.plugCareHeader .logoMark{display:grid;place-items:center;width:38px;height:38px;border:2px solid #0866ff;border-radius:50%;background:#0866ff;color:#fff}
+.plugCareHeader .accountTopNav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.plugCareHeader .accountTopNav .button{min-height:36px;padding:8px 11px;border:1px solid #484848;border-radius:7px;background:#202020;color:#fff;font-size:.69rem;font-weight:850;text-decoration:none}
+.plugCareHeader .accountTopNav .button:hover{background:#0866ff;border-color:#0866ff}
+.accountHome{width:100%;max-width:none!important;margin:0 auto!important;padding:clamp(18px,3vw,34px);border:1px solid #d7d4cc;border-radius:14px;background:#fff;color:#171717;box-shadow:0 12px 34px rgba(20,20,20,.06)}
+.accountHome,.accountHome *{box-sizing:border-box}
+.accountHome .accountHero{align-items:center;padding:0 0 22px;border-bottom:1px solid #e2dfd8}
+.accountHome .accountHero .kicker,.accountHome .kicker{color:#075be0;font-size:.65rem;font-weight:950;letter-spacing:.13em}
+.accountHome .accountHero h1{margin:8px 0 6px;color:#111;font-size:clamp(2rem,5vw,3.4rem);line-height:.98;letter-spacing:-.055em}
+.accountHome .accountHero p{max-width:620px;color:#55534f;font-size:.93rem;line-height:1.5}
+.accountHome .accountStatus{border:1px solid #b9d8c1;background:#eff8f1;color:#245b31}
+.accountRequestStage{margin:22px 0 26px;padding:clamp(15px,2.5vw,24px);border:1px solid #c9d7f4;border-radius:12px;background:#f3f6fc;color:#171717}
+.accountRequestStageHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.accountRequestStage .textLink{border:0;background:transparent;color:#075be0;font-size:.76rem;font-weight:900;text-decoration:underline;cursor:pointer}
+.accountHome .accountConnect{margin:22px 0 0;padding:16px;border:1px solid #d8d5ce;border-radius:11px;background:#f7f6f2;color:#171717}
+.accountHome .accountConnect strong{display:block;color:#171717;font-size:.94rem}
+.accountHome .accountConnect p{color:#57544e;font-size:.78rem;line-height:1.5}
+.accountHome .accountConnect .actions{display:flex;flex-wrap:wrap;gap:8px}
+.accountHome .accountConnect .button,.accountHome .accountConnect .googleSignInButton{min-height:42px;padding:10px 14px;border-radius:7px;font-size:.75rem;font-weight:900}
+.accountHome .accountSection{margin-top:24px;padding-top:20px;border-top:1px solid #e3e0da}
+.accountHome .panelHeading h2,.accountHome .accountSection h2{color:#171717;font-size:clamp(1.25rem,3vw,1.8rem);line-height:1.1;letter-spacing:-.035em}
+.accountHome .panelHeading p,.accountHome .orderTruth{color:#55534f;line-height:1.55}
+.accountHome .feedEmpty{margin:20px 0 0;padding:22px;border:1px solid #dedbd4;border-radius:11px;background:#f8f7f4;color:#171717}
+.accountHome .feedEmpty strong{display:block;color:#171717;font-size:1rem}
+.accountHome .feedEmpty p{color:#55534f;font-size:.83rem;line-height:1.5}
+.accountHome .feedList{display:grid;gap:10px}
+.accountHome .feedItem{padding:16px;border:1px solid #ddd9d1;border-radius:10px;background:#faf9f6;color:#171717}
+.accountHome .feedItemJustSubmitted{border:2px solid #0866ff;background:#f2f6ff}
+.accountHome .feedBody,.accountHome .feedBody p,.accountHome .feedTop strong{color:#171717}
+.accountHome .feedBody p{font-size:.88rem;line-height:1.5}
+.accountHome .feedTop small,.accountHome .feedActions span{color:#5d5a54}
+.accountHome .feedActions{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.accountHome .feedActions .button{min-height:40px;padding:9px 13px}
+.accountHome .accountRequestsHeading{align-items:center;gap:12px}
+.accountHome .accountRequestsHeading .buttonPrimary{min-height:42px;padding:10px 14px}
+.accountCareMessages{margin-top:24px;padding-top:20px;border-top:1px solid #e3e0da}
+.accountCareMessages .conversationHub{padding:0;border:0;background:transparent;color:#171717}
+.accountCareMessages .conversationHub .panelHeading h2{color:#171717}
+.accountCareMessages .conversationHub .panelHeading p{color:#55534f}
+.accountCareMessages .conversationHub .conversationPrivate{border-color:#d1d8e5;background:#f1f5fc;color:#234b89}
+.accountCareMessages .conversationRow,.accountCareMessages .conversationEmpty,.accountCareMessages .conversationStart{border-color:#dedbd4;background:#faf9f6;color:#171717}
+.accountCareMessages .conversationRow strong,.accountCareMessages .conversationEmpty strong,.accountCareMessages .conversationStart strong{color:#171717}
+.accountCareMessages .conversationRow small,.accountCareMessages .conversationEmpty p,.accountCareMessages .conversationStart small{color:#5c5953}
+.accountCareMessages .requestChoice{background:#fff;color:#171717;border-color:#d6d2ca}
+.accountCareMessages .requestChoice span{color:#55534f}
+.accountHome .memberSetup{margin-top:22px;border:1px solid #dedbd4;border-radius:11px;background:#f8f7f4;color:#171717}
+.accountHome .accountSetupSummary{padding:15px}
+.accountHome .accountSetupSummary strong{color:#171717;font-size:.9rem}
+.accountHome .accountSetupSummary small{color:#5b5852}
+.accountHome .accountDetails{margin-top:16px;border:1px solid #dedbd4;border-radius:11px;background:#f8f7f4;color:#171717}
+.accountHome .accountDetails summary strong{color:#171717}
+.accountHome .accountDetails summary small{color:#5b5852}
+.accountHome .accountDetails summary>b{color:#075be0}
+.accountHome .accountDetails .adminForm{padding:18px}
+.accountHome .adminForm label{display:grid;gap:7px;color:#292723;font-size:.8rem;font-weight:850}
+.accountHome .adminForm input,.accountHome .adminForm textarea{width:100%;min-height:44px;padding:10px 12px;border:1px solid #c9c5bc;border-radius:7px;background:#fff;color:#171717;font-size:16px}
+.accountHome .adminForm textarea{min-height:100px}
+.accountHome .accountFooterNote,.accountHome>.notice{color:#57534c;font-size:.76rem;line-height:1.55}
+.accountHome .accountBottomActions{border-color:#e0ddd6}
+@media(max-width:680px){
+ .orderPage:has(.accountHome){padding-top:8px}
+ .orderPage:has(.accountHome) .orderWrap{width:calc(100% - 16px)}
+ .orderPage:has(.accountHome) .plugCareHeader{display:grid;gap:10px;padding:10px;border-radius:9px}
+ .plugCareHeader .accountTopNav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+ .plugCareHeader .accountTopNav .button{justify-content:center;padding:8px 4px;font-size:.62rem;white-space:nowrap}
+ .accountHome{padding:16px 13px;border-radius:10px}
+ .accountHome .accountHero{display:flex;align-items:flex-start;gap:10px}
+ .accountHome .accountHero h1{font-size:2.35rem}
+ .accountHome .accountHero p{font-size:.84rem}
+ .accountHome .accountStatus{font-size:.62rem;padding:6px 8px}
+ .accountRequestStage{margin:16px 0;padding:13px}
+ .accountRequestStageHead{align-items:flex-start}
+ .accountHome .accountConnect{padding:13px}
+ .accountHome .accountConnect .actions,.accountHome .accountConnect .actions>*{width:100%}
+ .accountHome .accountRequestsHeading{align-items:flex-start;flex-direction:column}
+ .accountHome .accountRequestsHeading .buttonPrimary{width:100%}
+ .accountHome .feedActions{align-items:flex-start}
+ .accountCareMessages .conversationHub .panelHeading{align-items:flex-start;flex-direction:column}
+}
+@media(prefers-reduced-motion:reduce){.accountHome *{scroll-behavior:auto!important;transition:none!important}}
