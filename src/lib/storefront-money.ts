@@ -18,7 +18,11 @@ function readCache(): CachedRates | null {
   try {
     const value = JSON.parse(localStorage.getItem(CACHE_KEY) || "null") as CachedRates | null;
     if (!value || !value.rates || typeof value.savedAt !== "number" || typeof value.updatedAt !== "string") return null;
-    return value;
+    const parsedUpdatedAt = new Date(value.updatedAt);
+    const updatedAt = Number.isNaN(parsedUpdatedAt.getTime())
+      ? value.updatedAt
+      : new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(parsedUpdatedAt);
+    return { ...value, updatedAt };
   } catch {
     return null;
   }
