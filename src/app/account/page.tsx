@@ -24,7 +24,9 @@ function authMessage(error:unknown){
  if(code.startsWith("auth/")||code.startsWith("app/"))return "Google sign-in could not be completed because The Plug’s sign-in setup is not ready. Try again later; your current session has not been changed.";
  return "Google sign-in could not be completed. Please try again later. Your current session has not been changed.";
 }
-function requestKind(notes:string){return notes.match(/Request type:\\s*([^\\n]+)/i)?.[1]?.trim()||"Sourcing request"}\nfunction storefrontReference(notes:string){return notes.match(/Storefront listed price when requested:\\s*P([0-9,.]+)/i)?.[1]||""}\nconst terminal=new Set(["Delivered","Collected","Cancelled"]);
+function requestKind(notes:string){return notes.match(/Request type:\s*([^\n]+)/i)?.[1]?.trim()||"Sourcing request"}
+function storefrontReference(notes:string){return notes.match(/Storefront listed price when requested:\s*P([0-9,.]+)/i)?.[1]||""}
+const terminal=new Set(["Delivered","Collected","Cancelled"]);
 
 export default function AccountPage(){
  const[user,setUser]=useState<User|null>(null),[profile,setProfile]=useState<CustomerProfile|null>(null),[requests,setRequests]=useState<PlugRequest[]>([]),[busy,setBusy]=useState(false),[authReady,setAuthReady]=useState(false),[message,setMessage]=useState(""),[submittedRequestId,setSubmittedRequestId]=useState(""),[requestsReady,setRequestsReady]=useState(false),[requestIntent,setRequestIntent]=useState(false);
