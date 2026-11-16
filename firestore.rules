@@ -485,6 +485,7 @@ service cloud.firestore {
         && request.resource.data.description is string
         && request.resource.data.description.size() > 0
         && request.resource.data.issuedAt is string
+        && (!request.resource.data.keys().hasAny(['expiresAt']) || request.resource.data.expiresAt is string)
         && request.resource.data.status == 'available'
         && request.resource.data.sourceRequestId is string
         && exists(/databases/$(database)/documents/sourcingRequests/$(request.resource.data.sourceRequestId))
