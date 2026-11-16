@@ -21,7 +21,7 @@ function validRequestData(data:Record<string,unknown>,uid:string){
   if(Object.keys(data).some(key=>!allowed.includes(key)))return false;
   if(!allowed.every(key=>Object.prototype.hasOwnProperty.call(data,key)))return false;
   if(data.customerId!==uid||typeof data.customerName!=="string"||!data.customerName.trim()||data.customerName.length>120)return false;
-  if(typeof data.phone!=="string"||!data.phone.trim()||data.phone.length>60)return false;
+  if(typeof data.phone!=="string"||data.phone.length>60)return false;
   if(typeof data.product!=="string"||!data.product.trim()||data.product.length>500)return false;
   if(typeof data.size!=="string"||data.size.length>100||typeof data.colour!=="string"||data.colour.length>100)return false;
   if(typeof data.notes!=="string"||data.notes.length>5000)return false;
