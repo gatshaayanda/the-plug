@@ -924,7 +924,7 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 @keyframes plugHeroCopyEnter{from{opacity:0;transform:translate3d(0,22px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
 @keyframes plugHeroArtworkEnter{from{opacity:0;transform:translate3d(0,18px,0) scale(.975)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
 @media(max-width:680px){.plugArtworkFooter{grid-template-columns:1fr;gap:7px;padding:15px 16px}.plugArtworkFooter>span:first-child{grid-column:auto}.plugArtworkFooter>span:last-child{text-align:left;white-space:normal}.plugEditorialFooter>div{gap:12px}.plugBriefcaseLink{width:38px;height:38px}}
-@media(prefers-reduced-motion:reduce){.plugScrollReveal,.plugBriefcaseLink{transition:none}.plugScrollReveal{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.plugScrollReveal,.plugBriefcaseLink{transition:none}.plugScrollReveal{opacity:1;transform:none}.plugEditorialHeroCopy,.plugEditorialArtwork{animation:none;opacity:1;transform:none}}
 
 /* Iteration13-style contextual customer guide. */
 .plugGuideRoot{position:relative;z-index:120}
