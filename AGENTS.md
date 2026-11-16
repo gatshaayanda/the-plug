@@ -538,3 +538,11 @@ Research references:
 - The customer guide follows the Iteration13 screen-aware guide pattern: closed until deliberately opened, quick actions into existing routes, contextual bottom sheet on mobile, honest scripted responses, no fake AI/live-support claims, no collection of message content in analytics, Escape/close behavior, visible focus and reduced-motion support. Do not create a second request, account, messaging or order system.
 - Installation stays optional and collapsed by default. Keep one compact branded launcher; expand only after the visitor chooses it, keep it dismissible, and invoke the retained native `beforeinstallprompt` directly from the install button click. Preserve the embedded-browser gate, iOS guidance, service worker, offline behavior, manifest and existing install lifecycle. Do not add duplicate install buttons in the page header or footer.
 - Before release, verify image stacking and responsive crop for every featured find, market changes across BWP/ZAR/NAD/GBP/USD/CAD, language availability messaging, guide behavior at 320/360/390px and desktop, keyboard/Escape/reduced-motion behavior, install collapse/expand/dismissal, and footer Briefcase navigation.
+
+
+## Landing-page language and engagement checkpoint — 2026-11-16
+- The public landing page has four selectable, locally remembered UI languages: English, Setswana, Afrikaans and French. Language remains independent of market/currency.
+- Translate the landing-page interface, editorial hero, product action labels, community presentation, member-benefit explainer and contextual customer guide. Product names, brand names, sizes, Frank-authored product descriptions, canonical BWP amounts and customer/business records stay in their authored language.
+- This is landing-page-only. Do not claim request, account, order or conversation routes are translated. Do not implement customer-account changes until the product owner explicitly approves that stage.
+- Keep market and language controls sticky but compact and visual. Do not restore multi-line explanatory copy in the sticky strip.
+- Use restrained scroll reveals and a subtle hero entrance with a small product-card stagger. Respect `prefers-reduced-motion`; do not auto-advance rails or hijack scrolling.
