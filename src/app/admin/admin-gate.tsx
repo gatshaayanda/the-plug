@@ -1,6 +1,6 @@
 "use client";
 import {onAuthStateChanged,signInWithCustomToken,signOut,type User} from "firebase/auth";
-import {doc,onSnapshot} from "firebase/firestore";
+import {doc,getDocFromServer,onSnapshot} from "firebase/firestore";
 import {useEffect,useState} from "react";
 import {auth,db} from "@/lib/firebase/client";
 
@@ -15,6 +15,7 @@ function friendlyAuthError(err:unknown){
  }
  if(code==="auth/too-many-requests") return "Too many sign-in attempts. Wait a moment and try again.";
  if(code==="auth/network-request-failed") return "We could not reach Firebase. Check your internet connection and try again.";
+ if(code==="permission-denied"||code==="firestore/permission-denied") return "The Operations account could not verify its admin access. Check that the Firebase web app and server credentials use the same project.";
  return err instanceof Error?err.message:"We could not sign you in. Check your details.";
 }
 
@@ -29,7 +30,11 @@ export default function AdminGate({children}:{children:React.ReactNode}){
    setChecking(true);
    setOffline(false);
    if(!next){setAuthorized(false);setChecking(false);return}
-   stopAdmin=onSnapshot(doc(db,"admins",next.uid),snapshot=>{
+   stopAdmin=onSnapshot(doc(db,"admins",next.uid),{includeMetadataChanges:true},snapshot=>{
+    // Persistent Firestore cache can initially report a missing document even
+    // though the server-side one-word login has just created it. Never reject
+    // an admin based on that provisional cache result.
+    if(snapshot.metadata.fromCache)return;
     const allowed=snapshot.exists()&&hasAdminRole(snapshot.data());
     setAuthorized(allowed);
     setOffline(false);
@@ -50,14 +55,14 @@ export default function AdminGate({children}:{children:React.ReactNode}){
    const payload=await response.json() as {token?:string;error?:string};
    if(!response.ok||!payload.token)throw new Error(payload.error??"Access denied. Check the access word and try again.");
    const credential=await signInWithCustomToken(auth,payload.token);
-   const adminSnapshot=await new Promise<{exists:boolean;data:()=>Record<string,unknown>}|null>(resolve=>{
-    const stop=onSnapshot(doc(db,"admins",credential.user.uid),snapshot=>{stop();resolve({exists:snapshot.exists(),data:()=>snapshot.data()??{}})},()=>{stop();resolve(null)});
-   });
-   if(!adminSnapshot||!adminSnapshot.exists||!hasAdminRole(adminSnapshot.data())){
-    setError("This account is not enabled for The Plug Operations.");
+   // Force a server read: getDoc() may return a stale/empty persistent-cache
+   // entry immediately after the server creates the temporary Operations UID.
+   const adminSnapshot=await getDocFromServer(doc(db,"admins",credential.user.uid));
+   if(!adminSnapshot.exists()||!hasAdminRole(adminSnapshot.data())){
+    setError("This Operations account is missing its owner/staff role. The server login completed, but the admin record could not be verified.");
     await signOut(auth);
-   }else{setAuthorized(true);setOffline(false);setAccessWord("")}
-  }catch(err){setError(err instanceof Error?err.message:"We could not sign you in. Check the access word and try again.")}
+   }else{setAuthorized(true);setOffline(false);setAccessWord("");setError("")}
+  }catch(err){setError(friendlyAuthError(err));}
   finally{setBusy(false)}
  }
 
