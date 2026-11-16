@@ -1,8 +1,8 @@
 "use client";
 import type {PlugRequest,PlugPaymentRecord} from "@/lib/firebase/plug-data";
 function money(n:number){return "P"+n.toFixed(2)}
-function storefrontPrice(notes:string){const match=notes.match(/Storefront listed price when requested:\\s*P([0-9,.]+)/i);return match?Number(match[1].replace(/,/g,"")):undefined}
-function selectedItems(notes:string){const match=notes.match(/Selected storefront items:\\s*([\\s\\S]*?)(?=\\n(?:Request type:|Storefront listed price|Product \/ social link:|Budget guide:|Shopping for:|When needed:|Additional details:)|$)/i);return match?.[1]?.split("\\n").map(line=>line.trim()).filter(Boolean)??[]}
+function storefrontPrice(notes:string){const match=notes.match(/Storefront listed price when requested:\s*P([0-9,.]+)/i);return match?Number(match[1].replace(/,/g,"")):undefined}
+function selectedItems(notes:string){const match=notes.match(/Selected storefront items:\s*([\s\S]*?)(?=\n(?:Request type:|Storefront listed price|Product \/ social link:|Budget guide:|Shopping for:|When needed:|Additional details:)|$)/i);return match?.[1]?.split("\n").map(line=>line.trim()).filter(Boolean)??[]}
 function printRecord(){window.print()}
 type ReceiptRow={key:string;request:PlugRequest;payment:PlugPaymentRecord;legacy:boolean};
 export default function CustomerReceipts({requests}:{requests:PlugRequest[]}){
