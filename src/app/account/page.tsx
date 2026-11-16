@@ -34,7 +34,7 @@ export default function AccountPage(){
 
 
  useEffect(()=>{const refresh=()=>{try{const list=JSON.parse(localStorage.getItem("theplug:sourcing-selection:v1")||"[]") as SourcingSelectionItem[];const valid=Array.isArray(list)?list.filter(item=>item&&typeof item.id==="string"&&typeof item.title==="string"):[];setBasketItems(valid);setBasketCount(valid.length)}catch{setBasketItems([]);setBasketCount(0)}setBasketReady(true)};refresh();window.addEventListener("theplug:sourcing-selection-changed",refresh);window.addEventListener("storage",refresh);return()=>{window.removeEventListener("theplug:sourcing-selection-changed",refresh);window.removeEventListener("storage",refresh)}},[]);
- useEffect(()=>{const params=new URLSearchParams(window.location.search);if(params.has("submitted")){setMessage("Your request is saved. Frank will review it and confirm availability, final price and timing. Nothing is ordered or charged yet.");setSubmittedRequestId(params.get("submitted")||"")}setHasDirectProduct(params.has("product"));setSelectionReview(params.has("review"));setRequestIntent(params.has("product")||params.has("newRequest"))},[]);
+ useEffect(()=>{const params=new URLSearchParams(window.location.search);if(params.has("submitted")){setMessage("Your request is saved. Frank will review it and confirm availability, final price and timing. Nothing is ordered or charged yet.");setSubmittedRequestId(params.get("submitted")||"")}setHasDirectProduct(params.has("product"));setSelectionReview(params.has("review"));setRequestIntent(params.has("product")||params.has("newRequest")||params.has("review"))},[]);
  useEffect(()=>{
   let stopRequests=()=>{};
   let stopAuth=()=>{};
