@@ -4,7 +4,7 @@ import Link from "next/link";
 import {ArrowUpRight,MessageCircle,Send,Sparkles,X} from "lucide-react";
 import {useStorefrontText,storefrontText,type StorefrontCopyKey} from "@/lib/storefront-translations";
 type GuideMessage={id:number;from:"guide"|"you";text:string};
-const actions=[{href:"#featured",key:"browseFinds"},{href:"#deals",key:"offers"},{href:"/request",key:"requestProduct"},{href:"/account",key:"myPlug"}] as const;
+const actions=[{href:"#featured",key:"browseFinds"},{href:"#deals",key:"offers"},{href:"/account?newRequest=1",key:"requestProduct"},{href:"/account",key:"myPlug"}] as const;
 function replyFor(message:string,language:"en"|"tn"|"af"|"fr"){
  const v=message.toLowerCase();
  const key:StorefrontCopyKey=/request|source|buy|order|want|find me/.test(v)?"guideRequest":/account|saved|history|message|reply|track|status/.test(v)?"guideAccount":/offer|deal|discount|sale/.test(v)?"guideOffers":/find|shoe|sneaker|nike|adidas|clothes|apparel/.test(v)?"guideFinds":/install|app/.test(v)?"guideInstall":"guideFallback";
