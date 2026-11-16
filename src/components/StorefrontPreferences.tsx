@@ -84,6 +84,7 @@ export default function StorefrontPreferencesBar() {
       <small>
         Prices display in the selected region&apos;s currency · Estimates only · Frank confirms sourcing and delivery for each request.
       </small>
+      <small className="plugLanguageIntro">English is available now. More languages will be introduced after the full customer journey has been translated and reviewed.</small>
     </div>
   );
 }

@@ -904,3 +904,70 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 @media(max-width:560px){
   .plugPreferenceBar{width:100%;padding:10px 10px 12px;}
 }
+
+
+/* Featured media is the foreground image; editorial overlays remain legible above it. */
+.plugEditorialArtwork{isolation:isolate}
+.plugEditorialArtwork .plugArtworkImage{z-index:0}
+.plugEditorialArtwork:before{z-index:1}
+.plugEditorialArtwork:after{z-index:2}
+.plugEditorialArtwork .plugArtworkFooter,.plugEditorialArtwork .plugArtworkFallback{z-index:3}
+.plugArtworkFooter{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px 14px;padding:18px 20px}
+.plugArtworkFooter>span:first-child{grid-column:1/-1}
+.plugArtworkFooter strong{max-width:100%;text-align:left}
+.plugArtworkFooter>span:last-child{text-align:right;white-space:nowrap}
+.plugBriefcaseLink{display:inline-grid;place-items:center;width:40px;height:40px;border:1px solid #c8c5be;border-radius:50%;color:#111;transition:background .18s ease,color .18s ease,border-color .18s ease}
+.plugBriefcaseLink:hover{background:#111;color:#fff;border-color:#111}
+.plugBriefcaseLink:focus-visible{outline:3px solid #0866ff;outline-offset:3px}
+.plugLanguageIntro{color:#c6c6c6!important}
+.plugScrollReveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s cubic-bezier(.2,.75,.25,1)}
+.plugScrollReveal.is-visible{opacity:1;transform:translateY(0)}
+.plugProductCard.plugScrollReveal{transition-delay:.04s}
+@media(max-width:680px){.plugArtworkFooter{grid-template-columns:1fr;gap:7px;padding:15px 16px}.plugArtworkFooter>span:first-child{grid-column:auto}.plugArtworkFooter>span:last-child{text-align:left;white-space:normal}.plugEditorialFooter>div{gap:12px}.plugBriefcaseLink{width:38px;height:38px}}
+@media(prefers-reduced-motion:reduce){.plugScrollReveal,.plugBriefcaseLink{transition:none}.plugScrollReveal{opacity:1;transform:none}}
+
+/* Iteration13-style contextual customer guide. */
+.plugGuideRoot{position:relative;z-index:120}
+.plugGuideBackdrop{position:fixed;inset:0;z-index:120;border:0;background:rgba(9,12,18,.22)}
+.plugGuidePanel{position:fixed;right:16px;bottom:calc(144px + env(safe-area-inset-bottom));z-index:122;width:min(410px,calc(100vw - 28px));max-height:min(70dvh,650px);display:flex;flex-direction:column;overflow:hidden;border:1px solid #d9dce3;border-radius:20px;background:#fff;color:#15171b;box-shadow:0 24px 70px rgba(0,0,0,.24);animation:plugGuideEnter .2s ease-out}
+.plugGuideHead{display:flex;align-items:center;gap:11px;padding:15px 16px;background:#101114;color:#fff}
+.plugGuideAvatar{display:grid;place-items:center;width:38px;height:38px;flex:none;border-radius:12px;background:#0866ff;color:#fff}
+.plugGuideHead>div:nth-child(2){min-width:0;flex:1}
+.plugGuideHead small{display:block;color:#9ebaff;font-size:.58rem;font-weight:900;letter-spacing:.12em}
+.plugGuideHead h2{margin:3px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:1.02rem;letter-spacing:-.025em;text-transform:none;color:#fff}
+.plugGuideHead p{margin:3px 0 0;color:#c5c7cc;font-size:.68rem}
+.plugGuideHead button{display:grid;place-items:center;width:36px;height:36px;border:1px solid #45484f;border-radius:50%;background:#202228;color:#fff;cursor:pointer}
+.plugGuideIntro{padding:14px 16px 9px}
+.plugGuideIntro strong{font-size:.9rem;color:#111}
+.plugGuideIntro p{margin:5px 0 0;color:#555d68;font-size:.78rem;line-height:1.5}
+.plugGuideActions{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:5px 16px 13px}
+.plugGuideActions a{display:flex;align-items:center;justify-content:space-between;gap:7px;min-height:42px;padding:9px 10px;border:1px solid #e0e3e8;border-radius:10px;color:#1b2432;font-size:.72rem;font-weight:850}
+.plugGuideActions a:nth-child(odd){background:#f3f6fc}
+.plugGuideActions a:focus-visible,.plugGuideHead button:focus-visible,.plugGuideLauncher:focus-visible,.plugGuideComposer button:focus-visible{outline:3px solid #0866ff;outline-offset:2px}
+.plugGuideThread{display:grid;gap:7px;overflow:auto;padding:0 16px 12px}
+.plugGuideMessage{max-width:92%;margin:0;padding:9px 11px;border-radius:12px;background:#f0f2f6;color:#343a45;font-size:.75rem;line-height:1.45}
+.plugGuideMessage.is-you{justify-self:end;background:#e8efff;color:#102c64}
+.plugGuideComposer{display:flex;gap:8px;padding:11px 13px;border-top:1px solid #e5e7eb;background:#fafbfc}
+.plugGuideComposer input{flex:1;min-width:0;min-height:43px;padding:10px 12px;border:1px solid #cfd4dd;border-radius:11px;background:#fff;color:#15171b;font-size:.8rem}
+.plugGuideComposer input:focus{outline:2px solid #0866ff;outline-offset:1px}
+.plugGuideComposer button{display:grid;place-items:center;width:43px;flex:none;border:0;border-radius:11px;background:#0866ff;color:#fff}
+.plugGuideComposer button:disabled{opacity:.45}
+.plugGuideFootnote{margin:0;padding:0 16px 12px;color:#68707b;font-size:.63rem}
+.plugGuideLauncher{position:fixed;right:16px;bottom:calc(82px + env(safe-area-inset-bottom));z-index:121;display:flex;align-items:center;gap:8px;min-height:48px;padding:0 15px;border:1px solid #d4d8e1;border-radius:999px;background:#fff;color:#141820;font-size:.78rem;font-weight:900;box-shadow:0 8px 26px rgba(0,0,0,.18);cursor:pointer}
+.plugGuideLauncher svg{color:#0866ff}
+@keyframes plugGuideEnter{from{opacity:0;transform:translateY(9px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:560px){.plugGuidePanel{left:10px;right:10px;bottom:calc(140px + env(safe-area-inset-bottom));width:auto;max-height:70dvh;border-radius:18px}.plugGuideLauncher{right:12px;bottom:calc(78px + env(safe-area-inset-bottom));min-height:46px}}
+@media(prefers-reduced-motion:reduce){.plugGuidePanel{animation:none}}
+
+/* The install invitation is collapsed to one compact launcher until requested. */
+.plugPwaInstallButton{left:auto;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));width:auto;max-width:220px;padding:12px 17px;border-radius:999px;white-space:nowrap}
+.plugInstallModal{width:min(100%,420px);max-height:min(72dvh,520px);padding:17px;border-radius:17px}
+.plugInstallModal:before{height:4px}
+.plugInstallTop{margin-bottom:12px}
+.plugInstallModal h2{font-size:1.65rem;line-height:1.05;letter-spacing:-.05em;margin:7px 0}
+.plugInstallModal>p:not(.plugInstallFootnote){font-size:.78rem;line-height:1.45}
+.plugInstallCompactActions{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:12px}
+.plugInstallCompactActions .plugInstallPrimary{min-height:44px;padding:10px 14px}
+.plugInstallCompactActions .plugInstallSecondary{min-height:44px;margin:0;padding:10px 14px;width:auto}
+.plugInstallFootnote{margin-top:8px}
+@media(max-width:560px){.plugPwaInstallButton{left:auto;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));width:auto}.plugInstallModal{padding:15px}}

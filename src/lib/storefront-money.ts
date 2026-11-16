@@ -39,7 +39,12 @@ function loadRates(): Promise<CachedRates | null> {
           const rate = data.rates[code];
           if (typeof rate === "number" && Number.isFinite(rate) && rate > 0) selected[code] = rate;
         }
-        const next = { savedAt: Date.now(), updatedAt: data.time_last_update_utc || new Date().toISOString(), rates: selected };
+        const rawUpdatedAt = data.time_last_update_utc || new Date().toISOString();
+        const parsedUpdatedAt = new Date(rawUpdatedAt);
+        const updatedAt = Number.isNaN(parsedUpdatedAt.getTime())
+          ? undefined
+          : new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(parsedUpdatedAt);
+        const next = { savedAt: Date.now(), updatedAt: updatedAt || "recently", rates: selected };
         try { localStorage.setItem(CACHE_KEY, JSON.stringify(next)); } catch { /* Session conversion remains available. */ }
         return next;
       })
@@ -84,7 +89,7 @@ export function usePlugDisplayPrice(amount: number) {
   }
   const rate = rates?.rates[currency];
   if (typeof rate === "number") {
-    return { text: format(amount * rate, currency, locale), currency, estimate: format(amount, "BWP", "en-BW"), rateDate: rates?.updatedAt, sourceText: "Indicative estimate · Rates by ExchangeRate-API" };
+    return { text: format(amount * rate, currency, locale), currency, estimate: format(amount, "BWP", "en-BW"), rateDate: rates?.updatedAt, sourceText: "Indicative estimate · ExchangeRate-API" };
   }
   return {
     text: format(amount, "BWP", "en-BW"),
