@@ -1165,3 +1165,7 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .adminAccountBar{color:#344256;background:#fff;border-bottom:1px solid #d7dde5;padding:9px max(12px,calc((100% - 1200px)/2));font-size:.73rem}.adminAccountBar .button{min-height:34px;padding:7px 11px;border-radius:7px;background:#14233b;color:#fff;border-color:#14233b;font-size:.68rem}
 @media(max-width:680px){.adminAccountBar{padding:8px 12px;gap:8px;font-size:.66rem}.adminAccountBar .button{min-height:34px;padding:7px 9px}}
 @media(max-width:680px){.plugCareHeader .accountTopNav{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+.plugRewardProgress{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0}.plugRewardProgress article{display:grid;gap:4px;padding:12px;border:1px solid #d7d4cc;border-radius:9px;background:#f7f6f2}.plugRewardProgress strong{color:#075be0;font-size:1.35rem}.plugRewardProgress span{color:#4f4c46;font-size:.7rem;font-weight:850;text-transform:uppercase;letter-spacing:.04em}
+.adminPage .adminShell>.notice{order:3}
+@media(max-width:560px){.plugRewardProgress article{padding:10px}}
