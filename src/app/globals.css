@@ -890,13 +890,13 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 
 /* Compact, visual market and language controls remain available while browsing. */
 .plugPreferenceBar{position:sticky;top:0;z-index:50;width:100%;min-height:46px;margin:0;padding:4px max(12px,calc((100% - 1180px)/2));display:flex;align-items:center;gap:8px;flex-wrap:nowrap;background:rgba(245,243,238,.96);backdrop-filter:blur(14px);border-bottom:1px solid #d8d5ce;box-shadow:0 3px 12px rgba(20,20,20,.07)}
-.plugPreferenceControl{display:flex;align-items:center;gap:6px;min-width:0;padding:3px 9px;border:1px solid #d5d1c8;border-radius:999px;background:#fff;color:#0866ff;font-size:.68rem;font-weight:800}
+.plugPreferenceBar label.plugPreferenceControl{display:flex;align-items:center;gap:6px;min-width:0;padding:3px 9px;border:1px solid #d5d1c8;border-radius:999px;background:#fff;color:#0866ff;font-size:.68rem;font-weight:800}
 .plugPreferenceControl select{appearance:none;max-width:160px;min-height:25px;border:0;padding:2px 3px;background:transparent;color:#111;font:inherit;cursor:pointer}
 .plugPreferenceControl select:focus-visible{outline:2px solid #0866ff;border-radius:4px}
 .plugPreferenceControl b{font-size:.6rem;color:#0866ff}
-.plugPreferenceBar>small{margin-left:auto;max-width:340px;font-size:.6rem;color:#777;line-height:1.25;text-align:right}
+.plugPreferenceBar>small{flex:0 1 auto;min-width:0;margin-left:auto;max-width:340px;font-size:.6rem;color:#777;line-height:1.25;text-align:right}
 .plugEditorialNav{position:relative;top:auto;z-index:1;}
-@media(max-width:560px){.plugPreferenceBar{min-height:42px;padding:3px 7px;gap:5px}.plugPreferenceControl{gap:4px;padding:3px 6px;font-size:.58rem}.plugPreferenceControl select{max-width:112px;font-size:.66rem}.plugPreferenceBar>small{display:none}}
+@media(max-width:560px){.plugPreferenceBar{min-height:42px;padding:3px 7px;gap:5px}.plugPreferenceBar label.plugPreferenceControl{gap:4px;padding:3px 6px;font-size:.58rem}.plugPreferenceControl select{max-width:112px;font-size:.66rem}.plugPreferenceBar>small{display:none}}
 
 
 /* Featured media is the foreground image; editorial overlays remain legible above it. */
