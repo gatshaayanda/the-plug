@@ -9,7 +9,7 @@ import {createCustomerConversation,getCustomerProfile,recordConversationMessage,
 import {createPlugRequest} from "@/lib/firebase/plug-data";
 import {trackPlugJourney} from "@/lib/firebase/journey-analytics";
 
-type SourcingBasketItem={id:string;title:string;price?:number;type:"find"|"deal"};
+type SourcingBasketItem={id:string;title:string;price?:number;imageUrl?:string;type:"find"|"deal"};
 const SOURCING_BASKET_KEY="theplug:sourcing-selection:v1";
 const WHATSAPP="https://wa.me/26776411150";
 const WHATSAPP_CATALOG="https://wa.me/c/26776411150";
@@ -43,7 +43,7 @@ export default function RequestForm({embedded=false}:{embedded?:boolean}){
      <label>Anything else Frank should know?<textarea value={notes} onChange={e=>setNotes(e.target.value)} rows={3} placeholder="Fit, preferred source, multiple items or other useful details…"/></label>
    </div></details>
    {message&&!done&&<p className="notice" role="alert">{message}</p>}
-   <p className="plugQuickRequestPromise">Frank will reply in My Plug. Add a WhatsApp number in My details whenever you’re ready. No payment or stock reservation happens here.</p>
+   <p className="plugQuickRequestPromise">Frank will reply in My Plug. Add a WhatsApp number in My details whenever you’re ready. Frank confirms the details, availability and final price before you decide. No payment is taken here.</p>
    {busy&&<section className="requestProgress" role="status" aria-live="polite" aria-atomic="true"><div className="requestProgressHeading"><strong>{stage==="upload"?(uploadProgress>0?"Uploading your reference":"Preparing secure upload…"):"Saving your request"}</strong>{stage==="upload"&&uploadProgress>0&&<span>{uploadProgress}%</span>}</div><div className="requestProgressTrack" role="progressbar" aria-label={stage==="upload"?"Attachment upload progress":"Request submission progress"} aria-valuemin={0} aria-valuemax={100} aria-valuenow={stage==="upload"?uploadProgress:100}><span style={{width:(stage==="upload"?uploadProgress:100)+"%"}}/></div><p>{stage==="upload"?"Keep this page open while your reference uploads.":"Your request and private conversation are being saved. Please keep this page open."}</p>{stage==="upload"&&uploadProgress===0&&<span className="requestProgressSpinner" aria-hidden="true"/>}</section>}
    <button className="button buttonPrimary plugSendRequest" type="submit" disabled={busy} aria-disabled={busy}>{busy?(stage==="upload"?(uploadProgress>0?"Uploading · "+uploadProgress+"%":"Preparing upload…"):"Saving your request…"):"Send request to Frank →"}</button>
   </form>
