@@ -44,7 +44,7 @@ export default function StorefrontFeed(){
   const reveal=(node:Element)=>{
    if(!(node instanceof HTMLElement)||node.classList.contains("plugScrollReveal"))return;
    node.classList.add("plugScrollReveal");
-   if("IntersectionObserver" in window)observer.observe(node);else node.classList.add("is-visible");
+   observer?.observe(node);if(!observer)node.classList.add("is-visible");
   };
   const scan=(node:ParentNode)=>node.querySelectorAll("section,.plugProductCard").forEach(reveal);
   scan(root);
