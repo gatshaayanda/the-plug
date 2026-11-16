@@ -7,6 +7,17 @@ const CACHE_KEY="theplug:fx-bwp-v1";
 const PROVIDER_URL="https://open.er-api.com/v6/latest/BWP";
 const SUPPORTED=["BWP","ZAR","NAD","GBP","USD","CAD","EUR"] as const;
 function readCache():CachedRates|null{try{const value=JSON.parse(localStorage.getItem(CACHE_KEY)||"null") as CachedRates|null;if(!value||!value.rates||typeof value.savedAt!=="number"||typeof value.updatedAt!=="string")return null;return value;}catch{return null;}}
+let sharedRateRequest:Promise<CachedRates|null>|null=null;
+function loadRates():Promise<CachedRates|null>{
+ if(!sharedRateRequest)sharedRateRequest=fetch(PROVIDER_URL,{cache:"no-store"}).then(response=>{if(!response.ok)throw new Error("Rate service unavailable");return response.json() as Promise<RateResponse>;}).then(data=>{
+  if(data.result!=="success"||data.base_code!=="BWP"||!data.rates)throw new Error("BWP rates unavailable");
+  const selected:Record<string,number>={BWP:1};for(const code of SUPPORTED){const rate=data.rates[code];if(typeof rate==="number"&&Number.isFinite(rate)&&rate>0)selected[code]=rate;}
+  const next={savedAt:Date.now(),updatedAt:data.time_last_update_utc||new Date().toISOString(),rates:selected};
+  try{localStorage.setItem(CACHE_KEY,JSON.stringify(next));}catch{/* Conversion remains available for this session. */}
+  return next;
+ }).catch(()=>null);
+ return sharedRateRequest;
+}
 function format(amount:number,currency:string){return new Intl.NumberFormat(undefined,{style:"currency",currency,maximumFractionDigits:2}).format(amount);}
 export function usePlugDisplayPrice(amount:number){
  const [prefs,setPrefs]=useState<StorefrontPreferences>(DEFAULT_PREFERENCES);
@@ -18,14 +29,9 @@ export function usePlugDisplayPrice(amount:number){
   const cached=readCache();if(cached)setRates(cached);
   const fresh=cached&&Date.now()-cached.savedAt<20*60*60*1000;
   if(!fresh&&navigator.onLine){
-   const controller=new AbortController();
-   fetch(PROVIDER_URL,{signal:controller.signal,cache:"no-store"}).then(r=>{if(!r.ok)throw new Error("Rate service unavailable");return r.json() as Promise<RateResponse>;}).then(data=>{
-    if(data.result!=="success"||data.base_code!=="BWP"||!data.rates)throw new Error("BWP rates unavailable");
-    const selected:Record<string,number>={BWP:1};for(const code of SUPPORTED){const rate=data.rates[code];if(typeof rate==="number"&&Number.isFinite(rate)&&rate>0)selected[code]=rate;}
-    const next={savedAt:Date.now(),updatedAt:data.time_last_update_utc||new Date().toISOString(),rates:selected};
-    localStorage.setItem(CACHE_KEY,JSON.stringify(next));setRates(next);setFailed(false);
-   }).catch(()=>{if(!controller.signal.aborted)setFailed(true);});
-   return()=>{controller.abort();window.removeEventListener(PREFERENCES_EVENT,apply);};
+   let active=true;
+   void loadRates().then(next=>{if(!active)return;if(next){setRates(next);setFailed(false);}else setFailed(true);});
+   return()=>{active=false;window.removeEventListener(PREFERENCES_EVENT,apply);};
   }
   return()=>window.removeEventListener(PREFERENCES_EVENT,apply);
  },[]);
