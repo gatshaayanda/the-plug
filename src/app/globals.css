@@ -1257,3 +1257,12 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
  .plugQuickRequestForm{gap:12px}
  .plugSelectedFind{padding:12px}
 }
+
+
+/* Product-card details control sits inside the image, matching Frank's featured pick. */
+.plugProductImageDetailsButton{position:absolute;right:12px;bottom:12px;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:18px;min-width:132px;min-height:44px;padding:0 13px;border:1px solid rgba(255,255,255,.72);border-radius:3px;background:#0866ff;color:#fff;font-size:.72rem;font-weight:950;cursor:pointer;box-shadow:0 5px 14px rgba(8,102,255,.2)}
+.plugProductImageDetailsButton span{color:#fff;font-size:1.1rem}
+.plugProductImageDetailsButton:hover{background:#004fd0}
+.plugProductImageDetailsButton:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.plugProductCardFooter{display:block}
+@media(max-width:680px){.plugProductImageDetailsButton{right:10px;bottom:10px;min-height:42px;min-width:124px}}
