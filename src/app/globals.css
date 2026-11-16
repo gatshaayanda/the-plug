@@ -1169,3 +1169,5 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .plugRewardProgress{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0}.plugRewardProgress article{display:grid;gap:4px;padding:12px;border:1px solid #d7d4cc;border-radius:9px;background:#f7f6f2}.plugRewardProgress strong{color:#075be0;font-size:1.35rem}.plugRewardProgress span{color:#4f4c46;font-size:.7rem;font-weight:850;text-transform:uppercase;letter-spacing:.04em}
 .adminPage .adminShell>.notice{order:3}
 @media(max-width:560px){.plugRewardProgress article{padding:10px}}
+
+.adminPage .plugPaymentCapture{display:grid;gap:10px;padding:14px;border:1px solid #cbd5e1;border-radius:9px;background:#f7f9fc}.adminPage .plugPaymentCapture legend{padding:0 6px;color:#17263a;font-size:.82rem;font-weight:950}.adminPage .plugPaymentCapture small{color:#526071}.plugAdminPaymentList{display:grid;gap:6px}.plugAdminPaymentList>div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid #dce2e9;color:#344256;font-size:.72rem}.plugAdminPaymentList strong{color:#1758a8;white-space:nowrap}
