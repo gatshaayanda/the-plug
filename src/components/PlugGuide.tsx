@@ -38,13 +38,13 @@ export default function PlugGuide(){
   setMessages(current=>[...current,visitor,answer].slice(-8));setInput("");
  }
  return <div className="plugGuideRoot">
-  {open&&<button type="button" className="plugGuideBackdrop" aria-label="Close guide" onClick={()=>setOpen(false)}/>}
+  {open&&<button type="button" className="plugGuideBackdrop" aria-label={t("closeGuide")} onClick={()=>setOpen(false)}/>}
   {open&&<section ref={panelRef} className="plugGuidePanel" role="dialog" aria-modal="true" aria-labelledby="plug-guide-title">
    <header className="plugGuideHead"><span className="plugGuideAvatar"><Sparkles size={18} aria-hidden="true"/></span><div><small>{t("guideKicker")}</small><h2 id="plug-guide-title">{t("needHand")}</h2><p>{t("guidePrompt")}</p></div><button ref={closeRef} type="button" aria-label="Close guide" onClick={()=>setOpen(false)}><X size={18}/></button></header>
    <div className="plugGuideIntro"><strong>{t("guideIntro")}</strong><p>{t("guideExplanation")}</p></div>
    <nav className="plugGuideActions" aria-label="Guide shortcuts">{actions.map(action=><Link key={action.href} href={action.href} onClick={()=>setOpen(false)}>{t(action.key)}<ArrowUpRight size={14} aria-hidden="true"/></Link>)}</nav>
    <div className="plugGuideThread" aria-live="polite" aria-relevant="additions text">{messages.slice(-5).map(message=><p key={message.id} className={"plugGuideMessage is-"+message.from}>{message.text}</p>)}</div>
-   <form className="plugGuideComposer" onSubmit={send}><input value={input} onChange={event=>setInput(event.target.value)} aria-label="Ask The Plug guide" placeholder={t("guidePlaceholder")} maxLength={300}/><button type="submit" disabled={!input.trim()} aria-label="Send question"><Send size={17}/></button></form>
+   <form className="plugGuideComposer" onSubmit={send}><input value={input} onChange={event=>setInput(event.target.value)} aria-label={t("askGuide")} placeholder={t("guidePlaceholder")} maxLength={300}/><button type="submit" disabled={!input.trim()} aria-label={t("sendQuestion")}><Send size={17}/></button></form>
    <p className="plugGuideFootnote">{t("guideFootnote")}</p>
   </section>}
   <button ref={launcherRef} type="button" className="plugGuideLauncher" aria-expanded={open} aria-haspopup="dialog" onClick={()=>setOpen(value=>!value)}>{open?<X size={19} aria-hidden="true"/>:<MessageCircle size={19} aria-hidden="true"/>}<span>{open?t("close"):t("needHand")}</span></button>
