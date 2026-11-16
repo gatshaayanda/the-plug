@@ -1,90 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
-import {
-  DEFAULT_LANGUAGE,
-  DEFAULT_MARKET,
-  getLanguage,
-  getMarket,
-  STOREFRONT_LANGUAGES,
-  STOREFRONT_MARKETS,
-  type PlugLanguage,
-  type PlugMarket,
-} from "@/lib/storefront-config";
-
-export type { PlugLanguage, PlugMarket } from "@/lib/storefront-config";
-export type StorefrontPreferences = { market: PlugMarket; language: PlugLanguage };
-export const PREFERENCES_KEY = "theplug:storefront-preferences:v1";
-export const PREFERENCES_EVENT = "theplug:storefront-preferences-changed";
-export const DEFAULT_PREFERENCES: StorefrontPreferences = { market: DEFAULT_MARKET, language: DEFAULT_LANGUAGE };
-
-export function readStorefrontPreferences(): StorefrontPreferences {
-  try {
-    const value = JSON.parse(localStorage.getItem(PREFERENCES_KEY) || "null") as
-      | { market?: string; language?: string; currency?: string }
-      | null;
-    if (!value) return DEFAULT_PREFERENCES;
-    // Older versions stored a separately selectable currency. Market is now authoritative.
-    return { market: getMarket(value.market).code, language: getLanguage(value.language) };
-  } catch {
-    return DEFAULT_PREFERENCES;
-  }
-}
-
-export function saveStorefrontPreferences(value: StorefrontPreferences) {
-  try {
-    localStorage.setItem(PREFERENCES_KEY, JSON.stringify(value));
-    window.dispatchEvent(new CustomEvent(PREFERENCES_EVENT, { detail: value }));
-  } catch {
-    // Preferences are optional; defaults remain usable.
-  }
-}
-
-export default function StorefrontPreferencesBar() {
-  const [value, setValue] = useState<StorefrontPreferences>(DEFAULT_PREFERENCES);
-
-  useEffect(() => {
-    setValue(readStorefrontPreferences());
-  }, []);
-
-  function update(patch: Partial<StorefrontPreferences>) {
-    const next = { ...value, ...patch };
-    setValue(next);
-    saveStorefrontPreferences(next);
-  }
-
-  return (
-    <div className="plugPreferenceBar" aria-label="Store preferences">
-      <label>
-        <span>YOUR REGION</span>
-        <select
-          aria-label="Sourcing region"
-          value={value.market}
-          onChange={(event) => update({ market: getMarket(event.target.value).code })}
-        >
-          {STOREFRONT_MARKETS.map((market) => (
-            <option key={market.code} value={market.code}>
-              {market.flag} {market.name} · {market.currency}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        <span>LANGUAGE</span>
-        <select
-          aria-label="Display language"
-          value={value.language}
-          disabled={STOREFRONT_LANGUAGES.length < 2}
-          onChange={(event) => update({ language: getLanguage(event.target.value) })}
-        >
-          {STOREFRONT_LANGUAGES.map((language) => (
-            <option key={language.code} value={language.code}>{language.nativeName}</option>
-          ))}
-        </select>
-      </label>
-      <small>
-        Prices display in the selected region&apos;s currency · Estimates only · Frank confirms sourcing and delivery for each request.
-      </small>
-      <small className="plugLanguageIntro">English is available now. More languages will be introduced after the full customer journey has been translated and reviewed.</small>
-    </div>
-  );
-}
+import {useEffect,useState} from "react";
+import {Globe2,Languages} from "lucide-react";
+import {DEFAULT_LANGUAGE,DEFAULT_MARKET,getLanguage,getMarket,STOREFRONT_MARKETS,type PlugLanguage,type PlugMarket} from "@/lib/storefront-config";
+import {STOREFRONT_LANGUAGES,useStorefrontText} from "@/lib/storefront-translations";
+export type {PlugLanguage,PlugMarket} from "@/lib/storefront-config";
+type Preferences={market:PlugMarket;language:PlugLanguage};
+const KEY="theplug:storefront-preferences:v1",EVENT="theplug:storefront-preferences-changed";
+const DEFAULT={market:DEFAULT_MARKET,language:DEFAULT_LANGUAGE} as Preferences;
+function read():Preferences{try{const v=JSON.parse(localStorage.getItem(KEY)||"null") as {market?:string;language?:string}|null;return v?{market:getMarket(v.market).code,language:getLanguage(v.language)}:DEFAULT;}catch{return DEFAULT;}}
+export default function StorefrontPreferencesBar(){const[value,setValue]=useState<Preferences>(DEFAULT);const{t}=useStorefrontText();useEffect(()=>setValue(read()),[]);function update(patch:Partial<Preferences>){const next={...value,...patch};setValue(next);try{localStorage.setItem(KEY,JSON.stringify(next));window.dispatchEvent(new CustomEvent(EVENT,{detail:next}));}catch{/* optional preference */}}const market=getMarket(value.market);return <div className="plugPreferenceBar" aria-label="Store preferences"><label className="plugPreferenceControl"><Globe2 size={14} aria-hidden="true"/><span>{t("market")}</span><select aria-label="Sourcing market" value={value.market} onChange={e=>update({market:getMarket(e.target.value).code})}>{STOREFRONT_MARKETS.map(m=><option key={m.code} value={m.code}>{m.flag} {m.name} · {m.currency}</option>)}</select><b>{market.flag} {market.currency}</b></label><label className="plugPreferenceControl"><Languages size={14} aria-hidden="true"/><span>{t("language")}</span><select aria-label="Display language" value={value.language} onChange={e=>update({language:getLanguage(e.target.value)})}>{STOREFRONT_LANGUAGES.map(l=><option key={l.code} value={l.code}>{l.nativeName}</option>)}</select></label><small>{t("priceNote")}</small></div>}
