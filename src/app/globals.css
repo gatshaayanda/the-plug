@@ -1285,3 +1285,55 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .plugSelectionDock>div{display:grid;gap:3px;min-width:0}.plugSelectionDock strong{font-size:14px}.plugSelectionDock small{font-size:12px;color:#686868}.plugSelectionDockAction{flex:none;display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 15px;border-radius:10px;background:#171717;color:#fff;text-decoration:none;font-weight:700;font-size:13px}
 .plugSelectionReview{display:grid;gap:16px}.plugSelectionReviewHeading{display:grid;gap:4px}.plugSelectionReviewHeading strong{font-size:20px}.plugSelectionReviewHeading span{font-size:13px;color:#686868;line-height:1.5}.plugSelectionReviewItems{display:grid;gap:8px}.plugSelectionReviewItems article{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px;border:1px solid var(--plug-line,#e5e1da);border-radius:12px;background:#fff}.plugSelectionReviewItems article>div{display:grid;gap:4px;min-width:0}.plugSelectionReviewItems article strong{font-size:14px}.plugSelectionReviewItems article small{font-size:11px;color:#777}.plugSelectionReviewItems article>b{white-space:nowrap;font-size:13px}.plugSelectionReviewTotal{display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-top:1px solid var(--plug-line,#ddd)}.plugSelectionReviewTotal span{font-size:13px;color:#666}.plugSelectionReviewTotal strong{font-size:17px}.plugSelectionReviewActions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
 @media(max-width:560px){.plugSelectionDock{align-items:stretch;flex-direction:column;gap:10px}.plugSelectionDockAction{width:100%}.plugSelectionReviewActions{display:grid;grid-template-columns:1fr}.plugSelectionReviewActions .button{width:100%}.plugSelectionReviewItems article{align-items:flex-start}.plugSelectionReviewItems article>b{font-size:12px}}
+
+
+/* Live, stage-aware sourcing records in My Plug */
+.plugLiveRecordList{display:grid;gap:14px}
+.plugLiveRecord{overflow:hidden;border:1px solid #d9d6cf;border-radius:12px;background:#fff}
+.plugLiveRecordTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 15px;background:#f7f6f2}
+.plugLiveRecordTop>div{display:grid;gap:5px;min-width:0}
+.plugLiveRecordTop>div>strong{font-size:1rem;line-height:1.3;overflow-wrap:anywhere}
+.plugLiveRecordTop>div>small{color:#686868;font-size:.68rem}
+.plugLiveRecordStatus{flex:none;padding:6px 9px;border-radius:5px;background:#e9f0ff;color:#124da8;font-size:.67rem;font-weight:950}
+.plugLiveRecordPaper{padding:17px;border-top:1px solid #e8e5df}
+.plugLiveRecordPaper>header{display:flex;align-items:center;gap:9px;padding-bottom:14px;border-bottom:2px solid #151515}
+.plugRecordBrand{display:grid;place-items:center;width:36px;height:36px;background:#0866ff;color:#fff;font-weight:950;font-size:1.2rem}
+.plugLiveRecordPaper>header>div{display:grid;gap:2px}
+.plugLiveRecordPaper>header>div strong{font-size:.95rem;letter-spacing:.08em}
+.plugLiveRecordPaper>header>div small{font-size:.55rem;letter-spacing:.12em;color:#777}
+.plugRecordDocType{margin-left:auto;color:#0866ff;font-size:.62rem;font-weight:950;letter-spacing:.08em;text-align:right}
+.plugRecordIdentity{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:13px 0;border-bottom:1px solid #e7e4de}
+.plugRecordIdentity>div{display:grid;gap:4px;min-width:0}
+.plugRecordIdentity small,.plugRecordFinancials span{font-size:.58rem;color:#777;font-weight:900;letter-spacing:.07em;text-transform:uppercase}
+.plugRecordIdentity strong{font-size:.75rem;overflow-wrap:anywhere}
+.plugLiveRecordPaper dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;margin:14px 0}
+.plugLiveRecordPaper dl>div{display:grid;gap:3px;min-width:0}
+.plugLiveRecordPaper dt{font-size:.62rem;color:#777}
+.plugLiveRecordPaper dd{margin:0;font-size:.78rem;font-weight:800;overflow-wrap:anywhere}
+.plugRecordItems{display:grid;gap:6px;margin:12px 0;padding:12px;border:1px solid #e7e4de;border-radius:7px}
+.plugRecordItems strong{font-size:.7rem}
+.plugRecordItems span{font-size:.72rem;color:#555;overflow-wrap:anywhere}
+.plugRecordFinancials{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:13px}
+.plugRecordFinancials>div{display:grid;gap:5px;padding:11px;border:1px solid #e7e4de;border-radius:7px;background:#faf9f6}
+.plugRecordFinancials strong{font-size:1rem}
+.plugRecordFinancials small{font-size:.62rem;line-height:1.4;color:#666}
+.plugRecordNote{margin-top:12px;padding:11px;border-left:3px solid #0866ff;background:#f2f6ff}
+.plugRecordNote strong{font-size:.7rem}.plugRecordNote p{margin:5px 0 0;font-size:.75rem;line-height:1.5}
+.plugLiveRecordPaper>footer{margin-top:13px;padding-top:10px;border-top:1px solid #e7e4de;color:#777;font-size:.62rem;line-height:1.5}
+.plugLiveRecordActions{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-top:1px solid #e7e4de}
+.plugLiveRecordActions>span{font-size:.64rem;color:#777}
+.plugPaymentRecordsHeading{margin:24px 0 12px;padding-top:18px;border-top:1px solid #ddd}
+.plugPaymentRecordsHeading h3{margin:4px 0;font-size:1.05rem}
+.plugPaymentRecordsHeading p{margin:4px 0;color:#666;font-size:.76rem;line-height:1.45}
+@media(max-width:520px){.plugLiveRecordTop{flex-direction:column}.plugRecordIdentity{grid-template-columns:1fr 1fr}.plugRecordIdentity>div:last-child{grid-column:1/-1}.plugLiveRecordPaper{padding:12px}.plugRecordFinancials{grid-template-columns:1fr}.plugLiveRecordActions{align-items:stretch;flex-direction:column}.plugLiveRecordActions button{width:100%}.plugLiveRecordPaper dl{grid-template-columns:1fr}}
+@media print{
+ body *{visibility:hidden!important}
+ .plugLiveRecordPaper,.plugLiveRecordPaper *,.plugReceiptPaper,.plugReceiptPaper *{visibility:visible!important}
+ .plugLiveRecordPaper,.plugReceiptPaper{position:relative!important;width:100%!important;margin:0!important;padding:18px!important;border:0!important;box-shadow:none!important}
+ .plugLiveRecord,.plugReceipt{break-inside:avoid;border:0!important}
+ .plugLiveRecordTop,.plugLiveRecordActions,.plugReceipt>summary,.plugPaymentRecordsHeading,.panelHeading{display:none!important}
+ .plugLiveRecordList{display:block!important}
+ .plugLiveRecord{display:none!important}
+ .plugLiveRecord:has(.plugLiveRecordPaper){display:block!important}
+ .plugLiveRecordPaper>footer,.plugReceiptPaper>footer{color:#555!important}
+}
