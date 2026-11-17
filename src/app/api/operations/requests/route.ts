@@ -18,7 +18,7 @@ function adminApp(){
 
 export async function GET(request:Request){
  try{
-  const match=(request.headers.get("authorization")||"").match(/^Bearer\\s+(.+)$/i);
+  const match=(request.headers.get("authorization")||"").match(/^Bearer\s+(.+)$/i);
   if(!match)return NextResponse.json({error:"Your Operations session has expired. Sign in again."},{status:401});
   const app=adminApp();
   const decoded=await getAuth(app).verifyIdToken(match[1]);
