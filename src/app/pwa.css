@@ -10,3 +10,6 @@
 .reconnectingBanner{border-color:#a8dfc0;background:#f5fff8}
 .reconnectingBanner span{color:#16834a}
 @media(max-width:560px){.offlineBanner{font-size:.7rem;padding:9px 12px;line-height:1.4}}
+
+/* Keep PWA actions above floating chat controls so the chatbot cannot intercept taps. */
+.plugPwaInstallButton,.pwaInstall,.pwaUpdate,.pwaInstallInfo{z-index:2147483000;pointer-events:auto}
