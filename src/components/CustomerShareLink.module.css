@@ -13,6 +13,10 @@
 .editTag{background:#0866ff;color:#07101f}
 .previewTag{background:#252c39;color:#c7cfdd;border:1px solid #414b5d}
 .controls{display:grid;grid-template-columns:1fr 1.35fr;gap:10px}
+.controls label{display:grid;gap:7px;min-width:0;color:#cbd3e1;font-size:.72rem;font-weight:850}
+.controls label>span{display:flex;align-items:center;gap:6px}
+.controls select{width:100%;min-width:0;min-height:46px;padding:10px 34px 10px 12px;border:1px solid #414b5d;border-radius:10px;background:#0d1119;color:#fff;font-size:.83rem;font-weight:750}
+.controls select:focus-visible{outline:3px solid #80aaff;outline-offset:3px}
 .previewCard{display:grid;gap:10px;padding:13px;border:1px solid #3c4658;border-radius:11px;background:linear-gradient(145deg,#1b2433,#11151d)}
 .previewBrand{display:flex;align-items:center;gap:8px;font-size:.67rem;font-weight:950;letter-spacing:.1em;color:#dbe6ff}
 .previewBrand>span:last-child{display:grid;gap:2px}
@@ -24,4 +28,4 @@
 .previewMockAction span{font-size:1rem}
 .preview .plugCustomerShareSummary{background:#0d1119}
 .shareStep .plugCustomerShareButton{min-height:50px;border-radius:10px;font-size:.83rem;box-shadow:0 0 0 3px #0866ff26,0 8px 20px #0866ff25}
-@media(max-width:520px){.setup,.preview,.shareStep{padding:11px;gap:10px}.controls{grid-template-columns:1fr 1fr;gap:8px}.step>div small{font-size:.66rem}.editTag,.previewTag{font-size:.5rem;padding:4px 5px}.previewCard{padding:11px}}
+@media(max-width:520px){.setup,.preview,.shareStep{padding:11px;gap:10px}.controls{grid-template-columns:1fr 1fr;gap:8px}.controls select{font-size:.75rem;padding-left:9px}.step>div small{font-size:.66rem}.editTag,.previewTag{font-size:.5rem;padding:4px 5px}.previewCard{padding:11px}}
