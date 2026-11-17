@@ -20,7 +20,7 @@ function friendlyAuthError(err:unknown){
 }
 
 export default function AdminGate({children}:{children:React.ReactNode}){
- const[user,setUser]=useState<User|null>(null),[checking,setChecking]=useState(true),[authorized,setAuthorized]=useState(false),[offline,setOffline]=useState(false),[accessWord,setAccessWord]=useState(""),[error,setError]=useState(""),[busy,setBusy]=useState(false);
+ const[user,setUser]=useState<User|null>(null),[checking,setChecking]=useState(true),[authorized,setAuthorized]=useState(false),[accessWord,setAccessWord]=useState(""),[error,setError]=useState(""),[busy,setBusy]=useState(false);
 
  useEffect(()=>{
   let stopAdmin:undefined|(()=>void);
@@ -28,7 +28,6 @@ export default function AdminGate({children}:{children:React.ReactNode}){
    if(stopAdmin){stopAdmin();stopAdmin=undefined}
    setUser(next);
    setChecking(true);
-   setOffline(false);
    if(!next){setAuthorized(false);setChecking(false);return}
    stopAdmin=onSnapshot(doc(db,"admins",next.uid),{includeMetadataChanges:true},snapshot=>{
     // Persistent Firestore cache can initially report a missing document even
@@ -37,11 +36,9 @@ export default function AdminGate({children}:{children:React.ReactNode}){
     if(snapshot.metadata.fromCache)return;
     const allowed=snapshot.exists()&&hasAdminRole(snapshot.data());
     setAuthorized(allowed);
-    setOffline(false);
-    setChecking(false);
+     setChecking(false);
     if(!allowed)void signOut(auth);
    },()=>{
-    setOffline(true);
     setChecking(false);
    });
   });
@@ -67,6 +64,6 @@ export default function AdminGate({children}:{children:React.ReactNode}){
  }
 
  if(checking)return <main className="adminPage"><div className="adminShell"><div className="emptyState"><div>🔐</div><h1>Opening The Plug Admin</h1><p>Checking access…</p></div></div></main>;
- if(user&&authorized)return <div className="adminAuthorized">{offline&&<div className="adminAccountBar"><span>The Plug Admin · Offline mode · cached admin access</span><span>Changes will sync when connection returns.</span></div>}<div className="adminAccountBar"><span>The Plug Admin · {user.email??"authorized staff"}</span><button className="button buttonLight" type="button" onClick={()=>void signOut(auth)}>Sign out</button></div>{children}</div>;
+ if(user&&authorized)return <div className="adminAuthorized">{children}</div>;
  return <main className="adminPage"><div className="adminShell"><section className="adminPanel" style={{maxWidth:520,margin:"80px auto"}}><span className="kicker">The Plug · Operations</span><h1>Operations sign in</h1><p>Enter your Operations access word to manage sourcing requests, catalogue and customer conversations.</p><form className="adminForm" onSubmit={signIn}><label>Access word<input type="password" value={accessWord} onChange={e=>setAccessWord(e.target.value)} autoComplete="current-password" required autoFocus/></label><button className="button buttonPrimary" type="submit" disabled={busy}>{busy?"Checking access…":"Enter Operations"}</button></form>{error&&<p role="alert" className="notice">{error}</p>}</section></div></main>
 }
