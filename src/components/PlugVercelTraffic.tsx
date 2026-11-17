@@ -41,11 +41,11 @@ export default function PlugVercelTraffic(){
  useEffect(()=>{void load(range)},[load,range]);
  const maxDaily=Math.max(1,...(traffic?.daily??[]).map(row=>row.pageviews));
  return <section className="plugVercelTraffic">
-  <div className="plugVercelTrafficHead"><div><span className="kicker">VERCEL WEB ANALYTICS</span><h3>Actual site traffic</h3><p>Anonymous aggregated visits to The Plug, separate from customer identities and sourcing records.</p></div><button className="button buttonLight" type="button" disabled={loading} onClick={()=>void load(range,true)}>{loading?"Refreshing…":"↻ Refresh"}</button></div>
+  <div className="plugVercelTrafficHead"><div><span className="kicker">VERCEL WEB ANALYTICS</span><h3>Actual site traffic</h3><p>Automatic Vercel Analytics collection is installed on this app. This owner report retrieves anonymous aggregate traffic separately from customer identities and sourcing records.</p></div><button className="button buttonLight" type="button" disabled={loading} onClick={()=>void load(range,true)}>{loading?"Refreshing…":"↻ Refresh"}</button></div>
   <div className="plugVercelTrafficControls" role="group" aria-label="Traffic reporting period"><button type="button" className={range===7?"active":""} aria-pressed={range===7} onClick={()=>setRange(7)}>Last 7 days</button><button type="button" className={range===30?"active":""} aria-pressed={range===30} onClick={()=>setRange(30)}>Last 30 days</button></div>
   {loading&&!traffic?<p className="orderTruth">Loading Vercel traffic…</p>:null}
   {error?<p className="notice" role="status">{error}</p>:null}
-  {traffic?.connection==="not_connected"?<div className="plugVercelState"><strong>Vercel reporting is not connected</strong><p>{traffic.message}</p></div>:null}
+  {traffic?.connection==="not_connected"?<div className="plugVercelState"><strong>Automatic tracking is installed · owner report needs configuration</strong><p>{traffic.message}</p></div>:null}
   {traffic&&["unavailable","credentials","rate_limited"].includes(traffic.connection)?<div className="plugVercelState"><strong>{traffic.message||"Traffic analytics temporarily unavailable."}</strong><p>Customer and sourcing records remain available independently.</p></div>:null}
   {traffic?.connection==="connected"?<>
    {traffic.partial?<p className="orderTruth" role="status">{traffic.message||"Some breakdowns are temporarily unavailable."}</p>:null}

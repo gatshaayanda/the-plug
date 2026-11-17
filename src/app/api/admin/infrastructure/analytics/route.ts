@@ -44,8 +44,8 @@ async function queryTraffic(range:Range,refresh:boolean):Promise<Result>{
  const now=new Date();const until=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()));
  const since=new Date(until.getTime()-(range-1)*86400000);
  const base={range,since:since.toISOString().slice(0,10),until:until.toISOString().slice(0,10)};
- if(!token)return{...base,connection:"not_connected",message:"Add VERCEL_API_TOKEN to this Vercel project with access to The Plug's Web Analytics.",partial:false};
- if(!projectId)return{...base,connection:"not_connected",message:"Vercel project ID is unavailable. Confirm this deployment is linked to The Plug's Vercel project.",partial:false};
+ if(!token)return{...base,connection:"not_connected",message:"Automatic Vercel Analytics collection is installed. Add VERCEL_API_TOKEN with access to The Plug's Web Analytics to show this owner-side report.",partial:false};
+ if(!projectId)return{...base,connection:"not_connected",message:"Automatic Vercel Analytics collection is installed. Set VERCEL_PROJECT_ID to the actual The Plug Vercel project ID to retrieve owner-side traffic data.",partial:false};
  const key=range+":"+projectId+":"+teamId;
  if(!refresh){const cached=cache.get(key);if(cached&&cached.expiresAt>Date.now())return cached.value}
  const endpoint="https://api.vercel.com/v1/query/web-analytics/visits";
