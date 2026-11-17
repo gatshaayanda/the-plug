@@ -27,9 +27,9 @@ export async function GET(request:Request){
   }
 
   const token=process.env.VERCEL_API_TOKEN||process.env.VERCEL_TOKEN;
-  const projectId=process.env.VERCEL_PROJECT_ID;
+  const projectId=process.env.VERCEL_PROJECT_ID||process.env.VERCEL_GIT_REPO_SLUG||"the-plug";
   const teamId=process.env.VERCEL_TEAM_ID||process.env.VERCEL_ORG_ID;
-  if(!token||!projectId){
+  if(!token){
    return NextResponse.json({error:"Vercel Analytics API credentials are not configured for this deployment."},{status:503});
   }
 
