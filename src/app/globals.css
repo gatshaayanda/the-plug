@@ -1394,3 +1394,112 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .accountRequestStage .plugSelectionReviewItems article{align-items:center}
 .accountRequestStage .plugBasketLine{align-items:center}
 @media(max-width:520px){.plugSelectionReviewItems article>img,.plugBasketLine>img{width:48px;height:48px}}
+
+
+/* The Plug customer conversations: white, calm and readable. */
+.conversationHub,
+.conversationPanel,
+.accountCareMessages .conversationPanel {
+  background: #fff;
+  color: #171717;
+  border: 1px solid #dedbd4;
+  border-radius: 18px;
+  box-shadow: 0 8px 28px rgba(23, 23, 23, .045);
+}
+.conversationPanel .conversationHeader h2,
+.conversationHub .panelHeading h2 {
+  color: #171717;
+}
+.conversationPanel .conversationHeader p,
+.conversationHub .panelHeading p,
+.conversationPanel .orderTruth {
+  color: #55534f;
+}
+.conversationPanel .messageList {
+  background: #faf9f6;
+  border: 1px solid #e8e5df;
+  border-radius: 14px;
+  padding: 14px;
+}
+.conversationPanel .conversationEmpty {
+  color: #171717;
+  background: #fff;
+  border: 1px dashed #d6d2ca;
+  border-radius: 12px;
+  padding: 18px;
+}
+.conversationPanel .conversationEmpty strong { color: #171717; }
+.conversationPanel .conversationEmpty p { color: #55534f; }
+.conversationPanel .messageBubble {
+  color: #171717;
+  border: 1px solid #dedbd4;
+  box-shadow: 0 1px 2px rgba(23, 23, 23, .035);
+}
+.conversationPanel .messageBubble p { color: #171717; }
+.conversationPanel .messageMine {
+  background: #eaf1ff;
+  border-color: #b9cdf7;
+}
+.conversationPanel .messageThem {
+  background: #fff;
+  border-color: #dedbd4;
+}
+.conversationPanel .messageRole { color: #55534f; }
+.conversationPanel .messageAttachment {
+  color: #174a9a;
+  background: #f3f6fc;
+  border: 1px solid #d7e2f5;
+  border-radius: 10px;
+}
+.conversationPanel .messageAttachment small { color: #55534f; }
+.conversationPanel .messageComposer {
+  border-top-color: #e4e0d8;
+}
+.conversationPanel .messageComposer textarea {
+  background: #fff;
+  color: #171717;
+  border: 1px solid #c9c5bd;
+}
+.conversationPanel .messageComposer textarea::placeholder { color: #6b6862; opacity: 1; }
+.conversationPanel .messageComposer textarea:focus {
+  border-color: #0866ff;
+  box-shadow: 0 0 0 3px rgba(8, 102, 255, .14);
+}
+.conversationPanel .attachmentButton,
+.conversationPanel .fileRemove { color: #34312d; }
+.conversationPanel .orderTruth,
+.conversationPanel .notice { color: #55534f; }
+.conversationPanel button:focus-visible,
+.conversationPanel a:focus-visible,
+.conversationPanel textarea:focus-visible,
+.conversationPanel input:focus-visible {
+  outline: 3px solid #0866ff;
+  outline-offset: 3px;
+}
+.conversationHub .conversationRow {
+  background: #fff;
+  color: #171717;
+  border-color: #dedbd4;
+}
+.conversationHub .conversationRow strong { color: #171717; }
+.conversationHub .conversationRow small { color: #55534f; }
+.conversationHub .conversationRow time { color: #6b6862; }
+.conversationHub .conversationEmpty {
+  background: #fff;
+  color: #171717;
+  border: 1px dashed #d6d2ca;
+  border-radius: 14px;
+  padding: 18px;
+}
+.conversationHub .conversationEmpty p { color: #55534f; }
+.conversationHub .conversationStart {
+  background: #fff;
+  color: #171717;
+  border-color: #dedbd4;
+}
+@media (max-width: 520px) {
+  .conversationPanel,
+  .conversationHub { padding: 13px; border-radius: 15px; }
+  .conversationPanel .messageList { padding: 10px; }
+  .conversationPanel .messageBubble { max-width: 96%; }
+}
