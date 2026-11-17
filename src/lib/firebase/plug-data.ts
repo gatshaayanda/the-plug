@@ -19,7 +19,7 @@ export const PLUG_REQUEST_STATUSES = [
 export type PlugRequestStatus = typeof PLUG_REQUEST_STATUSES[number];
 
 export type PlugAttachment = {url:string;name:string;type:string;size:number};
-export type PlugPaymentRecord = {id:string;amount:number;method:"Cash"|"Bank transfer"|"Mobile money"|"Other";reference?:string;recordedAt:string};
+export type PlugPaymentRecord = {id:string;amount:number;part?:"deposit"|"balance";method:"Cash"|"Bank transfer"|"Mobile money"|"Other";reference?:string;recordedAt:string};
 export type PlugRequest = {
   id:string;
   customerId:string;
