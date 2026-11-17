@@ -29,3 +29,17 @@
 .preview .plugCustomerShareSummary{background:#0d1119}
 .shareStep .plugCustomerShareButton{min-height:50px;border-radius:10px;font-size:.83rem;box-shadow:0 0 0 3px #0866ff26,0 8px 20px #0866ff25}
 @media(max-width:520px){.setup,.preview,.shareStep{padding:11px;gap:10px}.controls{grid-template-columns:1fr 1fr;gap:8px}.controls select{font-size:.75rem;padding-left:9px}.step>div small{font-size:.66rem}.editTag,.previewTag{font-size:.5rem;padding:4px 5px}.previewCard{padding:11px}}
+
+.collapsedHeader{display:flex;align-items:center;gap:11px;min-width:0;list-style:none;cursor:pointer;padding:2px;outline-offset:4px}
+.collapsedHeader::-webkit-details-marker{display:none}
+.collapsedHeader::marker{content:""}
+.collapsedIcon{width:36px;height:36px;flex:0 0 36px;display:grid;place-items:center;border-radius:10px;background:#0866ff24;border:1px solid #0866ff55;color:#8ab3ff}
+.collapsedCopy{display:grid;gap:3px;flex:1;min-width:0}
+.collapsedCopy :global(.kicker){font-size:.6rem;color:#9bbcff;font-weight:900;letter-spacing:.12em}
+.collapsedCopy strong{font-size:.86rem;line-height:1.2;color:#fff}
+.collapsedCopy small{font-size:.68rem;line-height:1.35;color:#b5c0d1}
+.collapsedAction{display:flex;align-items:center;gap:6px;flex:0 0 auto;padding:8px 10px;border-radius:8px;background:#0866ff;color:#fff;font-size:.68rem;font-weight:900}
+.collapsedAction span{font-size:1rem;transition:transform .18s ease}
+:global(.plugCustomerShare[open]) .collapsedAction span{transform:rotate(180deg)}
+.expandedContent{display:grid;gap:12px;padding-top:13px;border-top:1px solid #303a4a}
+@media(max-width:520px){.collapsedHeader{gap:8px}.collapsedIcon{width:32px;height:32px;flex-basis:32px}.collapsedCopy strong{font-size:.8rem}.collapsedCopy small{font-size:.62rem}.collapsedAction{padding:7px 8px;font-size:.63rem}}
