@@ -1,9 +1,16 @@
 "use client";
 import {useEffect,useState} from "react";
-import {Globe2,Languages,Share2,Check} from "lucide-react";
+import {Globe2,Languages,Share2,Check,Eye,SlidersHorizontal} from "lucide-react";
 import {STOREFRONT_LANGUAGES} from "@/lib/storefront-translations";
 import {STOREFRONT_MARKETS,getLanguage,getMarket,type PlugLanguage,type PlugMarket} from "@/lib/storefront-config";
 import {readStorefrontPreferences} from "@/components/StorefrontPreferences";
+
+const previewCopy:Record<PlugLanguage,{account:string;action:string;market:string;currency:string}> = {
+ en:{account:"Your Plug account",action:"Start a request",market:"Your market",currency:"Your currency"},
+ tn:{account:"Akhaonto ya gago ya Plug",action:"Simolola kopo",market:"Mmaraka wa gago",currency:"Madi a gago"},
+ af:{account:"Jou Plug-rekening",action:"Begin 'n versoek",market:"Jou mark",currency:"Jou geldeenheid"},
+ fr:{account:"Votre compte Plug",action:"Commencer une demande",market:"Votre marché",currency:"Votre devise"},
+};
 
 export default function CustomerShareLink(){
  const[language,setLanguage]=useState<PlugLanguage>("en");
@@ -13,6 +20,7 @@ export default function CustomerShareLink(){
  useEffect(()=>{const saved=readStorefrontPreferences();setLanguage(saved.language);setMarketCode(saved.market)},[]);
  const market=getMarket(marketCode);
  const languageLabel=STOREFRONT_LANGUAGES.find(item=>item.code===language)?.nativeName??"English";
+ const preview=previewCopy[language]??previewCopy.en;
  async function share(){
   const url=new URL("/account",window.location.origin);
   url.searchParams.set("newRequest","1");
@@ -31,17 +39,36 @@ export default function CustomerShareLink(){
    setNotice("Sharing is unavailable in this browser. Copy this link: "+link);
   }
  }
- return <section className="plugCustomerShare" aria-label="Share configured customer link">
+ return <section className="plugCustomerShare" aria-label="Prepare and share a customer invite">
   <header className="plugCustomerShareHeader">
    <div className="plugCustomerShareIcon"><Share2 size={18} aria-hidden="true"/></div>
-   <div><span className="kicker">CUSTOMER INVITE</span><strong>Prepare a My Plug invite</strong><small>Set the customer’s language and market. Their matching currency is included automatically.</small></div>
+   <div><span className="kicker">CUSTOMER INVITE</span><strong>Prepare a My Plug invite</strong><small>Choose the customer’s language and market. Their matching currency is added automatically.</small></div>
   </header>
-  <div className="plugCustomerShareControls">
-   <label><span><Languages size={14} aria-hidden="true"/> Language</span><select value={language} onChange={event=>{setLanguage(getLanguage(event.target.value));setShared(false)}}>{STOREFRONT_LANGUAGES.map(item=><option key={item.code} value={item.code}>{item.nativeName}</option>)}</select></label>
-   <label><span><Globe2 size={14} aria-hidden="true"/> Country / market</span><select value={marketCode} onChange={event=>{setMarketCode(getMarket(event.target.value).code);setShared(false)}}>{STOREFRONT_MARKETS.map(item=><option key={item.code} value={item.code}>{item.flag} {item.name} · {item.currency}</option>)}</select></label>
+  <div className="plugInviteSetup">
+   <div className="plugInviteStep"><span className="plugInviteStepIcon"><SlidersHorizontal size={15} aria-hidden="true"/></span><div><strong>1. Set up the invite</strong><small>These are the settings you can change.</small></div><span className="plugInviteEditTag">EDIT SETTINGS</span></div>
+   <div className="plugCustomerShareControls">
+    <label><span><Languages size={14} aria-hidden="true"/> Language</span><select value={language} onChange={event=>{setLanguage(getLanguage(event.target.value));setShared(false);setNotice("")}}>{STOREFRONT_LANGUAGES.map(item=><option key={item.code} value={item.code}>{item.nativeName}</option>)}</select></label>
+    <label><span><Globe2 size={14} aria-hidden="true"/> Country / market</span><select value={marketCode} onChange={event=>{setMarketCode(getMarket(event.target.value).code);setShared(false);setNotice("")}}>{STOREFRONT_MARKETS.map(item=><option key={item.code} value={item.code}>{item.flag} {item.name} · {item.currency}</option>)}</select></label>
+   </div>
   </div>
-  <div className="plugCustomerShareSummary"><span><small>INVITE SETTINGS</small><strong>{market.flag} {market.name}</strong></span><span><small>LANGUAGE</small><strong>{languageLabel}</strong></span><span><small>CURRENCY</small><strong>{market.currency} · {market.currencyLabel}</strong></span></div>
-  <button type="button" className="button buttonPrimary plugCustomerShareButton" onClick={()=>void share()}>{shared?<Check size={17} aria-hidden="true"/>:<Share2 size={17} aria-hidden="true"/>}{shared?"Share again":"Share customer link"} <span aria-hidden="true">↗</span></button>
-  {notice&&<p className="plugCustomerShareNotice" role="status">{notice}</p>}
+  <div className="plugInvitePreview">
+   <div className="plugInviteStep"><span className="plugInviteStepIcon plugInviteEye"><Eye size={15} aria-hidden="true"/></span><div><strong>2. Customer preview</strong><small>This is a preview of the settings they’ll receive — not another button to press.</small></div><span className="plugInvitePreviewTag">PREVIEW ONLY</span></div>
+   <div className="plugInvitePreviewCard">
+    <div className="plugInvitePreviewBrand"><span className="plugInvitePreviewMark">P</span><span>THE PLUG <small>MY PLUG</small></span></div>
+    <strong className="plugInvitePreviewTitle">{preview.account}</strong>
+    <p>{preview.action}</p>
+    <div className="plugCustomerShareSummary">
+     <span><small>{preview.market}</small><strong>{market.flag} {market.name}</strong></span>
+     <span><small>LANGUAGE</small><strong>{languageLabel}</strong></span>
+     <span><small>{preview.currency}</small><strong>{market.currency} · {market.currencyLabel}</strong></span>
+    </div>
+    <div className="plugInvitePreviewMockAction" aria-hidden="true">{preview.action}<span>↗</span></div>
+   </div>
+  </div>
+  <div className="plugInviteShareStep">
+   <div className="plugInviteStep"><span className="plugInviteStepIcon plugInviteShareIcon"><Share2 size={15} aria-hidden="true"/></span><div><strong>3. Share the invite</strong><small>Press this button when the preview looks right.</small></div></div>
+   <button type="button" className="button buttonPrimary plugCustomerShareButton" onClick={()=>void share()}>{shared?<Check size={17} aria-hidden="true"/>:<Share2 size={17} aria-hidden="true"/>}{shared?"Share again":"Share customer link"} <span aria-hidden="true">↗</span></button>
+   {notice&&<p className="plugCustomerShareNotice" role="status">{notice}</p>}
+  </div>
  </section>;
 }
