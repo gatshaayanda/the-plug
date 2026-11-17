@@ -1808,3 +1808,7 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
  .plugMoneySync,.plugExpenseForm,.plugExpenseSave,.plugExpenseListHead button,.plugExpenseList article>.button,.plugMoneyLedger article>.button{display:none!important}
  .plugMoneyDashboard .journeyAnalytics{break-inside:avoid;box-shadow:none}
 }
+
+.plugWorkSync{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.plugWorkSync .button{min-height:38px;padding:8px 11px;font-size:.7rem}
+@media(max-width:600px){.plugWorkSync{justify-content:flex-start}.plugWorkSync .button{flex:1}}
