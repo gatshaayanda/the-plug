@@ -1557,3 +1557,37 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
  .plugCustomerMeta{justify-items:start;text-align:left}
  .plugNotesMeta{font-size:.66rem}
 }
+
+
+/* Owner shift and configured customer invite controls. */
+.plugOwnerShift{margin:0 0 14px;border:1px solid #3d3933;border-radius:14px;background:#111;color:#f7f4ee;overflow:hidden}
+.plugOwnerShiftSummary{width:100%;display:flex;align-items:center;gap:12px;padding:13px 15px;background:transparent;color:inherit;border:0;text-align:left;cursor:pointer;list-style:none}
+.plugOwnerShiftSummary::-webkit-details-marker{display:none}
+.plugShiftClock{font-size:24px;line-height:1;color:#c7d7ff}
+.plugShiftTitle{display:grid;gap:3px;flex:1;min-width:0}
+.plugShiftTitle small{font-size:.64rem;letter-spacing:.13em;font-weight:900;color:#aabfff}
+.plugShiftTitle strong{font-size:.92rem}
+.plugShiftLive{display:inline-flex;align-items:center;gap:6px;color:#72d5a8;font-size:.67rem;font-weight:900;letter-spacing:.1em;white-space:nowrap}
+.plugShiftLive i{width:7px;height:7px;border-radius:50%;background:#43c987;box-shadow:0 0 0 3px #43c98722}
+.plugShiftManage{font-size:.73rem;font-weight:800;color:#ddd6ca;white-space:nowrap}
+.plugOwnerShiftBody{padding:0 15px 14px;border-top:1px solid #34302b}
+.plugOwnerShiftMetrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:14px 0}
+.plugOwnerShiftMetrics article{display:grid;gap:4px}
+.plugOwnerShiftMetrics small,.plugOwnerShiftMetrics span{font-size:.7rem;color:#aaa}
+.plugOwnerShiftMetrics strong{font-size:1.25rem;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.plugOwnerShiftControls{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.plugOwnerShiftControls label{display:grid;gap:6px;font-size:.75rem;font-weight:750;color:#ddd6ca}
+.plugOwnerShiftControls select,.plugCustomerShareControls select{min-height:40px;padding:8px 11px;border-radius:9px;border:1px solid #4a453d;background:#191919;color:#fff;font:inherit}
+.plugOwnerShiftBody>p{font-size:.72rem;line-height:1.5;color:#aaa;margin:12px 0 0}
+.plugCustomerShare{display:grid;gap:12px;margin:0 0 16px;padding:14px;border:1px solid #38342e;border-radius:14px;background:#151515;color:#f6f2eb}
+.plugCustomerShare>div:first-child{display:grid;gap:4px}
+.plugCustomerShare>div:first-child .kicker{font-size:.64rem;color:#aabfff;font-weight:900;letter-spacing:.12em}
+.plugCustomerShare>div:first-child strong{font-size:.9rem}
+.plugCustomerShare>div:first-child small{font-size:.72rem;color:#aaa;line-height:1.45}
+.plugCustomerShareControls{display:flex;align-items:end;gap:9px;flex-wrap:wrap}
+.plugCustomerShareControls label{display:grid;gap:5px;font-size:.7rem;font-weight:800;color:#d8d1c6}
+.plugCustomerShareControls select{min-width:150px}
+.plugCustomerShareControls .button{min-height:40px}
+.plugCustomerShare .orderTruth{margin:0;font-size:.72rem;overflow-wrap:anywhere}
+.plugCustomerPreferenceLine{display:block;margin:5px 0 8px;color:#9ca8c4;font-size:.72rem;font-weight:750}
+@media(max-width:520px){.plugOwnerShiftSummary{gap:8px;padding:12px}.plugShiftManage{font-size:.66rem}.plugOwnerShiftControls{align-items:stretch}.plugOwnerShiftControls label,.plugOwnerShiftControls select{width:100%}.plugOwnerShiftControls .button{width:100%}.plugCustomerShareControls{display:grid;grid-template-columns:1fr 1fr}.plugCustomerShareControls label,.plugCustomerShareControls select{min-width:0;width:100%}.plugCustomerShareControls .button{grid-column:1/-1;width:100%}}
