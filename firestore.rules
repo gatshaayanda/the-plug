@@ -513,6 +513,56 @@ service cloud.firestore {
       allow create, update: if isAdmin() && validReconciliation();
     }
 
+    match /businessExpenses/{expenseId} {
+      function validBusinessExpense() {
+        return request.resource.data.keys().hasOnly([
+            'merchant', 'category', 'amount', 'currency', 'date', 'note',
+            'createdAt', 'updatedAt', 'createdBy', 'receipt'
+          ])
+          && request.resource.data.keys().hasAll([
+            'merchant', 'category', 'amount', 'currency', 'date', 'note',
+            'createdAt', 'updatedAt', 'createdBy', 'receipt'
+          ])
+          && request.resource.data.merchant is string
+          && request.resource.data.merchant.size() > 0
+          && request.resource.data.merchant.size() <= 120
+          && request.resource.data.category is string
+          && request.resource.data.category.size() <= 80
+          && request.resource.data.amount is number
+          && request.resource.data.amount > 0
+          && request.resource.data.amount <= 1000000000
+          && request.resource.data.currency == 'BWP'
+          && request.resource.data.date is string
+          && request.resource.data.note is string
+          && request.resource.data.note.size() <= 1200
+          && request.resource.data.createdAt is string
+          && request.resource.data.updatedAt is string
+          && request.resource.data.createdBy == request.auth.uid
+          && (
+            request.resource.data.receipt == null
+            || (
+              request.resource.data.receipt is map
+              && request.resource.data.receipt.keys().hasOnly(['url', 'name', 'type', 'size'])
+              && request.resource.data.receipt.url is string
+              && request.resource.data.receipt.url.matches('https://.*')
+              && request.resource.data.receipt.name is string
+              && request.resource.data.receipt.name.size() <= 255
+              && request.resource.data.receipt.type is string
+              && request.resource.data.receipt.size is number
+              && request.resource.data.receipt.size >= 0
+              && request.resource.data.receipt.size <= 4194304
+            )
+          );
+      }
+      allow read: if isAdmin();
+      allow create: if isAdmin() && validBusinessExpense();
+      allow update: if isAdmin()
+        && resource.data.createdBy == request.auth.uid
+        && request.resource.data.createdBy == resource.data.createdBy
+        && validBusinessExpense();
+      allow delete: if isAdmin();
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
