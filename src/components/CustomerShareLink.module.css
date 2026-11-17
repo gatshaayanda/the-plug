@@ -1,0 +1,27 @@
+.setup,.preview,.shareStep{display:grid;gap:12px;padding:13px;border:1px solid #343d4d;border-radius:13px;background:#10141d}
+.setup{border-left:4px solid #0866ff}
+.preview{border-left:4px solid #8b95a7;background:#11151d}
+.shareStep{border:1px solid #0866ff66;background:#101827}
+.step{display:flex;align-items:center;gap:9px;min-width:0}
+.step>div{display:grid;gap:3px;flex:1;min-width:0}
+.step>div strong{font-size:.83rem;color:#fff}
+.step>div small{font-size:.7rem;line-height:1.4;color:#aeb7c8}
+.stepIcon{width:30px;height:30px;flex:0 0 30px;display:grid;place-items:center;border-radius:9px;background:#0866ff24;color:#8ab3ff}
+.eye{background:#ffffff12;color:#c3ccdc}
+.shareIcon{background:#0866ff24;color:#8ab3ff}
+.editTag,.previewTag{flex:0 0 auto;padding:5px 7px;border-radius:6px;font-size:.56rem;font-weight:950;letter-spacing:.08em;white-space:nowrap}
+.editTag{background:#0866ff;color:#07101f}
+.previewTag{background:#252c39;color:#c7cfdd;border:1px solid #414b5d}
+.controls{display:grid;grid-template-columns:1fr 1.35fr;gap:10px}
+.previewCard{display:grid;gap:10px;padding:13px;border:1px solid #3c4658;border-radius:11px;background:linear-gradient(145deg,#1b2433,#11151d)}
+.previewBrand{display:flex;align-items:center;gap:8px;font-size:.67rem;font-weight:950;letter-spacing:.1em;color:#dbe6ff}
+.previewBrand>span:last-child{display:grid;gap:2px}
+.previewBrand small{font-size:.53rem;color:#9eabc2;letter-spacing:.14em}
+.previewMark{width:27px;height:27px;display:grid;place-items:center;border-radius:50%;background:#0866ff;color:#08101e;font-size:.9rem;font-weight:1000}
+.previewTitle{font-size:1rem;color:#fff;line-height:1.2}
+.previewCard>p{margin:0;color:#b8c4d8;font-size:.76rem}
+.previewMockAction{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:38px;padding:9px 11px;border:1px dashed #6c8dc6;border-radius:8px;background:#0866ff16;color:#c9dcff;font-size:.72rem;font-weight:850;pointer-events:none}
+.previewMockAction span{font-size:1rem}
+.preview .plugCustomerShareSummary{background:#0d1119}
+.shareStep .plugCustomerShareButton{min-height:50px;border-radius:10px;font-size:.83rem;box-shadow:0 0 0 3px #0866ff26,0 8px 20px #0866ff25}
+@media(max-width:520px){.setup,.preview,.shareStep{padding:11px;gap:10px}.controls{grid-template-columns:1fr 1fr;gap:8px}.step>div small{font-size:.66rem}.editTag,.previewTag{font-size:.5rem;padding:4px 5px}.previewCard{padding:11px}}
