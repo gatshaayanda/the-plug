@@ -58,7 +58,7 @@ export default function AdminGate({children}:{children:React.ReactNode}){
    if(!adminSnapshot.exists()||!hasAdminRole(adminSnapshot.data())){
     setError("This Operations account is missing its owner/staff role. The server login completed, but the admin record could not be verified.");
     await signOut(auth);
-   }else{setAuthorized(true);setOffline(false);setAccessWord("");setError("")}
+   }else{setAuthorized(true);setAccessWord("");setError("")}
   }catch(err){setError(friendlyAuthError(err));}
   finally{setBusy(false)}
  }
