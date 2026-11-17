@@ -40,7 +40,7 @@ function referenceValue(request:PlugRequest):number|null{
 function paymentBreakdown(request:PlugRequest){
  const records=request.paymentRecords||[];
  if(records.length){
-  return records.reduce((sum,item)=>{
+  const recorded=records.reduce((sum,item)=>{
    const amount=validAmount(item.amount);
    sum.total+=amount;
    if(item.part==="deposit")sum.deposit+=amount;
@@ -48,9 +48,15 @@ function paymentBreakdown(request:PlugRequest){
    else sum.unclassified+=amount;
    return sum;
   },{total:0,deposit:0,balance:0,unclassified:0});
+  return {
+   total:validAmount(request.depositPaid)||recorded.total,
+   deposit:request.depositReceived!==undefined?validAmount(request.depositReceived):recorded.deposit,
+   balance:request.balanceReceived!==undefined?validAmount(request.balanceReceived):recorded.balance,
+   unclassified:recorded.unclassified
+  };
  }
  const legacy=validAmount(request.depositPaid);
- return {total:legacy,deposit:0,balance:0,unclassified:legacy};
+ return {total:legacy,deposit:request.depositReceived!==undefined?validAmount(request.depositReceived):legacy,balance:validAmount(request.balanceReceived),unclassified:0};
 }
 function dateLabel(value:string){
  const date=new Date(value);
@@ -177,7 +183,7 @@ export default function PlugMoneyDashboard({requests,onOpenRequest,requestSyncSt
     <article><span>Customer-approved value</span><strong>{money(summary.approvedOpen)}</strong><small>Customer approved the current quote</small></article>
     <article><span>Delivered / collected value</span><strong>{money(summary.fulfilledValue)}</strong><small>Quoted value marked fulfilled</small></article>
     <article><span>Recorded payments</span><strong>{money(summary.payments.total)}</strong><small>Deposit {money(summary.payments.deposit)} · Balance {money(summary.payments.balance)}</small></article>
-    <article><span>Open quoted balance</span><strong>{money(summary.outstanding)}</strong><small>Confirmed quotes less all recorded payments</small></article>
+    <article><span>Outstanding quoted balance</span><strong>{money(summary.outstanding)}</strong><small>All non-cancelled quotes less recorded payments</small></article>
     <article><span>Completed · unpaid balance</span><strong>{money(summary.completedUnpaid)}</strong><small>Delivered / collected jobs not fully paid</small></article>
     <article><span>Expected deposits on approved quotes</span><strong>{money(summary.approvedDepositDue)}</strong><small>Uses the recorded deposit requirement or 50% of quote</small></article>
     <article><span>Deposit gap · classified deposits</span><strong>{money(summary.depositGap)}</strong><small>Legacy payments without a deposit/balance label are not assumed to be deposits</small></article>
