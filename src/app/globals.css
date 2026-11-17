@@ -1503,3 +1503,7 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
   .conversationPanel .messageList { padding: 10px; }
   .conversationPanel .messageBubble { max-width: 96%; }
 }
+
+
+/* Compact six-section owner Briefcase navigation. */
+.plugBriefcaseNav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;margin:18px 0 22px;padding:8px;background:#111;border:1px solid #34302b;border-radius:14px}.plugBriefcaseNav button{min-width:0;padding:12px 8px;font-size:.82rem;line-height:1.25;text-align:center}.plugBriefcaseNav button.active{background:var(--plug-blue);color:var(--plug-black)}@media(max-width:760px){.plugBriefcaseNav{display:flex;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:thin;padding:6px}.plugBriefcaseNav button{flex:0 0 auto;white-space:nowrap;padding:11px 13px}.plugBriefcaseNav button:first-child{position:sticky;left:0;z-index:1}}
