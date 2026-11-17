@@ -130,7 +130,7 @@ export default function PlugMoneyDashboard({requests,onOpenRequest,requestSyncSt
 
  const expenseTotal=useMemo(()=>expenses.reduce((sum,item)=>sum+validAmount(item.amount),0),[expenses]);
  const recordedCashAfterExpenses=summary.payments.total-expenseTotal;
- const latestRequests=useMemo(()=>[...requests].sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).slice(0,12),[requests]);
+ const latestRequests=useMemo(()=>[...requests].sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).slice(0,20),[requests]);
 
  async function saveExpense(){
   const value=Number(amount);
@@ -201,7 +201,7 @@ export default function PlugMoneyDashboard({requests,onOpenRequest,requestSyncSt
   </section>
 
   <section className="journeyAnalytics">
-   <div className="panelHeading"><div><span className="kicker">REQUEST LEDGER · LIVE RECORDS</span><h2>Every request, traceable</h2><p className="orderTruth">This is the request-level view behind the totals. Select a record to open it in Customers &amp; Jobs.</p></div><strong>{requests.length} records</strong></div>
+   <div className="panelHeading"><div><span className="kicker">REQUEST LEDGER · LIVE RECORDS</span><h2>Recent requests, traceable</h2><p className="orderTruth">The latest 20 request records behind the totals. Select a record to open it in Customers &amp; Jobs.</p></div><strong>{requests.length} records</strong></div>
    {latestRequests.length?<div className="plugMoneyLedger">{latestRequests.map(item=>{const reference=referenceValue(item);const paid=paymentBreakdown(item).total;return <article key={item.id}><div className="plugMoneyLedgerMain"><span className="plugMoneyLedgerStatus">{item.status}</span><strong>{item.product}</strong><small>{item.customerName} · #{item.id.slice(0,8).toUpperCase()} · {dateLabel(item.createdAt)}</small></div><div className="plugMoneyLedgerNumbers"><span>Reference <b>{reference===null?"Not listed":money(reference)}</b></span><span>Quote <b>{typeof item.quotedPrice==="number"?money(item.quotedPrice):"Pending"}</b></span><span>Paid <b>{money(paid)}</b></span></div><button type="button" className="button buttonLight" onClick={()=>onOpenRequest(item)}>Open request ↗</button></article>})}</div>:<p className="orderTruth">No sourcing requests are visible yet. Refresh records or check the request service connection.</p>}
   </section>
 
