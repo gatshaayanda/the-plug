@@ -6,9 +6,9 @@ function selectedItems(notes:string){const match=notes.match(/Selected storefron
 function printRecord(){window.print()}
 type ReceiptRow={key:string;request:PlugRequest;payment:PlugPaymentRecord;legacy:boolean};
 export default function CustomerReceipts({requests}:{requests:PlugRequest[]}){
- const paymentRows:ReceiptRow[]=requests.flatMap(request=>{
+ const paymentRows:ReceiptRow[]=requests.flatMap<ReceiptRow>(request=>{
   if(request.paymentRecords?.length)return request.paymentRecords.map((payment,index)=>({key:payment.id||request.id+"-"+index,request,payment,legacy:false}));
-  if(typeof request.depositPaid==="number"&&request.depositPaid>0)return [{key:request.id+"-legacy",request,payment:{id:"LEGACY",amount:request.depositPaid,part:"deposit",method:request.depositMethod??"Other",reference:request.depositReference,recordedAt:request.depositRecordedAt??""},legacy:true}];
+  if(typeof request.depositPaid==="number"&&request.depositPaid>0)return [{key:request.id+"-legacy",request,payment:{id:"LEGACY",amount:request.depositPaid,part:"deposit" as const,method:request.depositMethod??"Other",reference:request.depositReference,recordedAt:request.depositRecordedAt??""},legacy:true}];
   return [];
  }).sort((a,b)=>b.payment.recordedAt.localeCompare(a.payment.recordedAt));
  const sortedRequests=[...requests].sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt));
