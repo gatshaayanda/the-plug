@@ -1829,3 +1829,7 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
  .adminPage .queueActions{justify-content:space-between;align-items:center}
  .adminPage .queueActions .button{min-width:126px;min-height:44px}
 }
+
+/* Briefcase navigation must precede owner controls and all workspace panels. */
+.adminPage .adminShell>.plugBriefcaseNav{order:1}
+.adminPage .adminShell>.plugOwnerShift{order:2}
