@@ -1862,3 +1862,43 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .adminPage .plugVercelState strong{font-size:.82rem}
 .adminPage .plugVercelBreakdown>p,.adminPage .plugVercelTrend>p{color:#64748b;font-size:.76rem}
 @media(max-width:700px){.adminPage .plugVercelBreakdowns{grid-template-columns:1fr}.adminPage .plugVercelTrafficHead{flex-direction:column}.adminPage .plugVercelTrafficHead .button{width:100%}}
+
+
+/* Customer account request guidance: keep these surfaces clean white, without dark or tinted card contrast. */
+.accountHome .accountRequestStage,
+.accountHome .plugAccountBuilderEmpty,
+.accountHome .feedEmpty,
+.accountHome .feedNext {
+  background: #fff !important;
+  color: #171717;
+  border-color: transparent !important;
+  border-radius: 0;
+  box-shadow: none !important;
+}
+.accountHome .accountRequestStage {
+  padding: 16px 0;
+}
+.accountHome .plugAccountBuilderEmpty {
+  padding: 16px 0;
+}
+.accountHome .feedEmpty {
+  padding: 16px 0;
+}
+.accountHome .feedEmpty p,
+.accountHome .feedNext small,
+.accountHome .plugAccountBuilderEmpty p {
+  color: #555 !important;
+}
+.accountHome .feedNext {
+  padding: 16px 0;
+  border-top: 1px solid #ededed !important;
+}
+.accountHome .plugSelectionReviewItems article,
+.accountHome .plugSelectionReviewTotal,
+.accountHome .accountRequestReference {
+  background: #fff;
+  box-shadow: none;
+}
+.accountHome .accountRequestReference {
+  border-color: #ededed;
+}
