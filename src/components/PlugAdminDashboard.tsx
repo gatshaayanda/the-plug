@@ -2,7 +2,7 @@
 import Link from "next/link";
 import {useEffect,useMemo,useState} from "react";
 import {getIdToken} from "firebase/auth";
-import {addDoc,collection,doc,onSnapshot,setDoc,updateDoc} from "firebase/firestore";
+import {addDoc,collection,doc,onSnapshot,updateDoc} from "firebase/firestore";
 import {auth,db} from "@/lib/firebase/client";
 import AdminConversations from "@/components/AdminConversations";
 import {subscribeToAllPlugRequests,updatePlugRequest,type PlugRequest,type PlugRequestStatus,PLUG_REQUEST_STATUSES} from "@/lib/firebase/plug-data";
@@ -20,28 +20,25 @@ export default function PlugAdminDashboard(){
  useEffect(()=>onSnapshot(collection(db,"customerRewards"),snapshot=>setIssuedRewards(snapshot.docs.map(d=>({id:d.id,...d.data()} as IssuedReward)).sort((a,b)=>b.issuedAt.localeCompare(a.issuedAt))),()=>setRewardNotice("Customer rewards could not be loaded. Check the customerRewards rules.")),[]);
  useEffect(()=>{return onSnapshot(collection(db,"customerJourneyEvents"),snapshot=>{setJourneyEvents(snapshot.docs.map(d=>({id:d.id,...d.data()} as JourneyEvent)).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)));setAnalyticsNotice("");},()=>setAnalyticsNotice("Journey analytics are not available yet. Confirm the Firebase rules are published for customerJourneyEvents and that server analytics credentials are configured."))},[]);
  useEffect(()=>{
-  const uid=auth.currentUser?.uid;
-  if(!uid){setNotesReady(true);setNotesStatus("Owner session unavailable.");return}
-  return onSnapshot(doc(db,"ownerWorkspace",uid),snapshot=>{
-   if(snapshot.exists()){
-    const stored=snapshot.data().notes;
-    setOwnerNotes(typeof stored==="string"?stored:"");
-   }else{
-    try{setOwnerNotes(window.localStorage.getItem("the-plug:owner-notes:v1:"+uid)||"")}catch{setOwnerNotes("")}
-   }
-   setNotesCanSave(true);setNotesReady(true);setNotesStatus("Private owner storage connected.");
-  },()=>{
-   setNotesCanSave(false);setNotesReady(true);setNotesStatus("Private notes could not reach owner-only storage.");
-  });
+  let live=true;
+  const user=auth.currentUser;
+  if(!user){setNotesReady(true);setNotesStatus("Owner session unavailable.");return}
+  void getIdToken(user).then(token=>fetch("/api/admin/owner-notes",{headers:{Authorization:"Bearer "+token},cache:"no-store"}))
+   .then(async response=>{
+    const payload=await response.json() as {notes?:string;error?:string};
+    if(!response.ok)throw new Error(payload.error||"Private notes could not be loaded.");
+    if(live){setOwnerNotes(typeof payload.notes==="string"?payload.notes:"");setNotesCanSave(true);setNotesReady(true);setNotesStatus("Private owner storage connected.");}
+   }).catch(()=>{if(live){setNotesCanSave(false);setNotesReady(true);setNotesStatus("Private owner storage could not be reached.");}});
+  return ()=>{live=false};
  },[]);
  useEffect(()=>{
-  const uid=auth.currentUser?.uid;
-  if(!notesReady||!notesCanSave||!uid)return;
+  const user=auth.currentUser;
+  if(!notesReady||!notesCanSave||!user)return;
   const timeout=window.setTimeout(()=>{
    setNotesStatus("Saving private notes…");
-   void setDoc(doc(db,"ownerWorkspace",uid),{notes:ownerNotes,updatedAt:new Date().toISOString()},{merge:true})
-    .then(()=>setNotesStatus("Saved to your private owner workspace."))
-    .catch(()=>setNotesStatus("Save failed. Check owner-only Firestore access."));
+   void getIdToken(user).then(token=>fetch("/api/admin/owner-notes",{method:"PUT",headers:{Authorization:"Bearer "+token,"Content-Type":"application/json"},body:JSON.stringify({notes:ownerNotes})}))
+    .then(async response=>{if(!response.ok){const payload=await response.json().catch(()=>({}));throw new Error(payload.error||"Save failed");}setNotesStatus("Saved to your private owner workspace.");})
+    .catch(()=>setNotesStatus("Save failed. Check owner access and server storage."));
   },650);
   return ()=>window.clearTimeout(timeout);
  },[ownerNotes,notesReady,notesCanSave]);
