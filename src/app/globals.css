@@ -1729,3 +1729,82 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
     width:100%;
   }
 }
+
+/* The Plug owner finance: explicit money stages, traceable requests and synced expenses. */
+.plugMoneyDashboard{display:grid;gap:16px}
+.plugMoneyDashboard>.journeyAnalytics{margin:0}
+.plugMoneyHeading{align-items:flex-start;gap:16px}
+.plugMoneySync{display:grid;justify-items:end;gap:6px;min-width:150px}
+.plugMoneySync small{color:#64748b;font-size:.68rem;text-align:right}
+.plugMoneySyncBadge{display:inline-flex;align-items:center;padding:5px 9px;border-radius:999px;font-size:.63rem;font-weight:900;letter-spacing:.09em}
+.plugMoneySyncBadge.ready{background:#dcfce7;color:#166534}
+.plugMoneySyncBadge.pending{background:#fef3c7;color:#92400e}
+.plugMoneySyncBadge.error{background:#fee2e2;color:#991b1b}
+.plugFinanceSectionLabel{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:16px 0 9px;color:#475569;font-size:.68rem;font-weight:900;letter-spacing:.12em}
+.plugFinanceSectionLabel small{font-size:.68rem;font-weight:650;letter-spacing:0;color:#64748b}
+.plugMoneyDashboard .plugFinancePulse article,.plugMoneyDashboard .plugFinanceGrid article{min-width:0;border:1px solid #d7dee8;border-radius:12px;background:#fff;color:#111827;padding:14px;box-shadow:0 3px 12px rgba(15,23,42,.045)}
+.plugMoneyDashboard .plugFinancePulse article span,.plugMoneyDashboard .plugFinanceGrid article span{display:block;color:#475569;font-size:.72rem;font-weight:750;line-height:1.4}
+.plugMoneyDashboard .plugFinancePulse article strong,.plugMoneyDashboard .plugFinanceGrid article strong{display:block;margin-top:7px;color:#080b10;font-size:1.35rem;font-weight:900;line-height:1.15;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.plugMoneyDashboard .plugFinanceGrid article strong{font-size:1.18rem}
+.plugMoneyDashboard .plugFinancePulse article small,.plugMoneyDashboard .plugFinanceGrid article small{display:block;margin-top:7px;color:#64748b;font-size:.67rem;line-height:1.45}
+.plugMoneyDashboard .plugFinanceFootnote{margin:12px 0 0;color:#64748b;font-size:.7rem;line-height:1.55}
+.plugMoneyLedger{display:grid;gap:10px}
+.plugMoneyLedger article{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(180px,1fr) auto;align-items:center;gap:14px;padding:14px;border:1px solid #d7dee8;border-radius:12px;background:#fff;color:#111827}
+.plugMoneyLedgerMain{display:grid;gap:5px;min-width:0}
+.plugMoneyLedgerMain>strong{color:#080b10;font-size:.9rem;line-height:1.35;overflow-wrap:anywhere}
+.plugMoneyLedgerMain>small{color:#64748b;font-size:.69rem;line-height:1.4}
+.plugMoneyLedgerStatus{width:max-content;max-width:100%;padding:4px 7px;border-radius:6px;background:#eff6ff;color:#1d4ed8;font-size:.62rem;font-weight:900;overflow-wrap:anywhere}
+.plugMoneyLedgerNumbers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.plugMoneyLedgerNumbers span{display:grid;gap:3px;color:#64748b;font-size:.62rem}
+.plugMoneyLedgerNumbers b{color:#111827;font-size:.75rem;font-weight:900;overflow-wrap:anywhere}
+.plugMoneyLedger article>.button{min-height:40px;padding:9px 11px;border:1px solid #111827;background:#111827;color:#fff;font-size:.7rem;font-weight:850;white-space:nowrap}
+.plugMoneyLedger article>.button:hover{background:#0866ff;border-color:#0866ff;color:#fff}
+.plugExpenseForm{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.plugExpenseForm label{display:grid;gap:6px;min-width:0;color:#1f2937;font-size:.75rem;font-weight:800}
+.plugExpenseForm input,.plugExpenseForm select,.plugExpenseForm textarea{width:100%;min-width:0;min-height:42px;padding:10px 11px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;color:#111827;font:inherit;font-size:.82rem}
+.plugExpenseForm input:focus,.plugExpenseForm select:focus,.plugExpenseForm textarea:focus{outline:3px solid #2563eb33;border-color:#2563eb}
+.plugExpenseForm input[type=file]{padding:8px;background:#f8fafc}
+.plugExpenseForm label small{color:#64748b;font-size:.67rem;font-weight:600;overflow-wrap:anywhere}
+.plugExpenseWide{grid-column:1/-1}
+.plugExpenseSave{margin-top:12px;min-height:43px}
+.plugExpenseNotice{padding:10px 12px;border:1px solid #bfdbfe;border-radius:9px;background:#eff6ff;color:#1e3a8a;font-size:.75rem;line-height:1.5}
+.plugExpenseSummary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
+.plugExpenseSummary>div{display:grid;gap:5px;padding:13px;border:1px solid #d7dee8;border-radius:11px;background:#fff}
+.plugExpenseSummary span{color:#475569;font-size:.7rem;font-weight:800}
+.plugExpenseSummary strong{color:#080b10;font-size:1.25rem;font-weight:900;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.plugExpenseSummary small{color:#64748b;font-size:.65rem;line-height:1.4}
+.plugExpenseList{display:grid;gap:8px;margin-top:16px}
+.plugExpenseListHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.plugExpenseListHead>strong{color:#111827;font-size:.84rem}
+.plugExpenseList article{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:12px;padding:12px;border:1px solid #d7dee8;border-radius:10px;background:#fff;color:#111827}
+.plugExpenseList article>div{display:grid;gap:4px;min-width:0}
+.plugExpenseList article>div strong{color:#080b10;font-size:.82rem}
+.plugExpenseList article>div small{color:#64748b;font-size:.67rem;line-height:1.4;overflow-wrap:anywhere}
+.plugExpenseList article>div a{color:#1d4ed8;font-size:.7rem;font-weight:800}
+.plugExpenseList article>strong{color:#111827;font-size:.85rem;font-weight:900;white-space:nowrap}
+.plugExpenseList article>.button{min-height:34px;padding:7px 9px;font-size:.67rem}
+@media(max-width:760px){
+ .plugMoneyHeading{display:grid}
+ .plugMoneySync{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;min-width:0}
+ .plugMoneySync small{text-align:left}
+ .plugMoneyLedger article{grid-template-columns:minmax(0,1fr);gap:10px}
+ .plugMoneyLedgerNumbers{max-width:460px}
+ .plugMoneyLedger article>.button{width:100%}
+}
+@media(max-width:520px){
+ .plugFinanceSectionLabel{align-items:flex-start;flex-direction:column;gap:3px}
+ .plugMoneyDashboard .plugFinancePulse,.plugMoneyDashboard .plugFinanceGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .plugMoneyDashboard .plugFinancePulse article,.plugMoneyDashboard .plugFinanceGrid article{padding:11px}
+ .plugMoneyDashboard .plugFinancePulse article strong{font-size:1.15rem}
+ .plugMoneyDashboard .plugFinanceGrid article strong{font-size:1rem}
+ .plugExpenseForm{grid-template-columns:1fr}
+ .plugExpenseWide{grid-column:auto}
+ .plugExpenseSummary{grid-template-columns:1fr}
+ .plugExpenseListHead{align-items:flex-start;flex-direction:column}
+ .plugExpenseList article{grid-template-columns:minmax(0,1fr) auto;gap:8px}
+ .plugExpenseList article>.button{grid-column:1/-1;width:100%}
+}
+@media print{
+ .plugMoneySync,.plugExpenseForm,.plugExpenseSave,.plugExpenseListHead button,.plugExpenseList article>.button,.plugMoneyLedger article>.button{display:none!important}
+ .plugMoneyDashboard .journeyAnalytics{break-inside:avoid;box-shadow:none}
+}
