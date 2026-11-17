@@ -3,3 +3,10 @@
 /* Persistent installation entry point, matching the working Odi PWA pattern. */
 .plugPwaInstallButton{position:fixed;left:16px;right:16px;bottom:16px;z-index:999;max-width:720px;margin:0 auto;border:1px solid #0866FF;border-radius:14px;padding:14px 17px;background:#0866FF;color:#fff;font:inherit;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(8,102,255,.24)}
 @media(min-width:700px){.plugPwaInstallButton{left:auto;right:18px;bottom:18px;width:auto}}
+
+/* Offline status stays clear of the app's bottom navigation and install action. */
+.offlineBanner{top:calc(10px + env(safe-area-inset-top));bottom:auto;left:50%;right:auto;transform:translateX(-50%);width:min(760px,calc(100% - 24px));padding:10px 14px;border-color:#b8d2ff;border-radius:14px;font-size:.76rem;line-height:1.45;font-weight:750;box-shadow:0 8px 24px rgba(13,35,70,.12)}
+.offlineBanner span{color:#0866FF}
+.reconnectingBanner{border-color:#a8dfc0;background:#f5fff8}
+.reconnectingBanner span{color:#16834a}
+@media(max-width:560px){.offlineBanner{font-size:.7rem;padding:9px 12px;line-height:1.4}}
