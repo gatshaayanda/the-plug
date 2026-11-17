@@ -36,6 +36,8 @@ export type PlugRequest = {
   quotedPrice?:number;
   depositRequired?:number;
   depositPaid?:number;
+  depositReceived?:number;
+  balanceReceived?:number;
   depositRecordedAt?:string;
   depositMethod?:"Cash"|"Bank transfer"|"Mobile money"|"Other";
   depositReference?:string;
