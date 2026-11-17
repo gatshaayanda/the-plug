@@ -27,7 +27,7 @@ export async function GET(request:Request){
   const role=String(admin.data()?.role||"").toLowerCase();
   if(!admin.exists||!["owner","staff"].includes(role))return NextResponse.json({error:"Only authorized Operations staff can view sourcing requests."},{status:403});
   const snapshot=await db.collection("sourcingRequests").get();
-  const requests=snapshot.docs.map(item=>({id:item.id,...item.data()})).sort((a,b)=>String(b.updatedAt||b.createdAt||"").localeCompare(String(a.updatedAt||a.createdAt||"")));
+  const requests=snapshot.docs.map(item=>({id:item.id,...item.data()} as Record<string,unknown>)).sort((left,right)=>String(right.updatedAt||right.createdAt||"").localeCompare(String(left.updatedAt||left.createdAt||"")));
   return NextResponse.json({requests,checkedAt:new Date().toISOString(),count:requests.length},{headers:{"Cache-Control":"no-store, max-age=0"}});
  }catch(error){
   console.error("[The Plug] Operations request sync failed:",error);
