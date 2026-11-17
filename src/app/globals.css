@@ -1614,3 +1614,118 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .plugCustomerShareButton span{margin-left:auto}
 .plugCustomerShareNotice{margin:0;color:#b8c9e8;font-size:.72rem;line-height:1.5;overflow-wrap:anywhere}
 @media(max-width:520px){.plugCustomerShare{padding:13px;gap:12px}.plugCustomerShareControls{grid-template-columns:1fr 1fr;gap:8px}.plugCustomerShareControls select{font-size:.75rem;padding-left:9px}.plugCustomerShareSummary{grid-template-columns:1fr 1fr}.plugCustomerShareSummary>span:last-child{grid-column:1/-1;padding-top:7px;border-top:1px solid #303a4a}.plugCustomerShareSummary strong{font-size:.74rem}}
+
+
+/* High-contrast customer directory cards: readable at a glance on mobile. */
+.adminPage .plugCustomerList{gap:12px}
+.adminPage .plugCustomerList article{
+  align-items:center;
+  gap:16px;
+  padding:16px;
+  border:1px solid #cbd5e1;
+  border-radius:14px;
+  background:#fff;
+  color:#111827;
+  box-shadow:0 5px 16px rgba(15,23,42,.07);
+}
+.adminPage .plugCustomerList article>div:first-child{
+  display:grid;
+  gap:7px;
+  min-width:0;
+  flex:1 1 auto;
+}
+.adminPage .plugCustomerList article>div:first-child strong{
+  color:#080b10;
+  font-size:1.02rem;
+  font-weight:900;
+  line-height:1.25;
+  overflow-wrap:anywhere;
+}
+.adminPage .plugCustomerList article>div:first-child small{
+  color:#374151;
+  font-size:.84rem;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+}
+.adminPage .plugCustomerList article>div:first-child small:last-child{
+  margin-top:3px;
+  padding:9px 11px;
+  border-left:4px solid #0866ff;
+  border-radius:7px;
+  background:#f1f5ff;
+  color:#111827;
+  font-size:.91rem;
+  font-weight:800;
+  line-height:1.45;
+}
+.adminPage .plugCustomerList .plugCustomerMeta{
+  gap:7px;
+  min-width:160px;
+}
+.adminPage .plugCustomerList .plugCustomerMeta b{
+  color:#111827;
+  font-size:.9rem;
+  font-weight:900;
+}
+.adminPage .plugCustomerList .plugCustomerMeta small{
+  color:#374151;
+  font-size:.76rem;
+  line-height:1.4;
+}
+.adminPage .plugCustomerList .plugCustomerMeta .button{
+  min-height:42px;
+  padding:10px 13px;
+  border:1px solid #111827;
+  border-radius:9px;
+  background:#111827;
+  color:#fff;
+  font-size:.78rem;
+  font-weight:850;
+  white-space:normal;
+}
+.adminPage .plugCustomerList .plugCustomerMeta .button:hover{
+  background:#0866ff;
+  border-color:#0866ff;
+  color:#fff;
+}
+.adminPage .plugCustomerList .plugCustomerMeta .button:focus-visible{
+  outline:3px solid #0866ff;
+  outline-offset:3px;
+}
+@media(max-width:600px){
+  .adminPage .plugCustomerList article{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    align-items:stretch;
+    gap:12px;
+    padding:14px;
+  }
+  .adminPage .plugCustomerList .plugCustomerMeta{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    justify-items:start;
+    align-items:center;
+    min-width:0;
+    text-align:left;
+    padding-top:10px;
+    border-top:1px solid #e5e7eb;
+  }
+  .adminPage .plugCustomerList .plugCustomerMeta small{
+    grid-column:1;
+  }
+  .adminPage .plugCustomerList .plugCustomerMeta .button{
+    grid-column:2;
+    grid-row:1 / span 2;
+    max-width:100%;
+  }
+}
+@media(max-width:360px){
+  .adminPage .plugCustomerList .plugCustomerMeta{
+    grid-template-columns:1fr;
+  }
+  .adminPage .plugCustomerList .plugCustomerMeta .button{
+    grid-column:1;
+    grid-row:auto;
+    width:100%;
+  }
+}
