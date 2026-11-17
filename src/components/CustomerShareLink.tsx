@@ -46,14 +46,14 @@ export default function CustomerShareLink(){
    <div><span className="kicker">CUSTOMER INVITE</span><strong>Prepare a My Plug invite</strong><small>Choose the customer’s language and market. Their matching currency is added automatically.</small></div>
   </header>
   <div className={styles.setup}>
-   <div className={styles.step}><span className={styles.stepIcon}><SlidersHorizontal size={15} aria-hidden="true"/></span><div><strong>1. Set up the invite</strong><small>These are the settings you can change.</small></div><span className={styles.editTag}>EDIT SETTINGS</span></div>
+   <div className={styles.step}><span className={styles.stepIcon}><SlidersHorizontal size={15} aria-hidden="true"/></span><div><strong>1. Set up the invite</strong><small>CHANGE THESE TWO SETTINGS. Currency follows the selected market automatically.</small></div><span className={styles.editTag}>TAP TO EDIT</span></div>
    <div className={styles.controls}>
     <label><span><Languages size={14} aria-hidden="true"/> Language</span><select value={language} onChange={event=>{setLanguage(getLanguage(event.target.value));setShared(false);setNotice("")}}>{STOREFRONT_LANGUAGES.map(item=><option key={item.code} value={item.code}>{item.nativeName}</option>)}</select></label>
     <label><span><Globe2 size={14} aria-hidden="true"/> Country / market</span><select value={marketCode} onChange={event=>{setMarketCode(getMarket(event.target.value).code);setShared(false);setNotice("")}}>{STOREFRONT_MARKETS.map(item=><option key={item.code} value={item.code}>{item.flag} {item.name} · {item.currency}</option>)}</select></label>
    </div>
   </div>
   <div className={styles.preview}>
-   <div className={styles.step}><span className={styles.stepIcon+" "+styles.eye}><Eye size={15} aria-hidden="true"/></span><div><strong>2. Customer preview</strong><small>This is what the customer’s invite settings will look like — nothing to press here.</small></div><span className={styles.previewTag}>PREVIEW ONLY</span></div>
+   <div className={styles.step}><span className={styles.stepIcon+" "+styles.eye}><Eye size={15} aria-hidden="true"/></span><div><strong>2. Customer preview</strong><small>LOOK ONLY — this is a preview of the customer’s account language, market and currency. It is not a button.</small></div><span className={styles.previewTag}>LOOK · NO ACTION</span></div>
    <div className={styles.previewCard}>
     <div className={styles.previewBrand}><span className={styles.previewMark}>P</span><span>THE PLUG <small>MY PLUG</small></span></div>
     <strong className={styles.previewTitle}>{preview.account}</strong>
@@ -67,8 +67,8 @@ export default function CustomerShareLink(){
    </div>
   </div>
   <div className={styles.shareStep}>
-   <div className={styles.step}><span className={styles.stepIcon+" "+styles.shareIcon}><Share2 size={15} aria-hidden="true"/></span><div><strong>3. Share the invite</strong><small>Press the blue button when the preview looks right.</small></div></div>
-   <button type="button" className="button buttonPrimary plugCustomerShareButton" onClick={()=>void share()}>{shared?<Check size={17} aria-hidden="true"/>:<Share2 size={17} aria-hidden="true"/>}{shared?"Share again":"Share customer link"} <span aria-hidden="true">↗</span></button>
+   <div className={styles.step}><span className={styles.stepIcon+" "+styles.shareIcon}><Share2 size={15} aria-hidden="true"/></span><div><strong>3. Share the invite</strong><small>READY? Press the blue button to create and share this customer’s invite link.</small></div></div>
+   <button type="button" className="button buttonPrimary plugCustomerShareButton" onClick={()=>void share()}>{shared?<Check size={17} aria-hidden="true"/>:<Share2 size={17} aria-hidden="true"/>}{shared?"Share again":"Share customer invite"} <span aria-hidden="true">↗</span></button>
    {notice&&<p className="plugCustomerShareNotice" role="status">{notice}</p>}
   </div>
  </section>;
