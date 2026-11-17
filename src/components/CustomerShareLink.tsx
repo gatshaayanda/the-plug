@@ -20,11 +20,12 @@ export default function CustomerShareLink(){
   url.searchParams.set("currency",market.currency);
   url.searchParams.set("market",market.code);
   const link=url.toString();
+  const usedNativeShare=typeof navigator.share === "function";
   try{
-   if(navigator.share){await navigator.share({title:"The Plug · My Plug",text:"Open The Plug to send your sourcing request.",url:link});}
+   if(usedNativeShare){await navigator.share({title:"The Plug · My Plug",text:"Open The Plug to send your sourcing request.",url:link});}
    else{await navigator.clipboard.writeText(link);}
    setShared(true);
-   setNotice((navigator.share?"Customer link shared":"Customer link copied")+" · "+market.name+" · "+market.currency+" · "+languageLabel);
+   setNotice((usedNativeShare?"Customer link shared":"Customer link copied")+" · "+market.name+" · "+market.currency+" · "+languageLabel);
   }catch(error){
    if(error instanceof Error&&error.name==="AbortError")return;
    setNotice("Sharing is unavailable in this browser. Copy this link: "+link);
