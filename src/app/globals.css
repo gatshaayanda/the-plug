@@ -1591,3 +1591,26 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .plugCustomerShare .orderTruth{margin:0;font-size:.72rem;overflow-wrap:anywhere}
 .plugCustomerPreferenceLine{display:block;margin:5px 0 8px;color:#9ca8c4;font-size:.72rem;font-weight:750}
 @media(max-width:520px){.plugOwnerShiftSummary{gap:8px;padding:12px}.plugShiftManage{font-size:.66rem}.plugOwnerShiftControls{align-items:stretch}.plugOwnerShiftControls label,.plugOwnerShiftControls select{width:100%}.plugOwnerShiftControls .button{width:100%}.plugCustomerShareControls{display:grid;grid-template-columns:1fr 1fr}.plugCustomerShareControls label,.plugCustomerShareControls select{min-width:0;width:100%}.plugCustomerShareControls .button{grid-column:1/-1;width:100%}}
+
+
+/* Customer invite: match the storefront's real four-language and six-market settings. */
+.plugCustomerShare{display:grid;gap:14px;margin:0 0 18px;padding:17px;border:1px solid #343b49;border-radius:16px;background:linear-gradient(145deg,#171c27 0%,#111318 72%);color:#f8f9fc;box-shadow:0 12px 28px rgba(0,0,0,.18)}
+.plugCustomerShareHeader{display:flex;align-items:flex-start;gap:12px}
+.plugCustomerShareIcon{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border-radius:11px;background:#0866ff1c;color:#75a5ff;border:1px solid #0866ff55}
+.plugCustomerShareHeader>div:last-child{display:grid;gap:4px;min-width:0}
+.plugCustomerShareHeader .kicker{font-size:.64rem;color:#83aaff;letter-spacing:.14em}
+.plugCustomerShareHeader strong{font-size:1rem;line-height:1.2;color:#fff}
+.plugCustomerShareHeader small{max-width:620px;color:#aeb7c8;font-size:.76rem;line-height:1.5}
+.plugCustomerShareControls{display:grid;grid-template-columns:1fr 1.35fr;gap:10px}
+.plugCustomerShareControls label{display:grid;gap:7px;min-width:0;color:#cbd3e1;font-size:.72rem;font-weight:850}
+.plugCustomerShareControls label>span{display:flex;align-items:center;gap:6px}
+.plugCustomerShareControls select{width:100%;min-width:0;min-height:46px;padding:10px 34px 10px 12px;border:1px solid #414b5d;border-radius:10px;background:#0d1119;color:#fff;font-size:.83rem;font-weight:750}
+.plugCustomerShareControls select:focus-visible,.plugCustomerShareButton:focus-visible{outline:3px solid #80aaff;outline-offset:3px}
+.plugCustomerShareSummary{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:8px;padding:11px;border:1px solid #303a4a;border-radius:12px;background:#0d1119}
+.plugCustomerShareSummary>span{display:grid;gap:4px;min-width:0}
+.plugCustomerShareSummary small{color:#8996aa;font-size:.59rem;font-weight:900;letter-spacing:.1em}
+.plugCustomerShareSummary strong{color:#f2f5fb;font-size:.78rem;line-height:1.35;overflow-wrap:anywhere}
+.plugCustomerShareButton{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:46px}
+.plugCustomerShareButton span{margin-left:auto}
+.plugCustomerShareNotice{margin:0;color:#b8c9e8;font-size:.72rem;line-height:1.5;overflow-wrap:anywhere}
+@media(max-width:520px){.plugCustomerShare{padding:13px;gap:12px}.plugCustomerShareControls{grid-template-columns:1fr 1fr;gap:8px}.plugCustomerShareControls select{font-size:.75rem;padding-left:9px}.plugCustomerShareSummary{grid-template-columns:1fr 1fr}.plugCustomerShareSummary>span:last-child{grid-column:1/-1;padding-top:7px;border-top:1px solid #303a4a}.plugCustomerShareSummary strong{font-size:.74rem}}
