@@ -1833,3 +1833,32 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 /* Briefcase navigation must precede owner controls and all workspace panels. */
 .adminPage .adminShell>.plugBriefcaseNav{order:1}
 .adminPage .adminShell>.plugOwnerShift{order:2}
+
+/* Vercel traffic report, adapted from the BoardSignal founder analytics panel. */
+.adminPage .plugVercelTraffic{margin-top:16px;padding:16px;border:1px solid #d8e0e9;border-radius:12px;background:#fff;color:#172235}
+.adminPage .plugVercelTrafficHead{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.adminPage .plugVercelTrafficHead h3{margin:4px 0;font-size:1.15rem}
+.adminPage .plugVercelTrafficHead p,.adminPage .plugVercelState p{margin:4px 0;color:#536174;font-size:.82rem}
+.adminPage .plugVercelTrafficControls{display:flex;gap:7px;margin:14px 0}
+.adminPage .plugVercelTrafficControls button{padding:8px 12px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;color:#243247;font-size:.76rem;font-weight:800}
+.adminPage .plugVercelTrafficControls button.active{background:#1758a8;border-color:#1758a8;color:#fff}
+.adminPage .plugVercelMetrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.adminPage .plugVercelMetrics article{padding:13px;border:1px solid #dbe3ec;border-radius:9px;background:#f8fafc}
+.adminPage .plugVercelMetrics article span{display:block;color:#536174;font-size:.72rem;font-weight:800;text-transform:uppercase}
+.adminPage .plugVercelMetrics article strong{display:block;margin-top:4px;color:#101c2d;font-size:1.7rem}
+.adminPage .plugVercelTrend,.adminPage .plugVercelBreakdown{margin-top:16px}
+.adminPage .plugVercelTrend h4,.adminPage .plugVercelBreakdown h4{margin:0 0 10px;font-size:.88rem}
+.adminPage .plugVercelDay{display:grid;grid-template-columns:52px minmax(70px,1fr) 78px;align-items:center;gap:10px;min-height:35px;font-size:.72rem}
+.adminPage .plugVercelDay>i{height:24px;display:flex;align-items:flex-end;border-bottom:1px solid #dbe3ec;background:#f8fafc}
+.adminPage .plugVercelDay>i b{display:block;width:100%;min-height:3px;background:#2872c7;border-radius:3px 3px 0 0}
+.adminPage .plugVercelDay>strong{text-align:right;font-variant-numeric:tabular-nums}
+.adminPage .plugVercelBreakdowns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.adminPage .plugVercelBreakdownRow{margin:9px 0}
+.adminPage .plugVercelBreakdownRow>span{display:block;font-size:.75rem;font-weight:800;overflow-wrap:anywhere}
+.adminPage .plugVercelBreakdownRow small{display:block;color:#64748b;font-weight:500}
+.adminPage .plugVercelBreakdownRow i{display:block;height:5px;margin-top:5px;border-radius:8px;background:#e7edf4;overflow:hidden}
+.adminPage .plugVercelBreakdownRow i b{display:block;height:100%;background:#2872c7;border-radius:8px}
+.adminPage .plugVercelState{padding:12px;border:1px solid #e1e7ef;border-radius:8px;background:#f8fafc;color:#172235}
+.adminPage .plugVercelState strong{font-size:.82rem}
+.adminPage .plugVercelBreakdown>p,.adminPage .plugVercelTrend>p{color:#64748b;font-size:.76rem}
+@media(max-width:700px){.adminPage .plugVercelBreakdowns{grid-template-columns:1fr}.adminPage .plugVercelTrafficHead{flex-direction:column}.adminPage .plugVercelTrafficHead .button{width:100%}}
