@@ -45,7 +45,7 @@ self.addEventListener("notificationclick", (event) => {
   }));
 });
 
-const CACHE_VERSION = "theplug-shell-v15";
+const CACHE_VERSION = "theplug-shell-v16";
 const MEDIA_CACHE = "theplug-media-v1";
 const SHELL_CACHE = CACHE_VERSION;
 const STATIC_LIMIT = 100;
@@ -119,14 +119,27 @@ self.addEventListener("fetch", event => {
 
   if (isNavigation) {
     event.respondWith(fetch(request).then(response => {
-      if (response.ok) void caches.open(SHELL_CACHE).then(async cache => {
-        await cache.put(request, response.clone());
-        await trimCache(SHELL_CACHE, PUBLIC_PAGE_LIMIT + STATIC_LIMIT);
-      });
+      if (response.ok && response.headers.get("content-type")?.includes("text/html")) {
+        void caches.open(SHELL_CACHE).then(async cache => {
+          // Keep the exact URL (including its query) and a clean path copy. This lets
+          // a previously visited public screen reopen offline without serving a
+          // different screen or leaking member-specific HTML.
+          await cache.put(request, response.clone());
+          if (!url.search) {
+            const cleanPath = new Request(url.origin + url.pathname);
+            await cache.put(cleanPath, response.clone());
+          }
+          await trimCache(SHELL_CACHE, PUBLIC_PAGE_LIMIT + STATIC_LIMIT);
+        });
+      }
       return response;
     }).catch(async () => {
       const cache = await caches.open(SHELL_CACHE);
-      return await cache.match(request) || await cache.match("/") || await cache.match("/offline") || Response.error();
+      const exact = await cache.match(request);
+      if (exact) return exact;
+      const sameScreen = await cache.match(new Request(url.origin + url.pathname));
+      if (sameScreen) return sameScreen;
+      return await cache.match("/offline") || Response.error();
     }));
   }
 });
