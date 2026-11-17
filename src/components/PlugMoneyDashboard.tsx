@@ -1,0 +1,220 @@
+"use client";
+
+import {useEffect,useMemo,useState} from "react";
+import {addDoc,collection,deleteDoc,doc,onSnapshot,orderBy,query} from "firebase/firestore";
+import {auth,db} from "@/lib/firebase/client";
+import {uploadFiles} from "@/lib/uploadthing";
+import type {PlugRequest} from "@/lib/firebase/plug-data";
+
+type Expense={
+ id:string;
+ merchant:string;
+ category:string;
+ amount:number;
+ currency:"BWP";
+ date:string;
+ note:string;
+ createdAt:string;
+ receipt?:{url:string;name:string;type:string;size:number}|null;
+};
+type Props={
+ requests:PlugRequest[];
+ onOpenRequest:(request:PlugRequest)=>void;
+ requestSyncStatus:"connecting"|"live"|"server"|"error";
+ lastRequestSyncAt:string;
+ onRefreshRequests:()=>void;
+ refreshingRequests:boolean;
+};
+const terminal=new Set(["Delivered","Collected","Cancelled"]);
+const money=(value:number)=>"P"+(Number.isFinite(value)?value:0).toLocaleString("en-BW",{minimumFractionDigits:2,maximumFractionDigits:2});
+const validAmount=(value:unknown)=>typeof value==="number"&&Number.isFinite(value)&&value>0?value:0;
+function referenceValue(request:PlugRequest):number|null{
+ const notes=request.notes||"";
+ const basket=notes.split("Selected storefront items:\n")[1]?.split(/\n(?=[A-Z][^:\n]{0,90}:)/)[0]||"";
+ const itemPrices=[...basket.matchAll(/—\s*P\s*([\d,]+(?:\.\d{1,2})?)/g)].map(match=>Number(match[1].replace(/,/g,""))).filter(value=>Number.isFinite(value)&&value>0);
+ if(itemPrices.length)return itemPrices.reduce((sum,value)=>sum+value,0);
+ const listed=notes.match(/Storefront listed price when requested:\s*P\s*([\d,]+(?:\.\d{1,2})?)/i);
+ if(listed){const value=Number(listed[1].replace(/,/g,""));return Number.isFinite(value)&&value>0?value:null;}
+ return null;
+}
+function paymentBreakdown(request:PlugRequest){
+ const records=request.paymentRecords||[];
+ if(records.length){
+  return records.reduce((sum,item)=>{
+   const amount=validAmount(item.amount);
+   sum.total+=amount;
+   if(item.part==="deposit")sum.deposit+=amount;
+   else if(item.part==="balance")sum.balance+=amount;
+   else sum.unclassified+=amount;
+   return sum;
+  },{total:0,deposit:0,balance:0,unclassified:0});
+ }
+ const legacy=validAmount(request.depositPaid);
+ return {total:legacy,deposit:0,balance:0,unclassified:legacy};
+}
+function dateLabel(value:string){
+ const date=new Date(value);
+ return Number.isFinite(date.getTime())?date.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric",timeZone:"Africa/Gaborone"}):"Date not recorded";
+}
+function todayKey(){return new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Gaborone",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());}
+
+export default function PlugMoneyDashboard({requests,onOpenRequest,requestSyncStatus,lastRequestSyncAt,onRefreshRequests,refreshingRequests}:Props){
+ const [expenses,setExpenses]=useState<Expense[]>([]);
+ const [expensesLoading,setExpensesLoading]=useState(true);
+ const [expenseNotice,setExpenseNotice]=useState("");
+ const [merchant,setMerchant]=useState("");
+ const [category,setCategory]=useState("Operating costs");
+ const [amount,setAmount]=useState("");
+ const [expenseDate,setExpenseDate]=useState(todayKey());
+ const [expenseNote,setExpenseNote]=useState("");
+ const [receiptFile,setReceiptFile]=useState<File|null>(null);
+ const [savingExpense,setSavingExpense]=useState(false);
+ const [deletingExpense,setDeletingExpense]=useState("");
+
+ useEffect(()=>onSnapshot(query(collection(db,"businessExpenses"),orderBy("date","desc")),snapshot=>{
+  setExpenses(snapshot.docs.map(item=>({id:item.id,...item.data()} as Expense)));
+  setExpensesLoading(false);
+  setExpenseNotice("");
+ },()=>{
+  setExpensesLoading(false);
+  setExpenseNotice("Business expenses could not be loaded. Check that the latest Firestore rules are published and the Operations account is connected to the correct Firebase project.");
+ }),[]);
+
+ const summary=useMemo(()=>{
+  const eligible=requests.filter(item=>item.status!=="Cancelled");
+  const open=eligible.filter(item=>!terminal.has(item.status));
+  const quoted=eligible.filter(item=>typeof item.quotedPrice==="number"&&Number.isFinite(item.quotedPrice));
+  const approved=quoted.filter(item=>!!item.customerApprovedAt&&item.customerApprovedPrice===item.quotedPrice);
+  const fulfilled=eligible.filter(item=>["Delivered","Collected"].includes(item.status));
+  const referenceTotal=eligible.reduce((sum,item)=>sum+(referenceValue(item)||0),0);
+  const referenceCount=eligible.filter(item=>referenceValue(item)!==null).length;
+  const payments=eligible.reduce((sum,item)=>{const part=paymentBreakdown(item);sum.total+=part.total;sum.deposit+=part.deposit;sum.balance+=part.balance;sum.unclassified+=part.unclassified;return sum;},{total:0,deposit:0,balance:0,unclassified:0});
+  const approvedDepositDue=approved.reduce((sum,item)=>sum+(validAmount(item.depositRequired)||Math.round(validAmount(item.quotedPrice)*0.5*100)/100),0);
+  const quotedOpen=open.reduce((sum,item)=>sum+validAmount(item.quotedPrice),0);
+  const approvedOpen=approved.filter(item=>!terminal.has(item.status)).reduce((sum,item)=>sum+validAmount(item.quotedPrice),0);
+  const fulfilledValue=fulfilled.reduce((sum,item)=>sum+validAmount(item.quotedPrice),0);
+  const outstanding=quoted.reduce((sum,item)=>sum+Math.max(0,validAmount(item.quotedPrice)-paymentBreakdown(item).total),0);
+  const completedUnpaid=fulfilled.reduce((sum,item)=>sum+Math.max(0,validAmount(item.quotedPrice)-paymentBreakdown(item).total),0);
+  const awaitingQuote=open.filter(item=>typeof item.quotedPrice!=="number").length;
+  const awaitingDeposit=approved.filter(item=>paymentBreakdown(item).total+0.009<(validAmount(item.depositRequired)||validAmount(item.quotedPrice)*0.5)).length;
+  const cutoff=Date.now()-30*24*60*60*1000;
+  const recent=requests.filter(item=>{const stamp=Date.parse(item.createdAt||"");return Number.isFinite(stamp)&&stamp>=cutoff;});
+  const demand=new Map<string,{count:number;value:number;priced:number}>();
+  eligible.forEach(item=>{
+   const entry=demand.get(item.product)||{count:0,value:0,priced:0};
+   entry.count+=1;
+   const reference=referenceValue(item);
+   if(reference!==null){entry.value+=reference;entry.priced+=1;}
+   demand.set(item.product,entry);
+  });
+  return {
+   requestedReferenceValue:referenceTotal,referenceCount,unpricedRequests:eligible.length-referenceCount,
+   quotedOpen,approvedOpen,fulfilledValue,payments,outstanding,completedUnpaid,
+   approvedDepositDue,depositGap:Math.max(0,approvedDepositDue-payments.deposit),
+   awaitingQuote,awaitingDeposit,fulfilled:fulfilled.length,
+   newRequests:recent.filter(item=>item.status==="New Request").length,
+   quotesPrepared:recent.filter(item=>typeof item.quotedPrice==="number").length,
+   activeJobs:recent.filter(item=>["Deposit Received","Sourcing","In Transit","Ready"].includes(item.status)).length,
+   completedRecent:recent.filter(item=>["Delivered","Collected"].includes(item.status)).length,
+   cancelledRecent:recent.filter(item=>item.status==="Cancelled").length,
+   demand:[...demand.entries()].map(([product,data])=>({product,...data})).sort((a,b)=>b.count-a.count).slice(0,6)
+  };
+ },[requests]);
+
+ const expenseTotal=useMemo(()=>expenses.reduce((sum,item)=>sum+validAmount(item.amount),0),[expenses]);
+ const recordedCashAfterExpenses=summary.payments.total-expenseTotal;
+ const latestRequests=useMemo(()=>[...requests].sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).slice(0,12),[requests]);
+
+ async function saveExpense(){
+  const value=Number(amount);
+  if(!merchant.trim()||!Number.isFinite(value)||value<=0||!expenseDate){setExpenseNotice("Enter a merchant, a valid amount and an expense date.");return;}
+  setSavingExpense(true);setExpenseNotice("");
+  try{
+   let receipt:Expense["receipt"]=null;
+   if(receiptFile){
+    const uploadedFiles=await uploadFiles("fileUploader",{files:[receiptFile]});
+    const uploaded=uploadedFiles[0] as (typeof uploadedFiles)[number]&{ufsUrl?:string;appUrl?:string};
+    const url=uploaded?.url||uploaded?.ufsUrl||uploaded?.appUrl;
+    if(!url)throw new Error("The receipt upload finished without a file link. The expense was not saved.");
+    receipt={url,name:receiptFile.name,type:receiptFile.type,size:receiptFile.size};
+   }
+   const now=new Date().toISOString();
+   await addDoc(collection(db,"businessExpenses"),{merchant:merchant.trim(),category,amount:value,currency:"BWP",date:expenseDate,note:expenseNote.trim(),createdAt:now,updatedAt:now,createdBy:auth.currentUser?.uid||"",receipt});
+   setMerchant("");setAmount("");setExpenseNote("");setReceiptFile(null);setExpenseDate(todayKey());
+   setExpenseNotice("Expense saved to the owner’s Firebase records.");
+  }catch(error){setExpenseNotice(error instanceof Error?error.message:"The expense could not be saved. Check the connection and Firestore rules.");}
+  finally{setSavingExpense(false);}
+ }
+ async function removeExpense(item:Expense){
+  if(!window.confirm("Delete the expense record for "+item.merchant+" ("+money(item.amount)+")?"))return;
+  setDeletingExpense(item.id);setExpenseNotice("");
+  try{await deleteDoc(doc(db,"businessExpenses",item.id));setExpenseNotice("Expense record deleted.");}
+  catch{setExpenseNotice("The expense could not be deleted. Check Operations permissions.");}
+  finally{setDeletingExpense("");}
+ }
+ const syncText=requestSyncStatus==="live"?"LIVE FIREBASE":requestSyncStatus==="server"?"SERVER VERIFIED":requestSyncStatus==="error"?"SYNC ERROR":"CONNECTING";
+ const syncClass=requestSyncStatus==="error"?"error":requestSyncStatus==="connecting"?"pending":"ready";
+
+ return <div className="plugMoneyDashboard">
+  <section className="journeyAnalytics">
+   <div className="panelHeading plugMoneyHeading"><div><span className="kicker">MONEY · OWNER RECONCILIATION</span><h2>Money &amp; records</h2><p className="orderTruth">Demand, approved quotes, fulfilment, actual recorded payments and business expenses are shown separately. Storefront prices are references—not quotes or money received.</p></div><div className="plugMoneySync"><span className={"plugMoneySyncBadge "+syncClass}>{syncText}</span><button type="button" className="button buttonLight" onClick={onRefreshRequests} disabled={refreshingRequests}>{refreshingRequests?"Refreshing…":"Refresh requests ↻"}</button><small>{lastRequestSyncAt?"Last checked "+new Date(lastRequestSyncAt).toLocaleTimeString():"Waiting for first sync"}</small></div></div>
+   <div className="plugFinanceSectionLabel"><span>BUSINESS PULSE · LAST 30 DAYS</span><small>Live request records</small></div>
+   <div className="journeyAnalyticsGrid plugFinancePulse">
+    <article><span>New requests</span><strong>{summary.newRequests}</strong></article>
+    <article><span>Quotes prepared</span><strong>{summary.quotesPrepared}</strong></article>
+    <article><span>Awaiting deposit</span><strong>{summary.awaitingDeposit}</strong></article>
+    <article><span>Active sourcing jobs</span><strong>{summary.activeJobs}</strong></article>
+    <article><span>Delivered / collected</span><strong>{summary.completedRecent}</strong></article>
+    <article><span>Cancelled</span><strong>{summary.cancelledRecent}</strong></article>
+   </div>
+  </section>
+
+  <section className="journeyAnalytics">
+   <div className="panelHeading"><div><span className="kicker">FINANCIAL RECONCILIATION · BWP</span><h2>From requests to collections</h2><p className="orderTruth">All-time totals from the recorded sourcing requests. Amounts are not treated as sales until quoted, approved or paid at the appropriate stage.</p></div></div>
+   <div className="journeyAnalyticsGrid plugFinanceGrid">
+    <article><span>Requested storefront reference value</span><strong>{money(summary.requestedReferenceValue)}</strong><small>{summary.referenceCount} priced requests · {summary.unpricedRequests} without a reference price</small></article>
+    <article><span>Open quoted value</span><strong>{money(summary.quotedOpen)}</strong><small>Quotes on active, non-cancelled requests</small></article>
+    <article><span>Customer-approved value</span><strong>{money(summary.approvedOpen)}</strong><small>Customer approved the current quote</small></article>
+    <article><span>Delivered / collected value</span><strong>{money(summary.fulfilledValue)}</strong><small>Quoted value marked fulfilled</small></article>
+    <article><span>Recorded payments</span><strong>{money(summary.payments.total)}</strong><small>Deposit {money(summary.payments.deposit)} · Balance {money(summary.payments.balance)}</small></article>
+    <article><span>Open quoted balance</span><strong>{money(summary.outstanding)}</strong><small>Confirmed quotes less all recorded payments</small></article>
+    <article><span>Completed · unpaid balance</span><strong>{money(summary.completedUnpaid)}</strong><small>Delivered / collected jobs not fully paid</small></article>
+    <article><span>Expected deposits on approved quotes</span><strong>{money(summary.approvedDepositDue)}</strong><small>Uses the recorded deposit requirement or 50% of quote</small></article>
+    <article><span>Deposit gap · classified deposits</span><strong>{money(summary.depositGap)}</strong><small>Legacy payments without a deposit/balance label are not assumed to be deposits</small></article>
+    <article><span>Payments not yet classified</span><strong>{money(summary.payments.unclassified)}</strong><small>Older payment records without a deposit or balance label</small></article>
+    <article><span>Requests awaiting a quote</span><strong>{summary.awaitingQuote}</strong><small>Open requests with no quote entered</small></article>
+    <article><span>Approved requests awaiting deposit</span><strong>{summary.awaitingDeposit}</strong><small>Approved quotes below the required deposit</small></article>
+   </div>
+   <p className="plugFinanceFootnote">Recorded payments are owner-entered acknowledgements, not bank-feed verification. The deposit gap is a follow-up estimate. Storefront reference prices can change and are never treated as confirmed quotes.</p>
+  </section>
+
+  <section className="journeyAnalytics">
+   <div className="panelHeading"><div><span className="kicker">CUSTOMER DEMAND · NON-CANCELLED</span><h2>What customers are asking for</h2></div></div>
+   {summary.demand.length?<div className="journeyAnalyticsProducts">{summary.demand.map(item=><div key={item.product}><span><b>{item.product}</b><small className="plugActivityMeta">{item.count} request{item.count===1?"":"s"} · {item.priced} with reference pricing</small></span><b>{money(item.value)}</b></div>)}</div>:<p className="orderTruth">Customer demand will appear here after the first sourcing request is recorded.</p>}
+  </section>
+
+  <section className="journeyAnalytics">
+   <div className="panelHeading"><div><span className="kicker">REQUEST LEDGER · LIVE RECORDS</span><h2>Every request, traceable</h2><p className="orderTruth">This is the request-level view behind the totals. Select a record to open it in Customers &amp; Jobs.</p></div><strong>{requests.length} records</strong></div>
+   {latestRequests.length?<div className="plugMoneyLedger">{latestRequests.map(item=>{const reference=referenceValue(item);const paid=paymentBreakdown(item).total;return <article key={item.id}><div className="plugMoneyLedgerMain"><span className="plugMoneyLedgerStatus">{item.status}</span><strong>{item.product}</strong><small>{item.customerName} · #{item.id.slice(0,8).toUpperCase()} · {dateLabel(item.createdAt)}</small></div><div className="plugMoneyLedgerNumbers"><span>Reference <b>{reference===null?"Not listed":money(reference)}</b></span><span>Quote <b>{typeof item.quotedPrice==="number"?money(item.quotedPrice):"Pending"}</b></span><span>Paid <b>{money(paid)}</b></span></div><button type="button" className="button buttonLight" onClick={()=>onOpenRequest(item)}>Open request ↗</button></article>})}</div>:<p className="orderTruth">No sourcing requests are visible yet. Refresh records or check the request service connection.</p>}
+  </section>
+
+  <section className="journeyAnalytics">
+   <div className="panelHeading"><div><span className="kicker">BUSINESS EXPENSES</span><h2>Record what it costs to operate</h2><p className="orderTruth">Save operating expenses with the source receipt attached. These owner records sync through Firebase across signed-in Operations devices.</p></div></div>
+   {expenseNotice&&<p className="plugExpenseNotice" role="status">{expenseNotice}</p>}
+   <div className="plugExpenseForm">
+    <label>Merchant / supplier<input value={merchant} onChange={event=>setMerchant(event.target.value)} placeholder="e.g. Courier, supplier or fuel"/></label>
+    <label>Expense category<select value={category} onChange={event=>setCategory(event.target.value)}><option>Operating costs</option><option>Transport &amp; delivery</option><option>Supplier payments</option><option>Marketing</option><option>Software &amp; hosting</option><option>Packaging</option><option>Equipment</option><option>Other</option></select></label>
+    <label>Amount (BWP)<input type="number" min="0.01" step="0.01" value={amount} onChange={event=>setAmount(event.target.value)} placeholder="0.00"/></label>
+    <label>Date<input type="date" value={expenseDate} onChange={event=>setExpenseDate(event.target.value)}/></label>
+    <label className="plugExpenseWide">Receipt image or PDF <input type="file" accept="image/*,application/pdf" onChange={event=>{const file=event.target.files?.[0]||null;if(file&&file.size>4*1024*1024){setExpenseNotice("Receipt files must be 4 MB or smaller.");setReceiptFile(null);event.target.value="";return;}setReceiptFile(file);setExpenseNotice("");}}/><small>{receiptFile?receiptFile.name:"Optional · UploadThing attachment · max 4 MB"}</small></label>
+    <label className="plugExpenseWide">Note (optional)<textarea rows={2} value={expenseNote} onChange={event=>setExpenseNote(event.target.value)} placeholder="What was this expense for?"/></label>
+   </div>
+   <button type="button" className="button buttonPrimary plugExpenseSave" disabled={savingExpense} onClick={()=>void saveExpense()}>{savingExpense?"Saving expense…":"Save expense record"}</button>
+   <div className="plugExpenseSummary"><div><span>Recorded expenses</span><strong>{money(expenseTotal)}</strong><small>{expenses.length} records · Firebase synced</small></div><div><span>Recorded payments less recorded expenses</span><strong>{money(recordedCashAfterExpenses)}</strong><small>Cash movement only · not profit or a tax calculation</small></div></div>
+   <div className="plugExpenseList"><div className="plugExpenseListHead"><strong>Expense records</strong><button type="button" className="button buttonLight" onClick={()=>window.print()}>Print / save statement</button></div>
+    {expensesLoading?<p className="orderTruth">Loading expense records…</p>:expenses.length?expenses.map(item=><article key={item.id}><div><strong>{item.merchant}</strong><small>{item.category} · {dateLabel(item.date)}{item.note?" · "+item.note:""}</small>{item.receipt&&<a href={item.receipt.url} target="_blank" rel="noreferrer">Open receipt ↗</a>}</div><strong>{money(item.amount)}</strong><button type="button" className="button buttonLight" disabled={deletingExpense===item.id} onClick={()=>void removeExpense(item)}>{deletingExpense===item.id?"Deleting…":"Delete"}</button></article>):<p className="orderTruth">No expenses recorded yet.</p>}
+   </div>
+   <p className="plugFinanceFootnote">This is an operational owner ledger, not a certified financial statement, tax invoice or bank reconciliation. Verify every payment and expense against its source record.</p>
+  </section>
+ </div>;
+}
