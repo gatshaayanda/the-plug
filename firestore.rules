@@ -502,6 +502,25 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    function isBusinessOwner() {
+      return isAdmin()
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role in ['owner', 'Owner'];
+    }
+
+    match /ownerWorkspace/{uid} {
+      // Owner notes are private to the owner identity; staff roles cannot read them.
+      allow read: if signedIn() && request.auth.uid == uid && isBusinessOwner();
+      allow create, update: if signedIn()
+        && request.auth.uid == uid
+        && isBusinessOwner()
+        && request.resource.data.keys().hasOnly(['notes', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['notes', 'updatedAt'])
+        && request.resource.data.notes is string
+        && request.resource.data.notes.size() <= 12000
+        && request.resource.data.updatedAt is string;
+      allow delete: if false;
+    }
+
     match /customerJourneyEvents/{eventId} {
       allow read: if isAdmin();
       // Events are written only by the authenticated server route, never directly by clients.
