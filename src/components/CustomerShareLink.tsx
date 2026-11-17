@@ -1,14 +1,16 @@
 "use client";
-import {useState} from "react";
+import {useEffect,useState} from "react";
 import {Globe2,Languages,Share2,Check} from "lucide-react";
 import {STOREFRONT_LANGUAGES} from "@/lib/storefront-translations";
 import {STOREFRONT_MARKETS,getLanguage,getMarket,type PlugLanguage,type PlugMarket} from "@/lib/storefront-config";
+import {readStorefrontPreferences} from "@/components/StorefrontPreferences";
 
 export default function CustomerShareLink(){
  const[language,setLanguage]=useState<PlugLanguage>("en");
  const[marketCode,setMarketCode]=useState<PlugMarket>("BW");
  const[notice,setNotice]=useState("");
  const[shared,setShared]=useState(false);
+ useEffect(()=>{const saved=readStorefrontPreferences();setLanguage(saved.language);setMarketCode(saved.market)},[]);
  const market=getMarket(marketCode);
  const languageLabel=STOREFRONT_LANGUAGES.find(item=>item.code===language)?.nativeName??"English";
  async function share(){
