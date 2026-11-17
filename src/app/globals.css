@@ -1812,3 +1812,20 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .plugWorkSync{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
 .plugWorkSync .button{min-height:38px;padding:8px 11px;font-size:.7rem}
 @media(max-width:600px){.plugWorkSync{justify-content:flex-start}.plugWorkSync .button{flex:1}}
+
+/* Owner request editor: make Manage visibly open the active job on compact screens. */
+.adminPage .plugRequestEditor{scroll-margin-top:14px;border:2px solid #1758a8;box-shadow:0 0 0 4px rgba(23,88,168,.12);background:#fff}
+.adminPage .plugRequestEditor>.panelHeading{position:sticky;top:0;z-index:3;padding:10px 0;background:#fff;border-bottom:1px solid #d7dde5}
+.adminPage .plugRequestEditor .panelHeading h2{font-size:1.12rem;line-height:1.25}
+.adminPage .plugRequestEditor .panelHeading .button{flex:0 0 auto}
+.adminPage .queueActions .button{min-height:42px;padding:10px 15px;background:#1758a8;color:#fff;border:1px solid #1758a8;font-weight:900}
+.adminPage .queueRow{scroll-margin-top:12px}
+@media(max-width:760px){
+ .adminPage .plugRequestEditor{padding:12px;border-radius:10px}
+ .adminPage .plugRequestEditor>.panelHeading{gap:8px}
+ .adminPage .plugRequestEditor>.panelHeading h2{font-size:1rem}
+ .adminPage .plugRequestEditor .adminTwoCol{grid-template-columns:1fr}
+ .adminPage .queueRow{gap:10px}
+ .adminPage .queueActions{justify-content:space-between;align-items:center}
+ .adminPage .queueActions .button{min-width:126px;min-height:44px}
+}
