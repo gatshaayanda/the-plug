@@ -259,7 +259,9 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
    {latestRequests.length?<div className="plugMoneyLedger">{latestRequests.map(item=>{const reference=referenceValue(item);const paid=paymentBreakdown(item).total;return <article key={item.id}><div className="plugMoneyLedgerMain"><span className="plugMoneyLedgerStatus">{item.status}</span><strong>{item.product}</strong><small>{item.customerName} · #{item.id.slice(0,8).toUpperCase()} · {dateLabel(item.createdAt)}</small></div><div className="plugMoneyLedgerNumbers"><span>Reference <b>{reference===null?"Not listed":money(reference)}</b></span><span>Quote <b>{typeof item.quotedPrice==="number"?money(item.quotedPrice):"Pending"}</b></span><span>Paid <b>{money(paid)}</b></span></div><button type="button" className="button buttonLight" onClick={()=>onOpenRequest(item)}>Open request ↗</button></article>})}</div>:<p className="orderTruth">No sourcing requests are visible yet. Refresh records or check the request service connection.</p>}
   </section>
 
-  <section className="journeyAnalytics plugParticipationPanel">
+  <section className="journeyAnalytics">
+   <div className="panelHeading"><div><span className="kicker">BUSINESS EXPENSES</span><h2>Record what it costs to operate</h2><p className="orderTruth">Save operating expenses with the source receipt attached. These owner records sync through Firebase across signed-in Operations devices.</p></div></div>
+   <div className="plugParticipationPanel">
    <div className="panelHeading"><div><span className="kicker">ADMIN HUB · OPERATING PARTICIPATION</span><h2>Admin Hub participation</h2><p className="orderTruth">A transparent operating contribution based on completed, paid sourcing work recorded in The Plug—not storefront views, clicks, open quotes or estimated sales.</p></div></div>
    <div className="plugParticipationStats">
     <article><span>Eligible recorded revenue · last 30 days</span><strong>{money(participationSummary.eligibleRevenue)}</strong></article>
@@ -274,10 +276,8 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
    <p className="plugFinanceFootnote">The estimate uses completed requests with recorded payments; expenses are not deducted from the revenue basis. Rate changes apply to future periods only. The cycle renews every 30 days. Payment is not collected automatically.</p>
    {participationNotice&&<p className="plugExpenseNotice" role="status">{participationNotice}</p>}
    <div className="plugParticipationActions"><button type="button" className="button buttonPrimary plugExpenseSave" disabled={participationSaving||participationLoading} onClick={()=>void saveParticipation()}>{participationSaving?"Saving…":"Save participation setting"}</button>{participationSaved&&Date.now()>=Date.parse(participationSaved.nextDueAt)&&<button type="button" className="button buttonLight plugExpenseSave" onClick={()=>void recordParticipationPayment()}>Record payment &amp; expense</button>}</div>
-  </section>
 
-  <section className="journeyAnalytics">
-   <div className="panelHeading"><div><span className="kicker">BUSINESS EXPENSES</span><h2>Record what it costs to operate</h2><p className="orderTruth">Save operating expenses with the source receipt attached. These owner records sync through Firebase across signed-in Operations devices.</p></div></div>
+   </div>
    {expenseNotice&&<p className="plugExpenseNotice" role="status">{expenseNotice}</p>}
    <div className="plugExpenseForm">
     <label>Merchant / supplier<input value={merchant} onChange={event=>setMerchant(event.target.value)} placeholder="e.g. Courier, supplier or fuel"/></label>
