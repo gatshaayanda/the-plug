@@ -267,8 +267,8 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
      <li><b>Your digital shop:</b> a public storefront where customers can discover products and send sourcing requests.</li>
      <li><b>Your customer workspace:</b> customer accounts, request history and a direct path to follow each order.</li>
      <li><b>Your owner workspace:</b> one place to manage requests, quotes, payments, expenses and business records.</li>
-     <li><b>Your operating infrastructure:</b> production hosting, connected cloud records and cross-device data sync.</li>
-     <li><b>Your business insights:</b> demand activity and customer journey signals to help you see what people view and request.</li>
+     <li><b>Your operating infrastructure:</b> production hosting through Vercel, connected Firebase records and cross-device data sync for signed-in Operations devices.</li>
+     <li><b>Your business insights:</b> customer journey events record product views and request clicks; Vercel Web Analytics and Speed Insights collection are installed to support traffic and performance reporting. The owner-side provider report still needs its access configuration.</li>
      <li><b>Room to grow:</b> the app can support optional promotions, rewards and customer-engagement games when the owner chooses to use them.</li>
     </ul>
     <small>In simple terms: Admin Hub builds and provides the digital tools; the owner runs the business and records the real transactions.</small>
