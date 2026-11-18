@@ -13,3 +13,11 @@
 
 /* Keep PWA actions above floating chat controls so the chatbot cannot intercept taps. */
 .plugPwaInstallButton,.pwaInstall,.pwaUpdate,.pwaInstallInfo{z-index:2147483000;pointer-events:auto}
+
+
+/* The install card can be collapsed to its persistent branded launcher without dismissing it. */
+.plugInstallWindowControls{display:flex;align-items:center;gap:6px;margin-left:auto}
+.plugInstallWindowControls .plugInstallClose{margin-left:0}
+.plugInstallCollapse{display:grid;place-items:center;width:30px;height:30px;padding:0;border:1px solid #d8dee8;border-radius:8px;background:#f3f6fb;color:#172033;font-size:1.2rem;font-weight:800;line-height:1;cursor:pointer}
+.plugInstallCollapse:hover{background:#e7efff;border-color:#9bbcff}
+.plugInstallCollapse:focus-visible,.plugInstallClose:focus-visible{outline:3px solid #0866ff;outline-offset:2px}

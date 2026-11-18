@@ -298,7 +298,7 @@ export default function PwaRegister({ initialEmbedded = false, initialAndroid = 
   const installCard = installState === "native" ? (
     <div style={installShellStyle} role="presentation">
       <section className="plugInstallModal" role="dialog" aria-modal="false" aria-labelledby="plug-install-title" aria-describedby="plug-install-message">
-        <div className="plugInstallTop"><span className="plugInstallMark">P</span><span className="plugInstallTag">THE PLUG · BOTSWANA</span><button type="button" className="plugInstallClose" aria-label="Close install prompt" onClick={dismissInstall}>×</button></div>
+        <div className="plugInstallTop"><span className="plugInstallMark">P</span><span className="plugInstallTag">THE PLUG · BOTSWANA</span><div className="plugInstallWindowControls"><button type="button" className="plugInstallCollapse" aria-label="Collapse install prompt" title="Collapse" onClick={() => { setInstallHelpOpen(false); setInstallState("hidden"); }}>−</button><button type="button" className="plugInstallClose" aria-label="Dismiss install prompt for 7 days" onClick={dismissInstall}>×</button></div></div>
         <div className="plugInstallKicker">THE PLUG · ONE TAP AWAY</div>
         <h2 id="plug-install-title">Keep your finds close.</h2>
         <p id="plug-install-message">Add The Plug to your home screen for quick access to your finds, requests and private updates.</p>
