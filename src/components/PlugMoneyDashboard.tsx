@@ -78,7 +78,7 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
  const [receiptFile,setReceiptFile]=useState<File|null>(null);
  const [savingExpense,setSavingExpense]=useState(false);
  const [deletingExpense,setDeletingExpense]=useState("");
- const [participationRate,setParticipationRate]=useState(15);
+ const [participationRate,setParticipationRate]=useState(10);
  const [participationSaved,setParticipationSaved]=useState<{rate:number;nextRate?:number;activatedAt:string;nextDueAt:string}|null>(null);
  const [participationLoading,setParticipationLoading]=useState(true);
  const [participationSaving,setParticipationSaving]=useState(false);
@@ -178,7 +178,7 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
  async function saveParticipation(){
   const now=new Date(),activatedAt=participationSaved?.activatedAt||now.toISOString(),nextDueAt=participationSaved?.nextDueAt||new Date(now.getTime()+30*86400000).toISOString();
   setParticipationSaving(true);setParticipationNotice("");
-  try{if(participationSaved){await setDoc(doc(db,"businessSettings","adminHubParticipation"),{nextRate:participationRate,updatedAt:now.toISOString()},{merge:true});setParticipationSaved({...participationSaved,nextRate:participationRate});}else{await setDoc(doc(db,"businessSettings","adminHubParticipation"),{rate:participationRate,nextRate:participationRate,activatedAt,nextDueAt,updatedAt:now.toISOString(),basis:"completed_paid_recorded_revenue"},{merge:true});setParticipationSaved({rate:participationRate,nextRate:participationRate,activatedAt,nextDueAt});}setParticipationNotice("Saved. The selected rate applies from the next 30-day period; the current period is unchanged.");}
+  try{if(participationSaved){await setDoc(doc(db,"businessSettings","adminHubParticipation"),{nextRate:participationRate,updatedAt:now.toISOString()},{merge:true});setParticipationSaved({...participationSaved,nextRate:participationRate});}else{await setDoc(doc(db,"businessSettings","adminHubParticipation"),{rate:participationRate,nextRate:participationRate,activatedAt,nextDueAt,updatedAt:now.toISOString(),basis:"completed_paid_recorded_revenue"},{merge:true});setParticipationSaved({rate:participationRate,nextRate:participationRate,activatedAt,nextDueAt});}setParticipationNotice("Saved. Your rate is saved. It applies to the next 30-day period; the current period is unchanged.");}
   catch{setParticipationNotice("Settings were not saved. Check Operations permissions and try again.");}
   finally{setParticipationSaving(false);}
  }
@@ -231,6 +231,18 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
   </section>
 
   <section className="journeyAnalytics">
+   <div className="panelHeading"><div><span className="kicker">CUSTOMER DEMAND · NON-CANCELLED</span><h2>What customers are asking for</h2></div></div>
+   {summary.demand.length?<div className="journeyAnalyticsProducts">{summary.demand.map(item=><div key={item.product}><span><b>{item.product}</b><small className="plugActivityMeta">{item.count} request{item.count===1?"":"s"} · {item.priced} with reference pricing</small></span><b>{money(item.value)}</b></div>)}</div>:<p className="orderTruth">Customer demand will appear here after the first sourcing request is recorded.</p>}
+  </section>
+
+  <section className="journeyAnalytics">
+   <div className="panelHeading"><div><span className="kicker">REQUEST LEDGER · LIVE RECORDS</span><h2>Recent requests, traceable</h2><p className="orderTruth">The latest 20 request records behind the totals. Select a record to open it in Customers &amp; Jobs.</p></div><strong>{requests.length} records</strong></div>
+   {latestRequests.length?<div className="plugMoneyLedger">{latestRequests.map(item=>{const reference=referenceValue(item);const paid=paymentBreakdown(item).total;return <article key={item.id}><div className="plugMoneyLedgerMain"><span className="plugMoneyLedgerStatus">{item.status}</span><strong>{item.product}</strong><small>{item.customerName} · #{item.id.slice(0,8).toUpperCase()} · {dateLabel(item.createdAt)}</small></div><div className="plugMoneyLedgerNumbers"><span>Reference <b>{reference===null?"Not listed":money(reference)}</b></span><span>Quote <b>{typeof item.quotedPrice==="number"?money(item.quotedPrice):"Pending"}</b></span><span>Paid <b>{money(paid)}</b></span></div><button type="button" className="button buttonLight" onClick={()=>onOpenRequest(item)}>Open request ↗</button></article>})}</div>:<p className="orderTruth">No sourcing requests are visible yet. Refresh records or check the request service connection.</p>}
+  </section>
+
+  <section className="journeyAnalytics">
+   <div className="panelHeading"><div><span className="kicker">BUSINESS EXPENSES</span><h2>Record what it costs to operate</h2><p className="orderTruth">Save operating expenses with the source receipt attached. These owner records sync through Firebase across signed-in Operations devices.</p></div></div>
+   <div className="plugFinanceSectionLabel"><span>FINANCIAL RECONCILIATION · BWP</span><small>Requests → quotes → payments → costs</small></div>
    <div className="panelHeading"><div><span className="kicker">FINANCIAL RECONCILIATION · BWP</span><h2>From requests to collections</h2><p className="orderTruth">All-time totals from the recorded sourcing requests. Amounts are not treated as sales until quoted, approved or paid at the appropriate stage.</p></div></div>
    <div className="journeyAnalyticsGrid plugFinanceGrid">
     <article><span>Requested storefront reference value</span><strong>{money(summary.requestedReferenceValue)}</strong><small>{summary.referenceCount} priced requests · {summary.unpricedRequests} without a reference price</small></article>
@@ -247,35 +259,39 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
     <article><span>Approved requests awaiting deposit</span><strong>{summary.awaitingDeposit}</strong><small>Approved quotes below the required deposit</small></article>
    </div>
    <p className="plugFinanceFootnote">Recorded payments are owner-entered acknowledgements, not bank-feed verification. The deposit gap is a follow-up estimate. Storefront reference prices can change and are never treated as confirmed quotes.</p>
-  </section>
-
-  <section className="journeyAnalytics">
-   <div className="panelHeading"><div><span className="kicker">CUSTOMER DEMAND · NON-CANCELLED</span><h2>What customers are asking for</h2></div></div>
-   {summary.demand.length?<div className="journeyAnalyticsProducts">{summary.demand.map(item=><div key={item.product}><span><b>{item.product}</b><small className="plugActivityMeta">{item.count} request{item.count===1?"":"s"} · {item.priced} with reference pricing</small></span><b>{money(item.value)}</b></div>)}</div>:<p className="orderTruth">Customer demand will appear here after the first sourcing request is recorded.</p>}
-  </section>
-
-  <section className="journeyAnalytics">
-   <div className="panelHeading"><div><span className="kicker">REQUEST LEDGER · LIVE RECORDS</span><h2>Recent requests, traceable</h2><p className="orderTruth">The latest 20 request records behind the totals. Select a record to open it in Customers &amp; Jobs.</p></div><strong>{requests.length} records</strong></div>
-   {latestRequests.length?<div className="plugMoneyLedger">{latestRequests.map(item=>{const reference=referenceValue(item);const paid=paymentBreakdown(item).total;return <article key={item.id}><div className="plugMoneyLedgerMain"><span className="plugMoneyLedgerStatus">{item.status}</span><strong>{item.product}</strong><small>{item.customerName} · #{item.id.slice(0,8).toUpperCase()} · {dateLabel(item.createdAt)}</small></div><div className="plugMoneyLedgerNumbers"><span>Reference <b>{reference===null?"Not listed":money(reference)}</b></span><span>Quote <b>{typeof item.quotedPrice==="number"?money(item.quotedPrice):"Pending"}</b></span><span>Paid <b>{money(paid)}</b></span></div><button type="button" className="button buttonLight" onClick={()=>onOpenRequest(item)}>Open request ↗</button></article>})}</div>:<p className="orderTruth">No sourcing requests are visible yet. Refresh records or check the request service connection.</p>}
-  </section>
-
-  <section className="journeyAnalytics">
-   <div className="panelHeading"><div><span className="kicker">BUSINESS EXPENSES</span><h2>Record what it costs to operate</h2><p className="orderTruth">Save operating expenses with the source receipt attached. These owner records sync through Firebase across signed-in Operations devices.</p></div></div>
    <div className="plugParticipationPanel">
-   <div className="panelHeading"><div><span className="kicker">ADMIN HUB · OPERATING PARTICIPATION</span><h2>Admin Hub participation</h2><p className="orderTruth">A transparent operating contribution based on completed, paid sourcing work recorded in The Plug—not storefront views, clicks, open quotes or estimated sales.</p></div></div>
+   <div className="panelHeading"><div><span className="kicker">ADMIN HUB · OPERATING PARTICIPATION</span><h2>Admin Hub participation</h2><p className="orderTruth">Here is what Admin Hub provides, what the business is using, and how the owner can choose a fair operating contribution. The calculation uses eligible payments recorded in The Plug—not views, clicks or unapproved requests.</p></div></div>
+   <div className="plugParticipationIntro">
+    <strong>What Admin Hub has put in place</strong>
+    <ul>
+     <li><b>Your digital shop:</b> a public storefront where customers can discover products and send sourcing requests.</li>
+     <li><b>Your customer workspace:</b> customer accounts, request history and a direct path to follow each order.</li>
+     <li><b>Your owner workspace:</b> one place to manage requests, quotes, payments, expenses and business records.</li>
+     <li><b>Your operating infrastructure:</b> production hosting, connected cloud records and cross-device data sync.</li>
+     <li><b>Your business insights:</b> demand activity and customer journey signals to help you see what people view and request.</li>
+     <li><b>Room to grow:</b> the app can support optional promotions, rewards and customer-engagement games when the owner chooses to use them.</li>
+    </ul>
+    <small>In simple terms: Admin Hub builds and provides the digital tools; the owner runs the business and records the real transactions.</small>
+   </div>
    <div className="plugParticipationStats">
-    <article><span>Eligible recorded revenue · last 30 days</span><strong>{money(participationSummary.eligibleRevenue)}</strong></article>
-    <article><span>Completed paid transactions</span><strong>{participationSummary.paidTransactions}</strong></article>
-    <article><span>Customer activity · requests received</span><strong>{participationSummary.activity}</strong></article>
-    <article><span>Product views · last 30 days</span><strong>{participationSummary.demandViews}</strong></article>
+    <article><span>Eligible recorded payments · last 30 days</span><strong>{money(participationSummary.eligibleRevenue)}</strong><small>From completed requests only</small></article>
+    <article><span>Completed, fully paid transactions</span><strong>{participationSummary.paidTransactions}</strong></article>
+    <article><span>Customer requests received</span><strong>{participationSummary.activity}</strong></article>
+    <article><span>Product views</span><strong>{participationSummary.demandViews}</strong></article>
     <article><span>Product request clicks</span><strong>{participationSummary.requestClicks}</strong></article>
-    <article><span>Outstanding customer payments</span><strong>{money(participationSummary.outstanding)}</strong></article>
+    <article><span>Quoted customer balances still due</span><strong>{money(participationSummary.outstanding)}</strong></article>
    </div>
    <div className="plugParticipationRationale"><span>Revenue trend vs previous 30 days</span><strong>{participationSummary.change===null?"No previous-period baseline":(participationSummary.change>=0?"+":"")+participationSummary.change.toFixed(1)+"%"}</strong><small>Demand views and product clicks are supporting signals only; they do not count as revenue.</small></div>
-   <div className="plugParticipationControls"><label>Admin Hub participation rate<select value={participationRate} onChange={event=>setParticipationRate(Number(event.target.value))}>{[10,11,12,13,14,15,16,17,18,19,20].map(rate=><option key={rate} value={rate}>{rate}%</option>)}</select></label><div><span>Estimated next-period participation · at selected rate</span><strong>{money(participationAmount)}</strong><small>Current period rate: {participationSaved?.rate??participationRate}%</small></div><div><span>Next 30-day due date</span><strong>{participationLoading?"Loading…":participationSaved?dateLabel(participationSaved.nextDueAt):"Starts when saved"}</strong></div></div>
-   <p className="plugFinanceFootnote">The estimate uses completed requests with recorded payments; expenses are not deducted from the revenue basis. Rate changes apply to future periods only. The cycle renews every 30 days. Payment is not collected automatically.</p>
+   <div className="plugParticipationChoice">
+    <div className="plugParticipationChoiceHead"><div><span>YOUR CHOICE · ADMIN HUB PARTICIPATION</span><strong>{participationRate}%</strong></div><p>Move the slider to choose the percentage. You stay in control; nothing changes until you save.</p></div>
+    <input aria-label="Admin Hub participation percentage" type="range" min="10" max="20" step="1" value={participationRate} onChange={event=>setParticipationRate(Number(event.target.value))}/>
+    <div className="plugParticipationScale"><span>10% · lower contribution</span><span>15% · middle</span><span>20% · higher contribution</span></div>
+    <div className="plugParticipationEstimate"><div><span>At {participationRate}% of eligible payments</span><strong>{money(participationAmount)}</strong><small>Illustration using the last 30 days' eligible recorded payments</small></div><div><span>Next review / due date</span><strong>{participationLoading?"Loading…":participationSaved?dateLabel(participationSaved.nextDueAt):"Set when activated"}</strong></div></div>
+    <p className="plugParticipationPlain">ELI5: if the business records P1,000 in eligible completed customer payments, 10% is P100 and 20% is P200. This is calculated before business expenses are deducted. More expenses do not reduce the agreed percentage.</p>
+   </div>
+   <p className="plugFinanceFootnote">The 30-day statement will show the eligible payments, chosen rate and amount due. Changes you make now apply to the next period, not the period already running. This is an agreed operating contribution for Admin Hub's digital platform and services; it is not automatically collected.</p>
    {participationNotice&&<p className="plugExpenseNotice" role="status">{participationNotice}</p>}
-   <div className="plugParticipationActions"><button type="button" className="button buttonPrimary plugExpenseSave" disabled={participationSaving||participationLoading} onClick={()=>void saveParticipation()}>{participationSaving?"Saving…":"Save participation setting"}</button>{participationSaved&&Date.now()>=Date.parse(participationSaved.nextDueAt)&&<button type="button" className="button buttonLight plugExpenseSave" onClick={()=>void recordParticipationPayment()}>Record payment &amp; expense</button>}</div>
+   <div className="plugParticipationActions"><button type="button" className="button buttonPrimary plugExpenseSave" disabled={participationSaving||participationLoading} onClick={()=>void saveParticipation()}>{participationSaving?"Saving…":"Save participation rate"}</button>{participationSaved&&Date.now()>=Date.parse(participationSaved.nextDueAt)&&<button type="button" className="button buttonLight plugExpenseSave" onClick={()=>void recordParticipationPayment()}>Record payment &amp; expense</button>}</div>
 
    </div>
    {expenseNotice&&<p className="plugExpenseNotice" role="status">{expenseNotice}</p>}

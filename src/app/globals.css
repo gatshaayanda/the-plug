@@ -1917,3 +1917,26 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 .plugParticipationControls label{display:grid;gap:6px;padding:12px;border:1px solid #d7dee8;border-radius:10px;background:#fff;color:#1f2937;font-size:.72rem;font-weight:800}
 .plugParticipationControls select{width:100%;min-height:40px;padding:8px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#111827;font:inherit}
 @media(max-width:700px){.plugParticipationStats{grid-template-columns:repeat(2,minmax(0,1fr))}.plugParticipationControls{grid-template-columns:1fr}}
+
+
+/* Plain-language Admin Hub participation and financial reconciliation. */
+.plugParticipationIntro{padding:14px;border:1px solid #d7e1ef;border-radius:12px;background:#f7faff;margin:12px 0}
+.plugParticipationIntro>strong{display:block;color:#111827;font-size:.86rem;margin-bottom:7px}
+.plugParticipationIntro ul{display:grid;gap:7px;margin:0;padding-left:18px;color:#334155;font-size:.75rem;line-height:1.5}
+.plugParticipationIntro li b{color:#111827}
+.plugParticipationIntro small{display:block;margin-top:10px;color:#475569;font-size:.72rem;line-height:1.5}
+.plugParticipationChoice{padding:14px;border:1px solid #b9cce4;border-radius:12px;background:#f8fbff;margin-top:12px}
+.plugParticipationChoiceHead{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.plugParticipationChoiceHead>div{display:grid;gap:3px}
+.plugParticipationChoiceHead span{font-size:.65rem;font-weight:900;letter-spacing:.06em;color:#475569}
+.plugParticipationChoiceHead strong{font-size:1.8rem;line-height:1.1;color:#123e75;font-weight:900;font-variant-numeric:tabular-nums}
+.plugParticipationChoiceHead p{max-width:300px;margin:0;color:#475569;font-size:.72rem;line-height:1.45}
+.plugParticipationChoice input[type=range]{display:block;width:100%;margin:18px 0 8px;accent-color:#1760b5;cursor:pointer}
+.plugParticipationScale{display:flex;justify-content:space-between;gap:6px;color:#475569;font-size:.65rem;font-weight:750}
+.plugParticipationEstimate{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+.plugParticipationEstimate>div{display:grid;gap:5px;padding:12px;background:white;border:1px solid #d7dee8;border-radius:10px}
+.plugParticipationEstimate span{font-size:.68rem;font-weight:800;color:#475569}
+.plugParticipationEstimate strong{font-size:1.15rem;color:#111827;font-weight:900;font-variant-numeric:tabular-nums}
+.plugParticipationEstimate small{font-size:.65rem;color:#64748b;line-height:1.4}
+.plugParticipationPlain{margin:12px 0 0;padding:10px;border-radius:8px;background:#eaf2ff;color:#1e3a5f;font-size:.73rem;line-height:1.5}
+@media(max-width:600px){.plugParticipationChoiceHead{align-items:flex-start;flex-direction:column}.plugParticipationScale{font-size:.58rem}.plugParticipationEstimate{grid-template-columns:1fr}}
