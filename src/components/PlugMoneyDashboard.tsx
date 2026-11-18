@@ -17,7 +17,9 @@ type Expense={
  createdAt:string;
  receipt?:{url:string;name:string;type:string;size:number}|null;
 };
+type JourneyEvent={event:string;createdAt:string};
 type Props={
+ journeyEvents:JourneyEvent[];
  requests:PlugRequest[];
  onOpenRequest:(request:PlugRequest)=>void;
  requestSyncStatus:"connecting"|"live"|"server"|"error";
@@ -64,7 +66,7 @@ function dateLabel(value:string){
 }
 function todayKey(){return new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Gaborone",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());}
 
-export default function PlugMoneyDashboard({requests,onOpenRequest,requestSyncStatus,lastRequestSyncAt,onRefreshRequests,refreshingRequests}:Props){
+export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest,requestSyncStatus,lastRequestSyncAt,onRefreshRequests,refreshingRequests}:Props){
  const [expenses,setExpenses]=useState<Expense[]>([]);
  const [expensesLoading,setExpensesLoading]=useState(true);
  const [expenseNotice,setExpenseNotice]=useState("");
@@ -150,11 +152,28 @@ export default function PlugMoneyDashboard({requests,onOpenRequest,requestSyncSt
   const prior=rows.filter(row=>row.stamp>=previous&&row.stamp<cutoff&&["Delivered","Collected"].includes(row.request.status));
   const eligibleRevenue=eligible.reduce((sum,row)=>sum+row.amount,0),previousRevenue=prior.reduce((sum,row)=>sum+row.amount,0);
   const activity=requests.filter(item=>{const stamp=Date.parse(item.createdAt||"");return Number.isFinite(stamp)&&stamp>=cutoff&&stamp<=now&&item.status!=="Cancelled"}).length;
+  const events=journeyEvents.filter(item=>{const stamp=Date.parse(item.createdAt||"");return Number.isFinite(stamp)&&stamp>=cutoff&&stamp<=now});
+  const demandViews=events.filter(item=>["storefront_find_opened","storefront_offer_opened"].includes(item.event)).length;
+  const requestClicks=events.filter(item=>item.event==="product_request_clicked").length;
   const outstanding=requests.filter(item=>item.status!=="Cancelled"&&typeof item.quotedPrice==="number").reduce((sum,item)=>sum+Math.max(0,validAmount(item.quotedPrice)-paymentBreakdown(item).total),0);
   const paidTransactions=new Set(eligible.filter(row=>typeof row.request.quotedPrice==="number"&&paymentBreakdown(row.request).total+0.009>=row.request.quotedPrice).map(row=>row.request.id)).size;
-  return {eligibleRevenue,previousRevenue,paidTransactions,activity,outstanding,change:previousRevenue>0?(eligibleRevenue-previousRevenue)/previousRevenue*100:null};
- },[requests]);
+  return {eligibleRevenue,previousRevenue,paidTransactions,activity,outstanding,demandViews,requestClicks,change:previousRevenue>0?(eligibleRevenue-previousRevenue)/previousRevenue*100:null};
+ },[requests,journeyEvents]);
  const participationAmount=participationSummary.eligibleRevenue*participationRate/100;
+ async function recordParticipationPayment(){
+  if(!participationSaved||Date.now()<Date.parse(participationSaved.nextDueAt)){setParticipationNotice("The next 30-day participation payment is not due yet.");return;}
+  const period=participationSaved.nextDueAt.slice(0,10);
+  const periodNote="Admin Hub participation · "+participationRate+"% of completed paid recorded revenue · Period ending "+period;
+  if(expenses.some(item=>item.category==="Admin Hub participation"&&item.note.includes("Period ending "+period))){setParticipationNotice("This period already has an Admin Hub expense record.");return;}
+  const amountDue=participationSummary.eligibleRevenue*participationRate/100;
+  if(amountDue<=0){setParticipationNotice("No eligible completed paid revenue was recorded for this period. No participation payment is due.");return;}
+  const now=new Date().toISOString();
+  try{await addDoc(collection(db,"businessExpenses"),{merchant:"Admin Hub",category:"Admin Hub participation",amount:amountDue,currency:"BWP",date:todayKey(),note:periodNote,createdAt:now,updatedAt:now,createdBy:auth.currentUser?.uid||"",receipt:null});
+   const nextDueAt=new Date(Date.parse(participationSaved.nextDueAt)+30*86400000).toISOString();
+   await setDoc(doc(db,"businessSettings","adminHubParticipation"),{lastPaidPeriod:period,nextDueAt,updatedAt:now},{merge:true});
+   setParticipationSaved({...participationSaved,nextDueAt});setParticipationNotice("Payment recorded as an Admin Hub participation expense. Add the source receipt to the expense record if available.");
+  }catch{setParticipationNotice("The payment was not fully recorded. Check Firebase sync and verify the expense list before retrying.");}
+ }
  async function saveParticipation(){
   const now=new Date(),activatedAt=participationSaved?.activatedAt||now.toISOString(),nextDueAt=participationSaved?.nextDueAt||new Date(now.getTime()+30*86400000).toISOString();
   setParticipationSaving(true);setParticipationNotice("");
@@ -245,13 +264,15 @@ export default function PlugMoneyDashboard({requests,onOpenRequest,requestSyncSt
     <article><span>Eligible recorded revenue · last 30 days</span><strong>{money(participationSummary.eligibleRevenue)}</strong></article>
     <article><span>Completed paid transactions</span><strong>{participationSummary.paidTransactions}</strong></article>
     <article><span>Customer activity · requests received</span><strong>{participationSummary.activity}</strong></article>
+    <article><span>Product views · last 30 days</span><strong>{participationSummary.demandViews}</strong></article>
+    <article><span>Product request clicks</span><strong>{participationSummary.requestClicks}</strong></article>
     <article><span>Outstanding customer payments</span><strong>{money(participationSummary.outstanding)}</strong></article>
    </div>
    <div className="plugParticipationRationale"><span>Revenue trend vs previous 30 days</span><strong>{participationSummary.change===null?"No previous-period baseline":(participationSummary.change>=0?"+":"")+participationSummary.change.toFixed(1)+"%"}</strong><small>Demand views and product clicks are supporting signals only; they do not count as revenue.</small></div>
    <div className="plugParticipationControls"><label>Admin Hub participation rate<select value={participationRate} onChange={event=>setParticipationRate(Number(event.target.value))}>{[10,11,12,13,14,15,16,17,18,19,20].map(rate=><option key={rate} value={rate}>{rate}%</option>)}</select></label><div><span>Estimated participation for this period</span><strong>{money(participationAmount)}</strong></div><div><span>Next 30-day due date</span><strong>{participationLoading?"Loading…":participationSaved?dateLabel(participationSaved.nextDueAt):"Starts when saved"}</strong></div></div>
    <p className="plugFinanceFootnote">The estimate uses completed requests with recorded payments; expenses are not deducted from the revenue basis. Rate changes apply to future periods only. The cycle renews every 30 days. Payment is not collected automatically.</p>
    {participationNotice&&<p className="plugExpenseNotice" role="status">{participationNotice}</p>}
-   <button type="button" className="button buttonPrimary plugExpenseSave" disabled={participationSaving||participationLoading} onClick={()=>void saveParticipation()}>{participationSaving?"Saving…":"Save participation setting"}</button>
+   <div className="plugParticipationActions"><button type="button" className="button buttonPrimary plugExpenseSave" disabled={participationSaving||participationLoading} onClick={()=>void saveParticipation()}>{participationSaving?"Saving…":"Save participation setting"}</button>{participationSaved&&Date.now()>=Date.parse(participationSaved.nextDueAt)&&<button type="button" className="button buttonLight plugExpenseSave" onClick={()=>void recordParticipationPayment()}>Record payment &amp; expense</button>}</div>
   </section>
 
   <section className="journeyAnalytics">
