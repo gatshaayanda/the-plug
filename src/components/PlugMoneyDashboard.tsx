@@ -1,7 +1,7 @@
 "use client";
 
 import {useEffect,useMemo,useState} from "react";
-import {addDoc,collection,deleteDoc,doc,onSnapshot,orderBy,query} from "firebase/firestore";
+import {addDoc,collection,deleteDoc,doc,onSnapshot,orderBy,query,setDoc} from "firebase/firestore";
 import {auth,db} from "@/lib/firebase/client";
 import {uploadFiles} from "@/lib/uploadthing";
 import type {PlugRequest} from "@/lib/firebase/plug-data";
@@ -76,6 +76,17 @@ export default function PlugMoneyDashboard({requests,onOpenRequest,requestSyncSt
  const [receiptFile,setReceiptFile]=useState<File|null>(null);
  const [savingExpense,setSavingExpense]=useState(false);
  const [deletingExpense,setDeletingExpense]=useState("");
+ const [participationRate,setParticipationRate]=useState(15);
+ const [participationSaved,setParticipationSaved]=useState<{rate:number;activatedAt:string;nextDueAt:string}|null>(null);
+ const [participationLoading,setParticipationLoading]=useState(true);
+ const [participationSaving,setParticipationSaving]=useState(false);
+ const [participationNotice,setParticipationNotice]=useState("");
+
+ useEffect(()=>onSnapshot(doc(db,"businessSettings","adminHubParticipation"),snapshot=>{
+  const value=snapshot.exists()?snapshot.data() as {rate?:number;activatedAt?:string;nextDueAt?:string}:null;
+  if(value&&typeof value.rate==="number"&&typeof value.activatedAt==="string"&&typeof value.nextDueAt==="string"){setParticipationSaved({rate:value.rate,activatedAt:value.activatedAt,nextDueAt:value.nextDueAt});setParticipationRate(value.rate)}
+  setParticipationLoading(false);
+ },()=>{setParticipationLoading(false);setParticipationNotice("Admin Hub participation settings could not be loaded. Check Operations permissions.")}),[]);
 
  useEffect(()=>onSnapshot(query(collection(db,"businessExpenses"),orderBy("date","desc")),snapshot=>{
   setExpenses(snapshot.docs.map(item=>({id:item.id,...item.data()} as Expense)));
@@ -129,6 +140,29 @@ export default function PlugMoneyDashboard({requests,onOpenRequest,requestSyncSt
  },[requests]);
 
  const expenseTotal=useMemo(()=>expenses.reduce((sum,item)=>sum+validAmount(item.amount),0),[expenses]);
+ const participationSummary=useMemo(()=>{
+  const now=Date.now(),cutoff=now-30*86400000,previous=cutoff-30*86400000;
+  const rows=requests.filter(item=>item.status!=="Cancelled").flatMap(item=>{
+   const payments=item.paymentRecords?.length?item.paymentRecords.map(payment=>({amount:validAmount(payment.amount),stamp:Date.parse(payment.recordedAt||"")})):(validAmount(item.depositPaid)>0?[{amount:validAmount(item.depositPaid),stamp:Date.parse(item.depositRecordedAt||"")}]:[]);
+   return payments.filter(row=>Number.isFinite(row.stamp)).map(row=>({...row,request:item}));
+  });
+  const eligible=rows.filter(row=>row.stamp>=cutoff&&row.stamp<=now&&["Delivered","Collected"].includes(row.request.status));
+  const prior=rows.filter(row=>row.stamp>=previous&&row.stamp<cutoff&&["Delivered","Collected"].includes(row.request.status));
+  const eligibleRevenue=eligible.reduce((sum,row)=>sum+row.amount,0),previousRevenue=prior.reduce((sum,row)=>sum+row.amount,0);
+  const activity=requests.filter(item=>{const stamp=Date.parse(item.createdAt||"");return Number.isFinite(stamp)&&stamp>=cutoff&&stamp<=now&&item.status!=="Cancelled"}).length;
+  const outstanding=requests.filter(item=>item.status!=="Cancelled"&&typeof item.quotedPrice==="number").reduce((sum,item)=>sum+Math.max(0,validAmount(item.quotedPrice)-paymentBreakdown(item).total),0);
+  const paidTransactions=new Set(eligible.filter(row=>typeof row.request.quotedPrice==="number"&&paymentBreakdown(row.request).total+0.009>=row.request.quotedPrice).map(row=>row.request.id)).size;
+  return {eligibleRevenue,previousRevenue,paidTransactions,activity,outstanding,change:previousRevenue>0?(eligibleRevenue-previousRevenue)/previousRevenue*100:null};
+ },[requests]);
+ const participationAmount=participationSummary.eligibleRevenue*participationRate/100;
+ async function saveParticipation(){
+  const now=new Date(),activatedAt=participationSaved?.activatedAt||now.toISOString(),nextDueAt=participationSaved?.nextDueAt||new Date(now.getTime()+30*86400000).toISOString();
+  setParticipationSaving(true);setParticipationNotice("");
+  try{await setDoc(doc(db,"businessSettings","adminHubParticipation"),{rate:participationRate,activatedAt,nextDueAt,updatedAt:now.toISOString(),basis:"completed_paid_recorded_revenue"},{merge:true});setParticipationSaved({rate:participationRate,activatedAt,nextDueAt});setParticipationNotice("Saved. The 30-day cycle starts from activation; rate changes apply prospectively.");}
+  catch{setParticipationNotice("Settings were not saved. Check Operations permissions and try again.");}
+  finally{setParticipationSaving(false);}
+ }
+
  const recordedCashAfterExpenses=summary.payments.total-expenseTotal;
  const latestRequests=useMemo(()=>[...requests].sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).slice(0,20),[requests]);
 
@@ -205,12 +239,27 @@ export default function PlugMoneyDashboard({requests,onOpenRequest,requestSyncSt
    {latestRequests.length?<div className="plugMoneyLedger">{latestRequests.map(item=>{const reference=referenceValue(item);const paid=paymentBreakdown(item).total;return <article key={item.id}><div className="plugMoneyLedgerMain"><span className="plugMoneyLedgerStatus">{item.status}</span><strong>{item.product}</strong><small>{item.customerName} · #{item.id.slice(0,8).toUpperCase()} · {dateLabel(item.createdAt)}</small></div><div className="plugMoneyLedgerNumbers"><span>Reference <b>{reference===null?"Not listed":money(reference)}</b></span><span>Quote <b>{typeof item.quotedPrice==="number"?money(item.quotedPrice):"Pending"}</b></span><span>Paid <b>{money(paid)}</b></span></div><button type="button" className="button buttonLight" onClick={()=>onOpenRequest(item)}>Open request ↗</button></article>})}</div>:<p className="orderTruth">No sourcing requests are visible yet. Refresh records or check the request service connection.</p>}
   </section>
 
+  <section className="journeyAnalytics plugParticipationPanel">
+   <div className="panelHeading"><div><span className="kicker">ADMIN HUB · OPERATING PARTICIPATION</span><h2>Admin Hub participation</h2><p className="orderTruth">A transparent operating contribution based on completed, paid sourcing work recorded in The Plug—not storefront views, clicks, open quotes or estimated sales.</p></div></div>
+   <div className="plugParticipationStats">
+    <article><span>Eligible recorded revenue · last 30 days</span><strong>{money(participationSummary.eligibleRevenue)}</strong></article>
+    <article><span>Completed paid transactions</span><strong>{participationSummary.paidTransactions}</strong></article>
+    <article><span>Customer activity · requests received</span><strong>{participationSummary.activity}</strong></article>
+    <article><span>Outstanding customer payments</span><strong>{money(participationSummary.outstanding)}</strong></article>
+   </div>
+   <div className="plugParticipationRationale"><span>Revenue trend vs previous 30 days</span><strong>{participationSummary.change===null?"No previous-period baseline":(participationSummary.change>=0?"+":"")+participationSummary.change.toFixed(1)+"%"}</strong><small>Demand views and product clicks are supporting signals only; they do not count as revenue.</small></div>
+   <div className="plugParticipationControls"><label>Admin Hub participation rate<select value={participationRate} onChange={event=>setParticipationRate(Number(event.target.value))}>{[10,11,12,13,14,15,16,17,18,19,20].map(rate=><option key={rate} value={rate}>{rate}%</option>)}</select></label><div><span>Estimated participation for this period</span><strong>{money(participationAmount)}</strong></div><div><span>Next 30-day due date</span><strong>{participationLoading?"Loading…":participationSaved?dateLabel(participationSaved.nextDueAt):"Starts when saved"}</strong></div></div>
+   <p className="plugFinanceFootnote">The estimate uses completed requests with recorded payments; expenses are not deducted from the revenue basis. Rate changes apply to future periods only. The cycle renews every 30 days. Payment is not collected automatically.</p>
+   {participationNotice&&<p className="plugExpenseNotice" role="status">{participationNotice}</p>}
+   <button type="button" className="button buttonPrimary plugExpenseSave" disabled={participationSaving||participationLoading} onClick={()=>void saveParticipation()}>{participationSaving?"Saving…":"Save participation setting"}</button>
+  </section>
+
   <section className="journeyAnalytics">
    <div className="panelHeading"><div><span className="kicker">BUSINESS EXPENSES</span><h2>Record what it costs to operate</h2><p className="orderTruth">Save operating expenses with the source receipt attached. These owner records sync through Firebase across signed-in Operations devices.</p></div></div>
    {expenseNotice&&<p className="plugExpenseNotice" role="status">{expenseNotice}</p>}
    <div className="plugExpenseForm">
     <label>Merchant / supplier<input value={merchant} onChange={event=>setMerchant(event.target.value)} placeholder="e.g. Courier, supplier or fuel"/></label>
-    <label>Expense category<select value={category} onChange={event=>setCategory(event.target.value)}><option>Operating costs</option><option>Transport &amp; delivery</option><option>Supplier payments</option><option>Marketing</option><option>Software &amp; hosting</option><option>Packaging</option><option>Equipment</option><option>Other</option></select></label>
+    <label>Expense category<select value={category} onChange={event=>setCategory(event.target.value)}><option>Operating costs</option><option>Admin Hub participation</option><option>Transport &amp; delivery</option><option>Supplier payments</option><option>Marketing</option><option>Software &amp; hosting</option><option>Packaging</option><option>Equipment</option><option>Other</option></select></label>
     <label>Amount (BWP)<input type="number" min="0.01" step="0.01" value={amount} onChange={event=>setAmount(event.target.value)} placeholder="0.00"/></label>
     <label>Date<input type="date" value={expenseDate} onChange={event=>setExpenseDate(event.target.value)}/></label>
     <label className="plugExpenseWide">Receipt image or PDF <input type="file" accept="image/*,application/pdf" onChange={event=>{const file=event.target.files?.[0]||null;if(file&&file.size>4*1024*1024){setExpenseNotice("Receipt files must be 4 MB or smaller.");setReceiptFile(null);event.target.value="";return;}setReceiptFile(file);setExpenseNotice("");}}/><small>{receiptFile?receiptFile.name:"Optional · UploadThing attachment · max 4 MB"}</small></label>
