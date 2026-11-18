@@ -1833,6 +1833,7 @@ button.plugProductAction{width:100%;align-items:center;background:transparent;bo
 /* Briefcase navigation must precede owner controls and all workspace panels. */
 .adminPage .adminShell>.plugBriefcaseNav{order:1}
 .adminPage .adminShell>.plugOwnerShift{order:2}
+.adminPage .adminShell>.plugMoneyDashboard{order:3}
 
 /* Vercel traffic report, adapted from the BoardSignal founder analytics panel. */
 .adminPage .plugVercelTraffic{margin-top:16px;padding:16px;border:1px solid #d8e0e9;border-radius:12px;background:#fff;color:#172235}
