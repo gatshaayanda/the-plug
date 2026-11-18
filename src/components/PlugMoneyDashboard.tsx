@@ -78,7 +78,7 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
  const [receiptFile,setReceiptFile]=useState<File|null>(null);
  const [savingExpense,setSavingExpense]=useState(false);
  const [deletingExpense,setDeletingExpense]=useState("");
- const [participationRate,setParticipationRate]=useState(10);
+ const [participationRate,setParticipationRate]=useState<number|null>(null);
  const [participationSaved,setParticipationSaved]=useState<{rate:number;nextRate?:number;activatedAt:string;nextDueAt:string}|null>(null);
  const [participationLoading,setParticipationLoading]=useState(true);
  const [participationSaving,setParticipationSaving]=useState(false);
@@ -159,7 +159,7 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
   const paidTransactions=new Set(eligible.filter(row=>typeof row.request.quotedPrice==="number"&&paymentBreakdown(row.request).total+0.009>=row.request.quotedPrice).map(row=>row.request.id)).size;
   return {eligibleRevenue,previousRevenue,paidTransactions,activity,outstanding,demandViews,requestClicks,change:previousRevenue>0?(eligibleRevenue-previousRevenue)/previousRevenue*100:null};
  },[requests,journeyEvents]);
- const participationAmount=participationSummary.eligibleRevenue*participationRate/100;
+ const participationAmount=participationSummary.eligibleRevenue*(participationRate??0)/100;
  async function recordParticipationPayment(){
   if(!participationSaved||Date.now()<Date.parse(participationSaved.nextDueAt)){setParticipationNotice("The next 30-day participation payment is not due yet.");return;}
   const period=participationSaved.nextDueAt.slice(0,10);
@@ -176,6 +176,7 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
   }catch{setParticipationNotice("The payment was not fully recorded. Check Firebase sync and verify the expense list before retrying.");}
  }
  async function saveParticipation(){
+  if(participationRate===null){setParticipationNotice("Choose a participation rate between 10% and 20% first.");return;}
   const now=new Date(),activatedAt=participationSaved?.activatedAt||now.toISOString(),nextDueAt=participationSaved?.nextDueAt||new Date(now.getTime()+30*86400000).toISOString();
   setParticipationSaving(true);setParticipationNotice("");
   try{if(participationSaved){await setDoc(doc(db,"businessSettings","adminHubParticipation"),{nextRate:participationRate,updatedAt:now.toISOString()},{merge:true});setParticipationSaved({...participationSaved,nextRate:participationRate});}else{await setDoc(doc(db,"businessSettings","adminHubParticipation"),{rate:participationRate,nextRate:participationRate,activatedAt,nextDueAt,updatedAt:now.toISOString(),basis:"completed_paid_recorded_revenue"},{merge:true});setParticipationSaved({rate:participationRate,nextRate:participationRate,activatedAt,nextDueAt});}setParticipationNotice("Saved. Your rate is saved. It applies to the next 30-day period; the current period is unchanged.");}
@@ -283,15 +284,15 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
    </div>
    <div className="plugParticipationRationale"><span>Revenue trend vs previous 30 days</span><strong>{participationSummary.change===null?"No previous-period baseline":(participationSummary.change>=0?"+":"")+participationSummary.change.toFixed(1)+"%"}</strong><small>Demand views and product clicks are supporting signals only; they do not count as revenue.</small></div>
    <div className="plugParticipationChoice">
-    <div className="plugParticipationChoiceHead"><div><span>YOUR CHOICE · ADMIN HUB PARTICIPATION</span><strong>{participationRate}%</strong></div><p>Move the slider to choose the percentage. You stay in control; nothing changes until you save.</p></div>
-    <input aria-label="Admin Hub participation percentage" type="range" min="10" max="20" step="1" value={participationRate} onChange={event=>setParticipationRate(Number(event.target.value))}/>
+    <div className="plugParticipationChoiceHead"><div><span>YOUR CHOICE · ADMIN HUB PARTICIPATION</span><strong>{participationRate===null?"Choose a rate":participationRate+"%"}</strong></div><p>Move the slider to choose a percentage from 10% to 20%. No rate is selected or activated until you choose and save it.</p></div>
+    <input aria-label="Admin Hub participation percentage" type="range" min="10" max="20" step="1" value={participationRate??15} onChange={event=>setParticipationRate(Number(event.target.value))}/>
     <div className="plugParticipationScale"><span>10% · lower contribution</span><span>15% · middle</span><span>20% · higher contribution</span></div>
-    <div className="plugParticipationEstimate"><div><span>At {participationRate}% of eligible payments</span><strong>{money(participationAmount)}</strong><small>Illustration using the last 30 days' eligible recorded payments</small></div><div><span>Next review / due date</span><strong>{participationLoading?"Loading…":participationSaved?dateLabel(participationSaved.nextDueAt):"Set when activated"}</strong></div></div>
+    <div className="plugParticipationEstimate"><div><span>{participationRate===null?"Choose a rate to see the estimate":"At "+participationRate+"% of eligible payments"}</span><strong>{participationRate===null?"—":money(participationAmount)}</strong><small>Illustration using the last 30 days of eligible recorded payments</small></div><div><span>Next review / due date</span><strong>{participationLoading?"Loading…":participationSaved?dateLabel(participationSaved.nextDueAt):"Set when activated"}</strong></div></div>
     <p className="plugParticipationPlain">ELI5: if the business records P1,000 in eligible completed customer payments, 10% is P100 and 20% is P200. This is calculated before business expenses are deducted. More expenses do not reduce the agreed percentage.</p>
    </div>
    <p className="plugFinanceFootnote">The 30-day statement will show the eligible payments, chosen rate and amount due. Changes you make now apply to the next period, not the period already running. This is an agreed operating contribution for Admin Hub's digital platform and services; it is not automatically collected.</p>
    {participationNotice&&<p className="plugExpenseNotice" role="status">{participationNotice}</p>}
-   <div className="plugParticipationActions"><button type="button" className="button buttonPrimary plugExpenseSave" disabled={participationSaving||participationLoading} onClick={()=>void saveParticipation()}>{participationSaving?"Saving…":"Save participation rate"}</button>{participationSaved&&Date.now()>=Date.parse(participationSaved.nextDueAt)&&<button type="button" className="button buttonLight plugExpenseSave" onClick={()=>void recordParticipationPayment()}>Record payment &amp; expense</button>}</div>
+   <div className="plugParticipationActions"><button type="button" className="button buttonPrimary plugExpenseSave" disabled={participationSaving||participationLoading||participationRate===null} onClick={()=>void saveParticipation()}>{participationSaving?"Saving…":"Save participation rate"}</button>{participationSaved&&Date.now()>=Date.parse(participationSaved.nextDueAt)&&<button type="button" className="button buttonLight plugExpenseSave" onClick={()=>void recordParticipationPayment()}>Record payment &amp; expense</button>}</div>
 
    </div>
    {expenseNotice&&<p className="plugExpenseNotice" role="status">{expenseNotice}</p>}
