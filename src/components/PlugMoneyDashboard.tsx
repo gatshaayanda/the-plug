@@ -165,7 +165,7 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
  const previewFee=previewBasis*(serviceFeeRate??0)/100;
  const previewRemainder=Math.max(0,previewBasis-previewFee);
  const previewFeeShare=previewBasis>0?Math.min(100,previewFee/previewBasis*100):0;
- async function recordService feePayment(){
+ async function recordServiceFeePayment(){
   if(!serviceFeeSaved||Date.now()<Date.parse(serviceFeeSaved.nextDueAt)){setServiceFeeNotice("The next 30-day service fee payment is not due yet.");return;}
   const period=serviceFeeSaved.nextDueAt.slice(0,10);
   const periodNote="Admin Hub service fee · "+serviceFeeSaved.rate+"% of completed paid recorded revenue · Period ending "+period;
@@ -180,7 +180,7 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
    setServiceFeeSaved({...serviceFeeSaved,rate:nextRate,nextRate,nextDueAt});setServiceFeeRate(nextRate);setServiceFeeNotice("Payment recorded as an Admin Hub service fee expense. Add the source receipt to the expense record if available.");
   }catch{setServiceFeeNotice("The payment was not fully recorded. Check Firebase sync and verify the expense list before retrying.");}
  }
- async function saveService fee(){
+ async function saveServiceFee(){
   if(serviceFeeRate===null){setServiceFeeNotice("Choose a service rate between 10% and 20% first.");return;}
   const now=new Date(),activatedAt=serviceFeeSaved?.activatedAt||now.toISOString(),nextDueAt=serviceFeeSaved?.nextDueAt||new Date(now.getTime()+30*86400000).toISOString();
   setServiceFeeSaving(true);setServiceFeeNotice("");
@@ -299,7 +299,7 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
    </div>
    <p className="plugFinanceFootnote">The 30-day statement will show the eligible payments, chosen rate and amount due. Changes you make now apply to the next period, not the period already running. This is an agreed software service fee for Admin Hub&apos;s digital platform and services; it is not automatically collected.</p>
    {serviceFeeNotice&&<p className="plugExpenseNotice" role="status">{serviceFeeNotice}</p>}
-   <div className="plugParticipationActions"><button type="button" className="button buttonPrimary plugExpenseSave" disabled={serviceFeeSaving||serviceFeeLoading||serviceFeeRate===null} onClick={()=>void saveService fee()}>{serviceFeeSaving?"Saving…":"Save service rate"}</button>{serviceFeeSaved&&Date.now()>=Date.parse(serviceFeeSaved.nextDueAt)&&<button type="button" className="button buttonLight plugExpenseSave" onClick={()=>void recordService feePayment()}>Record payment &amp; expense</button>}</div>
+   <div className="plugParticipationActions"><button type="button" className="button buttonPrimary plugExpenseSave" disabled={serviceFeeSaving||serviceFeeLoading||serviceFeeRate===null} onClick={()=>void saveServiceFee()}>{serviceFeeSaving?"Saving…":"Save service rate"}</button>{serviceFeeSaved&&Date.now()>=Date.parse(serviceFeeSaved.nextDueAt)&&<button type="button" className="button buttonLight plugExpenseSave" onClick={()=>void recordServiceFeePayment()}>Record payment &amp; expense</button>}</div>
 
    </div>
    {expenseNotice&&<p className="plugExpenseNotice" role="status">{expenseNotice}</p>}
