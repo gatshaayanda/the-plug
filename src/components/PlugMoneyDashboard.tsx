@@ -78,18 +78,18 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
  const [receiptFile,setReceiptFile]=useState<File|null>(null);
  const [savingExpense,setSavingExpense]=useState(false);
  const [deletingExpense,setDeletingExpense]=useState("");
- const [service feeRate,setService feeRate]=useState<number|null>(null);
- const [service feeSaved,setService feeSaved]=useState<{rate:number;nextRate?:number;activatedAt:string;nextDueAt:string}|null>(null);
- const [service feeLoading,setService feeLoading]=useState(true);
- const [service feeSaving,setService feeSaving]=useState(false);
- const [service feeNotice,setService feeNotice]=useState("");
+ const [serviceFeeRate,setServiceFeeRate]=useState<number|null>(null);
+ const [serviceFeeSaved,setServiceFeeSaved]=useState<{rate:number;nextRate?:number;activatedAt:string;nextDueAt:string}|null>(null);
+ const [serviceFeeLoading,setServiceFeeLoading]=useState(true);
+ const [serviceFeeSaving,setServiceFeeSaving]=useState(false);
+ const [serviceFeeNotice,setServiceFeeNotice]=useState("");
  const [showStorefrontReferencePreview,setShowStorefrontReferencePreview]=useState(false);
 
- useEffect(()=>onSnapshot(doc(db,"businessSettings","adminHubService fee"),snapshot=>{
+ useEffect(()=>onSnapshot(doc(db,"businessSettings","adminHubParticipation"),snapshot=>{
   const value=snapshot.exists()?snapshot.data() as {rate?:number;nextRate?:number;activatedAt?:string;nextDueAt?:string}:null;
-  if(value&&typeof value.rate==="number"&&typeof value.activatedAt==="string"&&typeof value.nextDueAt==="string"){setService feeSaved({rate:value.rate,nextRate:value.nextRate,activatedAt:value.activatedAt,nextDueAt:value.nextDueAt});setService feeRate(typeof value.nextRate==="number"?value.nextRate:value.rate)}
-  setService feeLoading(false);
- },()=>{setService feeLoading(false);setService feeNotice("Admin Hub service fee settings could not be loaded. Check Operations permissions.")}),[]);
+  if(value&&typeof value.rate==="number"&&typeof value.activatedAt==="string"&&typeof value.nextDueAt==="string"){setServiceFeeSaved({rate:value.rate,nextRate:value.nextRate,activatedAt:value.activatedAt,nextDueAt:value.nextDueAt});setServiceFeeRate(typeof value.nextRate==="number"?value.nextRate:value.rate)}
+  setServiceFeeLoading(false);
+ },()=>{setServiceFeeLoading(false);setServiceFeeNotice("Admin Hub service fee settings could not be loaded. Check Operations permissions.")}),[]);
 
  useEffect(()=>onSnapshot(query(collection(db,"businessExpenses"),orderBy("date","desc")),snapshot=>{
   setExpenses(snapshot.docs.map(item=>({id:item.id,...item.data()} as Expense)));
@@ -143,7 +143,7 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
  },[requests]);
 
  const expenseTotal=useMemo(()=>expenses.reduce((sum,item)=>sum+validAmount(item.amount),0),[expenses]);
- const service feeSummary=useMemo(()=>{
+ const serviceFeeSummary=useMemo(()=>{
   const now=Date.now(),cutoff=now-30*86400000,previous=cutoff-30*86400000;
   const rows=requests.filter(item=>item.status!=="Cancelled").flatMap(item=>{
    const payments=item.paymentRecords?.length?item.paymentRecords.map(payment=>({amount:validAmount(payment.amount),stamp:Date.parse(payment.recordedAt||"")})):(validAmount(item.depositPaid)>0?[{amount:validAmount(item.depositPaid),stamp:Date.parse(item.depositRecordedAt||"")}]:[]);
@@ -160,33 +160,33 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
   const paidTransactions=new Set(eligible.filter(row=>typeof row.request.quotedPrice==="number"&&paymentBreakdown(row.request).total+0.009>=row.request.quotedPrice).map(row=>row.request.id)).size;
   return {eligibleRevenue,previousRevenue,paidTransactions,activity,outstanding,demandViews,requestClicks,change:previousRevenue>0?(eligibleRevenue-previousRevenue)/previousRevenue*100:null};
  },[requests,journeyEvents]);
- const service feeAmount=service feeSummary.eligibleRevenue*(service feeRate??0)/100;
- const previewBasis=showStorefrontReferencePreview?summary.requestedReferenceValue:service feeSummary.eligibleRevenue;
- const previewFee=previewBasis*(service feeRate??0)/100;
+ const serviceFeeAmount=serviceFeeSummary.eligibleRevenue*(serviceFeeRate??0)/100;
+ const previewBasis=showStorefrontReferencePreview?summary.requestedReferenceValue:serviceFeeSummary.eligibleRevenue;
+ const previewFee=previewBasis*(serviceFeeRate??0)/100;
  const previewRemainder=Math.max(0,previewBasis-previewFee);
  const previewFeeShare=previewBasis>0?Math.min(100,previewFee/previewBasis*100):0;
  async function recordService feePayment(){
-  if(!service feeSaved||Date.now()<Date.parse(service feeSaved.nextDueAt)){setService feeNotice("The next 30-day service fee payment is not due yet.");return;}
-  const period=service feeSaved.nextDueAt.slice(0,10);
-  const periodNote="Admin Hub service fee · "+service feeSaved.rate+"% of completed paid recorded revenue · Period ending "+period;
-  if(expenses.some(item=>item.category==="Admin Hub service fee"&&item.note.includes("Period ending "+period))){setService feeNotice("This period already has an Admin Hub expense record.");return;}
-  const amountDue=service feeSummary.eligibleRevenue*service feeSaved.rate/100;
-  if(amountDue<=0){setService feeNotice("No eligible completed paid revenue was recorded for this period. No service fee payment is due.");return;}
+  if(!serviceFeeSaved||Date.now()<Date.parse(serviceFeeSaved.nextDueAt)){setServiceFeeNotice("The next 30-day service fee payment is not due yet.");return;}
+  const period=serviceFeeSaved.nextDueAt.slice(0,10);
+  const periodNote="Admin Hub service fee · "+serviceFeeSaved.rate+"% of completed paid recorded revenue · Period ending "+period;
+  if(expenses.some(item=>item.category==="Admin Hub service fee"&&item.note.includes("Period ending "+period))){setServiceFeeNotice("This period already has an Admin Hub expense record.");return;}
+  const amountDue=serviceFeeSummary.eligibleRevenue*serviceFeeSaved.rate/100;
+  if(amountDue<=0){setServiceFeeNotice("No eligible completed paid revenue was recorded for this period. No service fee payment is due.");return;}
   const now=new Date().toISOString();
   try{await addDoc(collection(db,"businessExpenses"),{merchant:"Admin Hub",category:"Admin Hub service fee",amount:amountDue,currency:"BWP",date:todayKey(),note:periodNote,createdAt:now,updatedAt:now,createdBy:auth.currentUser?.uid||"",receipt:null});
-   const nextDueAt=new Date(Date.parse(service feeSaved.nextDueAt)+30*86400000).toISOString();
-   const nextRate=service feeSaved.nextRate??service feeSaved.rate;
-   await setDoc(doc(db,"businessSettings","adminHubService fee"),{rate:nextRate,nextRate,lastPaidPeriod:period,nextDueAt,updatedAt:now},{merge:true});
-   setService feeSaved({...service feeSaved,rate:nextRate,nextRate,nextDueAt});setService feeRate(nextRate);setService feeNotice("Payment recorded as an Admin Hub service fee expense. Add the source receipt to the expense record if available.");
-  }catch{setService feeNotice("The payment was not fully recorded. Check Firebase sync and verify the expense list before retrying.");}
+   const nextDueAt=new Date(Date.parse(serviceFeeSaved.nextDueAt)+30*86400000).toISOString();
+   const nextRate=serviceFeeSaved.nextRate??serviceFeeSaved.rate;
+   await setDoc(doc(db,"businessSettings","adminHubParticipation"),{rate:nextRate,nextRate,lastPaidPeriod:period,nextDueAt,updatedAt:now},{merge:true});
+   setServiceFeeSaved({...serviceFeeSaved,rate:nextRate,nextRate,nextDueAt});setServiceFeeRate(nextRate);setServiceFeeNotice("Payment recorded as an Admin Hub service fee expense. Add the source receipt to the expense record if available.");
+  }catch{setServiceFeeNotice("The payment was not fully recorded. Check Firebase sync and verify the expense list before retrying.");}
  }
  async function saveService fee(){
-  if(service feeRate===null){setService feeNotice("Choose a service rate between 10% and 20% first.");return;}
-  const now=new Date(),activatedAt=service feeSaved?.activatedAt||now.toISOString(),nextDueAt=service feeSaved?.nextDueAt||new Date(now.getTime()+30*86400000).toISOString();
-  setService feeSaving(true);setService feeNotice("");
-  try{if(service feeSaved){await setDoc(doc(db,"businessSettings","adminHubService fee"),{nextRate:service feeRate,updatedAt:now.toISOString()},{merge:true});setService feeSaved({...service feeSaved,nextRate:service feeRate});}else{await setDoc(doc(db,"businessSettings","adminHubService fee"),{rate:service feeRate,nextRate:service feeRate,activatedAt,nextDueAt,updatedAt:now.toISOString(),basis:"completed_paid_recorded_revenue"},{merge:true});setService feeSaved({rate:service feeRate,nextRate:service feeRate,activatedAt,nextDueAt});}setService feeNotice("Saved. Your rate is saved. It applies to the next 30-day period; the current period is unchanged.");}
-  catch{setService feeNotice("Settings were not saved. Check Operations permissions and try again.");}
-  finally{setService feeSaving(false);}
+  if(serviceFeeRate===null){setServiceFeeNotice("Choose a service rate between 10% and 20% first.");return;}
+  const now=new Date(),activatedAt=serviceFeeSaved?.activatedAt||now.toISOString(),nextDueAt=serviceFeeSaved?.nextDueAt||new Date(now.getTime()+30*86400000).toISOString();
+  setServiceFeeSaving(true);setServiceFeeNotice("");
+  try{if(serviceFeeSaved){await setDoc(doc(db,"businessSettings","adminHubParticipation"),{nextRate:serviceFeeRate,updatedAt:now.toISOString()},{merge:true});setServiceFeeSaved({...serviceFeeSaved,nextRate:serviceFeeRate});}else{await setDoc(doc(db,"businessSettings","adminHubParticipation"),{rate:serviceFeeRate,nextRate:serviceFeeRate,activatedAt,nextDueAt,updatedAt:now.toISOString(),basis:"completed_paid_recorded_revenue"},{merge:true});setServiceFeeSaved({rate:serviceFeeRate,nextRate:serviceFeeRate,activatedAt,nextDueAt});}setServiceFeeNotice("Saved. Your rate is saved. It applies to the next 30-day period; the current period is unchanged.");}
+  catch{setServiceFeeNotice("Settings were not saved. Check Operations permissions and try again.");}
+  finally{setServiceFeeSaving(false);}
  }
 
  const recordedCashAfterExpenses=summary.payments.total-expenseTotal;
@@ -265,9 +265,9 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
     <article><span>Approved requests awaiting deposit</span><strong>{summary.awaitingDeposit}</strong><small>Approved quotes below the required deposit</small></article>
    </div>
    <p className="plugFinanceFootnote">Recorded payments are owner-entered acknowledgements, not bank-feed verification. The deposit gap is a follow-up estimate. Storefront reference prices can change and are never treated as confirmed quotes.</p>
-   <div className="plugService feePanel">
+   <div className="plugParticipationPanel">
    <div className="panelHeading"><div><span className="kicker">ADMIN HUB · SOFTWARE SERVICE</span><h2>Admin Hub service fee</h2><p className="orderTruth">Your Plug workspace helps customers discover products, enquire and place orders. The service fee is agreed upfront and calculated against eligible completed, paid sales recorded in The Plug.</p></div></div>
-   <div className="plugService feeIntro">
+   <div className="plugParticipationIntro">
     <strong>What Admin Hub has put in place</strong>
     <ul>
      <li><b>Your digital shop:</b> a public storefront where customers can discover products and send sourcing requests.</li>
@@ -279,27 +279,27 @@ export default function PlugMoneyDashboard({journeyEvents,requests,onOpenRequest
     </ul>
     <small>In simple terms: Admin Hub builds and provides the digital tools; the owner runs the business and records the real transactions.</small>
    </div>
-   <div className="plugService feeStats">
-    <article><span>Eligible recorded payments · last 30 days</span><strong>{money(service feeSummary.eligibleRevenue)}</strong><small>From completed requests only</small></article>
-    <article><span>Completed, fully paid transactions</span><strong>{service feeSummary.paidTransactions}</strong></article>
-    <article><span>Customer requests received</span><strong>{service feeSummary.activity}</strong></article>
-    <article><span>Product views</span><strong>{service feeSummary.demandViews}</strong></article>
-    <article><span>Product request clicks</span><strong>{service feeSummary.requestClicks}</strong></article>
-    <article><span>Quoted customer balances still due</span><strong>{money(service feeSummary.outstanding)}</strong></article>
+   <div className="plugParticipationStats">
+    <article><span>Eligible recorded payments · last 30 days</span><strong>{money(serviceFeeSummary.eligibleRevenue)}</strong><small>From completed requests only</small></article>
+    <article><span>Completed, fully paid transactions</span><strong>{serviceFeeSummary.paidTransactions}</strong></article>
+    <article><span>Customer requests received</span><strong>{serviceFeeSummary.activity}</strong></article>
+    <article><span>Product views</span><strong>{serviceFeeSummary.demandViews}</strong></article>
+    <article><span>Product request clicks</span><strong>{serviceFeeSummary.requestClicks}</strong></article>
+    <article><span>Quoted customer balances still due</span><strong>{money(serviceFeeSummary.outstanding)}</strong></article>
    </div>
-   <div className="plugService feeRationale"><span>Revenue trend vs previous 30 days</span><strong>{service feeSummary.change===null?"No previous-period baseline":(service feeSummary.change>=0?"+":"")+service feeSummary.change.toFixed(1)+"%"}</strong><small>Demand views and product clicks are supporting signals only; they do not count as revenue.</small></div>
-   <div className="plugService feeChoice">
-    <div className="plugService feeChoiceHead"><div><span>YOUR CHOICE · ADMIN HUB SERVICE FEE</span><strong>{service feeRate===null?"Choose a rate":service feeRate+"%"}</strong></div><p>Choose a service rate between 10% and 20%. Your saved rate applies prospectively from the next 30-day period.</p></div>
+   <div className="plugParticipationRationale"><span>Revenue trend vs previous 30 days</span><strong>{serviceFeeSummary.change===null?"No previous-period baseline":(serviceFeeSummary.change>=0?"+":"")+serviceFeeSummary.change.toFixed(1)+"%"}</strong><small>Demand views and product clicks are supporting signals only; they do not count as revenue.</small></div>
+   <div className="plugParticipationChoice">
+    <div className="plugParticipationChoiceHead"><div><span>YOUR CHOICE · ADMIN HUB SERVICE FEE</span><strong>{serviceFeeRate===null?"Choose a rate":serviceFeeRate+"%"}</strong></div><p>Choose a service rate between 10% and 20%. Your saved rate applies prospectively from the next 30-day period.</p></div>
      <div className="plugFeePreviewToggle"><div><strong>Preview against storefront requests</strong><small>Use the requested storefront reference value as an illustration—not as a billable sales figure.</small></div><button type="button" role="switch" aria-checked={showStorefrontReferencePreview} className={"plugFeeSwitch"+(showStorefrontReferencePreview?" isOn":"")} onClick={()=>setShowStorefrontReferencePreview(value=>!value)}><span/>{showStorefrontReferencePreview?"On":"Off"}</button></div>
-     <div className="plugFeeVisual" aria-live="polite"><div className="plugFeeVisualHead"><span>{showStorefrontReferencePreview?"REQUESTED STOREFRONT REFERENCE VALUE":"ELIGIBLE COMPLETED, PAID SALES · LAST 30 DAYS"}</span><strong>{money(previewBasis)}</strong></div><div className="plugFeeBar" role="img" aria-label={"Illustrative service fee "+money(previewFee)+" and amount before other operating costs "+money(previewRemainder)}><span className="plugFeeBarCharge" style={{width:previewFeeShare+"%"}}/><span className="plugFeeBarRemainder" style={{width:(100-previewFeeShare)+"%"}}/></div><div className="plugFeeVisualLegend"><span><i className="plugFeeDot charge"/>Admin Hub service fee <b>{service feeRate===null?"Choose rate":money(previewFee)}</b></span><span><i className="plugFeeDot remainder"/>Remaining before other operating costs <b>{service feeRate===null?"—":money(previewRemainder)}</b></span></div>{showStorefrontReferencePreview?<p className="plugFeePreviewNote">Illustrative only: {summary.referenceCount} priced requests · {summary.unpricedRequests} without a reference price. Requests are not confirmed quotes, completed sales or money received. This preview does not change the billing calculation.</p>:<p className="plugFeePreviewNote">This is the live calculation basis. Only eligible completed, paid recorded sales count; unpaid balances, open requests and storefront views are excluded.</p>}</div>
-    <input aria-label="Admin Hub service fee percentage" type="range" min="10" max="20" step="1" value={service feeRate??15} onChange={event=>setService feeRate(Number(event.target.value))}/>
-    <div className="plugService feeScale"><span>10% · lower contribution</span><span>15% · middle</span><span>20% · higher contribution</span></div>
-    <div className="plugService feeEstimate"><div><span>{service feeRate===null?"Choose a rate to see the estimate":"At "+service feeRate+"% of eligible payments"}</span><strong>{service feeRate===null?"—":money(service feeAmount)}</strong><small>Illustration using the last 30 days of eligible recorded payments</small></div><div><span>Next review / due date</span><strong>{service feeLoading?"Loading…":service feeSaved?dateLabel(service feeSaved.nextDueAt):"Set when activated"}</strong></div></div>
-    <p className="plugService feePlain">In simple terms: account for the Admin Hub service fee first, then plan stock, delivery, marketing and other operating expenses. The fee is calculated before those costs are deducted.</p>
+     <div className="plugFeeVisual" aria-live="polite"><div className="plugFeeVisualHead"><span>{showStorefrontReferencePreview?"REQUESTED STOREFRONT REFERENCE VALUE":"ELIGIBLE COMPLETED, PAID SALES · LAST 30 DAYS"}</span><strong>{money(previewBasis)}</strong></div><div className="plugFeeBar" role="img" aria-label={"Illustrative service fee "+money(previewFee)+" and amount before other operating costs "+money(previewRemainder)}><span className="plugFeeBarCharge" style={{width:previewFeeShare+"%"}}/><span className="plugFeeBarRemainder" style={{width:(100-previewFeeShare)+"%"}}/></div><div className="plugFeeVisualLegend"><span><i className="plugFeeDot charge"/>Admin Hub service fee <b>{serviceFeeRate===null?"Choose rate":money(previewFee)}</b></span><span><i className="plugFeeDot remainder"/>Remaining before other operating costs <b>{serviceFeeRate===null?"—":money(previewRemainder)}</b></span></div>{showStorefrontReferencePreview?<p className="plugFeePreviewNote">Illustrative only: {summary.referenceCount} priced requests · {summary.unpricedRequests} without a reference price. Requests are not confirmed quotes, completed sales or money received. This preview does not change the billing calculation.</p>:<p className="plugFeePreviewNote">This is the live calculation basis. Only eligible completed, paid recorded sales count; unpaid balances, open requests and storefront views are excluded.</p>}</div>
+    <input aria-label="Admin Hub service fee percentage" type="range" min="10" max="20" step="1" value={serviceFeeRate??15} onChange={event=>setServiceFeeRate(Number(event.target.value))}/>
+    <div className="plugParticipationScale"><span>10% · lower contribution</span><span>15% · middle</span><span>20% · higher contribution</span></div>
+    <div className="plugParticipationEstimate"><div><span>{serviceFeeRate===null?"Choose a rate to see the estimate":"At "+serviceFeeRate+"% of eligible payments"}</span><strong>{serviceFeeRate===null?"—":money(serviceFeeAmount)}</strong><small>Illustration using the last 30 days of eligible recorded payments</small></div><div><span>Next review / due date</span><strong>{serviceFeeLoading?"Loading…":serviceFeeSaved?dateLabel(serviceFeeSaved.nextDueAt):"Set when activated"}</strong></div></div>
+    <p className="plugParticipationPlain">In simple terms: account for the Admin Hub service fee first, then plan stock, delivery, marketing and other operating expenses. The fee is calculated before those costs are deducted.</p>
    </div>
    <p className="plugFinanceFootnote">The 30-day statement will show the eligible payments, chosen rate and amount due. Changes you make now apply to the next period, not the period already running. This is an agreed software service fee for Admin Hub&apos;s digital platform and services; it is not automatically collected.</p>
-   {service feeNotice&&<p className="plugExpenseNotice" role="status">{service feeNotice}</p>}
-   <div className="plugService feeActions"><button type="button" className="button buttonPrimary plugExpenseSave" disabled={service feeSaving||service feeLoading||service feeRate===null} onClick={()=>void saveService fee()}>{service feeSaving?"Saving…":"Save service rate"}</button>{service feeSaved&&Date.now()>=Date.parse(service feeSaved.nextDueAt)&&<button type="button" className="button buttonLight plugExpenseSave" onClick={()=>void recordService feePayment()}>Record payment &amp; expense</button>}</div>
+   {serviceFeeNotice&&<p className="plugExpenseNotice" role="status">{serviceFeeNotice}</p>}
+   <div className="plugParticipationActions"><button type="button" className="button buttonPrimary plugExpenseSave" disabled={serviceFeeSaving||serviceFeeLoading||serviceFeeRate===null} onClick={()=>void saveService fee()}>{serviceFeeSaving?"Saving…":"Save service rate"}</button>{serviceFeeSaved&&Date.now()>=Date.parse(serviceFeeSaved.nextDueAt)&&<button type="button" className="button buttonLight plugExpenseSave" onClick={()=>void recordService feePayment()}>Record payment &amp; expense</button>}</div>
 
    </div>
    {expenseNotice&&<p className="plugExpenseNotice" role="status">{expenseNotice}</p>}
