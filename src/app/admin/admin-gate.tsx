@@ -93,11 +93,6 @@ export default function AdminGate({ children }: { children: React.ReactNode }) {
     }
   }
 
-  async function signOutAdmin() {
-    await signOut(auth);
-    setAuthorized(false);
-  }
-
   if (checking) {
     return (
       <main className="adminPage">
@@ -112,19 +107,7 @@ export default function AdminGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (user && authorized) {
-    return (
-      <div className="adminAuthorized">
-        <div className="adminSecuritySession">
-          <span>Signed in as {user.email}</span>
-          <button type="button" className="button buttonSecondary" onClick={signOutAdmin}>
-            Sign out
-          </button>
-        </div>
-        {children}
-      </div>
-    );
-  }
+  if (user && authorized) return <div className="adminAuthorized">{children}</div>;
 
   return (
     <main className="adminPage">
@@ -136,7 +119,6 @@ export default function AdminGate({ children }: { children: React.ReactNode }) {
           <button className="button buttonPrimary" type="button" onClick={signIn} disabled={busy}>
             {busy ? "Opening Google sign-in…" : "Continue with Google"}
           </button>
-          <p className="mutedText">Access is restricted to approved administrator accounts.</p>
           {error && <p role="alert" className="notice">{error}</p>}
         </section>
       </div>
