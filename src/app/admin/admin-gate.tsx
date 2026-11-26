@@ -1,69 +1,145 @@
 "use client";
-import {onAuthStateChanged,signInWithCustomToken,signOut,type User} from "firebase/auth";
-import {doc,getDocFromServer,onSnapshot} from "firebase/firestore";
-import {useEffect,useState} from "react";
-import {auth,db} from "@/lib/firebase/client";
 
-function hasAdminRole(data:Record<string,unknown>|undefined){
- return ["owner","staff"].includes(String(data?.role??"").toLowerCase());
+import {
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+  type User,
+} from "firebase/auth";
+import { useEffect, useState } from "react";
+import { auth } from "@/lib/firebase/client";
+
+function friendlyAuthError(error: unknown) {
+  const code =
+    typeof error === "object" && error !== null && "code" in error
+      ? String((error as { code?: unknown }).code)
+      : "";
+
+  if (code === "auth/popup-closed-by-user") return "The Google sign-in window was closed before completion.";
+  if (code === "auth/popup-blocked") return "Your browser blocked the Google sign-in window. Allow pop-ups and try again.";
+  if (code === "auth/cancelled-popup-request") return "Another Google sign-in request is already open.";
+  if (code === "auth/network-request-failed") return "We could not reach Firebase. Check your internet connection and try again.";
+  if (code === "auth/unauthorized-domain") return "This domain is not authorised for Google sign-in in the Firebase project.";
+  if (code === "auth/operation-not-allowed") return "Google sign-in is not enabled in the Firebase Authentication settings.";
+  return error instanceof Error ? error.message : "We could not complete Google sign-in. Please try again.";
 }
 
-function friendlyAuthError(err:unknown){
- const code=typeof err==="object"&&err!==null&&"code" in err?String((err as {code?:unknown}).code):"";
- if(["auth/invalid-credential","auth/wrong-password","auth/user-not-found","auth/invalid-login-credentials"].includes(code)){
-  return "Sign-in failed. Check your email and password and try again.";
- }
- if(code==="auth/too-many-requests") return "Too many sign-in attempts. Wait a moment and try again.";
- if(code==="auth/network-request-failed") return "We could not reach Firebase. Check your internet connection and try again.";
- if(code==="permission-denied"||code==="firestore/permission-denied") return "The Operations account could not verify its admin access. Check that the Firebase web app and server credentials use the same project.";
- return err instanceof Error?err.message:"We could not sign you in. Check your details.";
-}
+export default function AdminGate({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [checking, setChecking] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
-export default function AdminGate({children}:{children:React.ReactNode}){
- const[user,setUser]=useState<User|null>(null),[checking,setChecking]=useState(true),[authorized,setAuthorized]=useState(false),[accessWord,setAccessWord]=useState(""),[error,setError]=useState(""),[busy,setBusy]=useState(false);
+  useEffect(() => {
+    let active = true;
+    let revision = 0;
 
- useEffect(()=>{
-  let stopAdmin:undefined|(()=>void);
-  const stopAuth=onAuthStateChanged(auth,next=>{
-   if(stopAdmin){stopAdmin();stopAdmin=undefined}
-   setUser(next);
-   setChecking(true);
-   if(!next){setAuthorized(false);setChecking(false);return}
-   stopAdmin=onSnapshot(doc(db,"admins",next.uid),{includeMetadataChanges:true},snapshot=>{
-    // Persistent Firestore cache can initially report a missing document even
-    // though the server-side one-word login has just created it. Never reject
-    // an admin based on that provisional cache result.
-    if(snapshot.metadata.fromCache)return;
-    const allowed=snapshot.exists()&&hasAdminRole(snapshot.data());
-    setAuthorized(allowed);
-     setChecking(false);
-    if(!allowed)void signOut(auth);
-   },()=>{
-    setChecking(false);
-   });
-  });
-  return ()=>{if(stopAdmin)stopAdmin();stopAuth()};
- },[]);
+    const stopAuth = onAuthStateChanged(auth, async (nextUser) => {
+      const currentRevision = ++revision;
+      if (!active) return;
+      setUser(nextUser);
+      setAuthorized(false);
+      setChecking(Boolean(nextUser));
+      if (!nextUser) {
+        setChecking(false);
+        return;
+      }
 
- async function signIn(e:React.FormEvent){
-  e.preventDefault();setBusy(true);setError("");
-  try{
-   const response=await fetch("/api/operations-login",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({word:accessWord})});
-   const payload=await response.json() as {token?:string;error?:string};
-   if(!response.ok||!payload.token)throw new Error(payload.error??"Access denied. Check the access word and try again.");
-   const credential=await signInWithCustomToken(auth,payload.token);
-   // Force a server read: getDoc() may return a stale/empty persistent-cache
-   // entry immediately after the server creates the temporary Operations UID.
-   const adminSnapshot=await getDocFromServer(doc(db,"admins",credential.user.uid));
-   if(!adminSnapshot.exists()||!hasAdminRole(adminSnapshot.data())){
-    setError("This Operations account is missing its owner/staff role. The server login completed, but the admin record could not be verified.");
+      try {
+        const idToken = await nextUser.getIdToken();
+        const response = await fetch("/api/admin-auth", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ idToken }),
+          cache: "no-store",
+        });
+        const payload = (await response.json().catch(() => ({}))) as { error?: string };
+        if (!response.ok) throw new Error(payload.error || "This Google account is not approved for Operations access.");
+
+        if (!active || currentRevision !== revision) return;
+        setAuthorized(true);
+        setError("");
+      } catch (authError) {
+        if (!active || currentRevision !== revision) return;
+        setError(friendlyAuthError(authError));
+        await signOut(auth);
+      } finally {
+        if (active && currentRevision === revision) setChecking(false);
+      }
+    });
+
+    return () => {
+      active = false;
+      revision++;
+      stopAuth();
+    };
+  }, []);
+
+  async function signIn() {
+    setBusy(true);
+    setError("");
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+      await signInWithPopup(auth, provider);
+      // onAuthStateChanged verifies the Google identity with the trusted server
+      // before the Operations dashboard is rendered.
+    } catch (authError) {
+      setError(friendlyAuthError(authError));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function signOutAdmin() {
     await signOut(auth);
-   }else{setAuthorized(true);setAccessWord("");setError("")}
-  }catch(err){setError(friendlyAuthError(err));}
-  finally{setBusy(false)}
- }
+    setAuthorized(false);
+  }
 
- if(checking)return <main className="adminPage"><div className="adminShell"><div className="emptyState"><div>🔐</div><h1>Opening The Plug Admin</h1><p>Checking access…</p></div></div></main>;
- if(user&&authorized)return <div className="adminAuthorized">{children}</div>;
- return <main className="adminPage"><div className="adminShell"><section className="adminPanel" style={{maxWidth:520,margin:"80px auto"}}><span className="kicker">The Plug · Operations</span><h1>Operations sign in</h1><p>Enter your Operations access word to manage sourcing requests, catalogue and customer conversations.</p><form className="adminForm" onSubmit={signIn}><label>Access word<input type="password" value={accessWord} onChange={e=>setAccessWord(e.target.value)} autoComplete="current-password" required autoFocus/></label><button className="button buttonPrimary" type="submit" disabled={busy}>{busy?"Checking access…":"Enter Operations"}</button></form>{error&&<p role="alert" className="notice">{error}</p>}</section></div></main>
+  if (checking) {
+    return (
+      <main className="adminPage">
+        <div className="adminShell">
+          <div className="emptyState">
+            <div>🔐</div>
+            <h1>Opening The Plug Admin</h1>
+            <p>Verifying your Google account and Operations permissions…</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (user && authorized) {
+    return (
+      <div className="adminAuthorized">
+        <div className="adminSecuritySession">
+          <span>Signed in as {user.email}</span>
+          <button type="button" className="button buttonSecondary" onClick={signOutAdmin}>
+            Sign out
+          </button>
+        </div>
+        {children}
+      </div>
+    );
+  }
+
+  return (
+    <main className="adminPage">
+      <div className="adminShell">
+        <section className="adminPanel" style={{ maxWidth: 520, margin: "80px auto" }}>
+          <span className="kicker">The Plug · Operations</span>
+          <h1>Operations sign in</h1>
+          <p>Use an approved Google account to securely access sourcing requests, catalogue and customer conversations.</p>
+          <button className="button buttonPrimary" type="button" onClick={signIn} disabled={busy}>
+            {busy ? "Opening Google sign-in…" : "Continue with Google"}
+          </button>
+          <p className="mutedText">Access is restricted to approved administrator accounts.</p>
+          {error && <p role="alert" className="notice">{error}</p>}
+        </section>
+      </div>
+    </main>
+  );
 }
