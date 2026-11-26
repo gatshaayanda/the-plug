@@ -13,7 +13,7 @@ The server verifies the Firebase ID token (including revocation), requires the G
 - frankchiwanga@yahoo.com
 - gatshaayanda@gmail.com
 
-Only after those checks does the trusted Firebase Admin SDK create or update the caller's `admins/{uid}` role record. Firestore and Storage administrator rules continue to require that trusted role record. The browser cannot create or edit administrator role records.
+Only after those checks does the trusted Firebase Admin SDK create or update the caller's `admins/{uid}` role record. Firestore and Storage administrator rules continue to require that trusted role record. The browser cannot create or edit administrator role records. Firestore and Storage rules independently require the same verified Google identity and exact email allowlist as defence in depth. The legacy shared Operations UID is retired during approved administrator sign-in: its role record is deleted and any existing refresh tokens are revoked.
 
 Successful administrator sign-ins are recorded in the server-only `adminSecurityEvents` collection. The collection is not exposed by client Firestore rules; unmatched access remains denied.
 
@@ -23,7 +23,7 @@ Successful administrator sign-ins are recorded in the server-only `adminSecurity
 |---|---|---|
 | Admin identity | Google OAuth 2.0 via Firebase Authentication | Implemented in application code; Firebase Console provider/domain configuration must be verified |
 | Token validation | Firebase Admin SDK ID-token verification with revocation check | Implemented |
-| Admin authorization | Exact email allowlist + verified email + Google provider + trusted Firestore role record | Implemented |
+| Admin authorization | Exact email allowlist + verified email + Google provider + trusted Firestore role record | Implemented in server endpoint and Firestore/Storage rules |
 | Data authorization | Firestore Security Rules; owner-scoped customer records; role-gated admin records | Existing baseline retained; full collection-by-collection audit pending |
 | File authorization | Firebase Storage Security Rules with role and ownership checks, size/type limits | Existing baseline retained; full path audit pending |
 | Transport security | HTTPS/TLS for production traffic and Firebase endpoints | Platform-managed; deployment configuration still requires verification |
