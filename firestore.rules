@@ -11,8 +11,16 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == uid;
     }
 
-    function isAdmin() {
+    function isApprovedAdminIdentity() {
       return signedIn()
+        && request.auth.token.email is string
+        && request.auth.token.email_verified == true
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.auth.token.email in ['frankchiwanga@yahoo.com', 'gatshaayanda@gmail.com'];
+    }
+
+    function isAdmin() {
+      return isApprovedAdminIdentity()
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
         && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role in ['owner', 'staff', 'Owner', 'Staff'];
     }
