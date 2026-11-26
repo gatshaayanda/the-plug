@@ -36,6 +36,21 @@ export async function POST(request: Request) {
     }
 
     const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // Retire the legacy shared one-word Operations identity. Its Firestore
+    // role record is removed and any existing refresh tokens are revoked.
+    const legacyOperationsUid = "the-plug-temporary-operations";
+    try {
+      await auth.revokeRefreshTokens(legacyOperationsUid);
+    } catch (legacyAuthError) {
+      const code = typeof legacyAuthError === "object" && legacyAuthError !== null && "code" in legacyAuthError
+        ? String((legacyAuthError as { code?: unknown }).code)
+        : "";
+      if (code !== "auth/user-not-found") throw legacyAuthError;
+    }
+    await db.collection("admins").doc(legacyOperationsUid).delete();
+
     const adminRef = db.collection("admins").doc(decoded.uid);
     const existing = await adminRef.get();
     const now = FieldValue.serverTimestamp();
